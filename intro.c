@@ -17,9 +17,9 @@ void cd(char *path){
 void ler(char *file){
 	printf("Lendo arquivo %s\n", file);
 	char a;
-	FILE *f = null;
+	FILE *f;
 	f = fopen(file, "r");
-	if (f == null) {
+	if (!f) {
 		printf("Arquivo nao encontrado\n");
 		return;
 	}
