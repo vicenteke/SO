@@ -9,7 +9,7 @@ CPU::Context::Context(void (* func)(Tn ...), Tn ... an) {
     //Setting up _context
     getcontext(&_context);
     _context.uc_link            = 0;
-    _context.uc_stack.ss_sp     = malloc(STACK_SIZE);
+    _context.uc_stack.ss_sp     = malloc(STACK_SIZE); //Can we use 'new' and 'delete'?
     _context.uc_stack.ss_size   = STACK_SIZE;
     _context.uc_stack.ss_flags  = 0;
 
