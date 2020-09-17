@@ -16,7 +16,7 @@ void CPU::Context::load()
 CPU::Context::~Context()
 {
     //delete _context.uc_stack.ss_sp;
-    free(_context.uc_stack.ss_sp);
+    operator delete(stack);
     //delete _stack; ??
     VALGRIND_STACK_DEREGISTER(valcontext);
 }

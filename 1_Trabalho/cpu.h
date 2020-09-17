@@ -23,11 +23,10 @@ class CPU
             template<typename ... Tn>
             Context(void (* func)(Tn ...), Tn ... an) {
 
-                void *stack;
                 //Setting up _context
                 getcontext(&_context);
 
-                stack = malloc(STACK_SIZE);
+                stack = operator new(STACK_SIZE);
 
                 valcontext = VALGRIND_STACK_REGISTER(stack, ((uint8_t*)stack) + STACK_SIZE);
 
@@ -52,6 +51,7 @@ class CPU
         public:
             ucontext_t _context;
             int valcontext;
+            void *stack = NULL;
         };
 
     public:
