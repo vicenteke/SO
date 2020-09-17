@@ -31,7 +31,7 @@ class CPU
                 _context.uc_stack.ss_flags  = 0;
 
                 //Attaching func to _context
-                makecontext(&(_context), (void (*) (void))func, 1, an ...);
+                makecontext(&(_context), (void (*) (void))func, sizeof...(an), an ...);
             }
 
             ~Context();
