@@ -19,7 +19,20 @@ class CPU
             Context() { _stack = 0; }
 
             template<typename ... Tn>
-            Context(void (* func)(Tn ...), Tn ... an);
+            Context(void (* func)(Tn ...), Tn ... an) {
+
+                //Setting up _context
+                getcontext(&_context);
+                _context.uc_link            = 0;
+                //_context.uc_stack.ss_sp     = new char [STACK_SIZE]; //Can we use 'new' and 'delete'?
+                _context.uc_stack.ss_sp     = malloc(STACK_SIZE); //Can we use 'new' and 'delete'?
+                _stack = (char*) _context.uc_stack.ss_sp;
+                _context.uc_stack.ss_size   = STACK_SIZE;
+                _context.uc_stack.ss_flags  = 0;
+
+                //Attaching func to _context
+                makecontext(&(_context), (void (*) (void))func, 1, an ...);
+            }
 
             ~Context();
 

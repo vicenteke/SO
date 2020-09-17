@@ -3,20 +3,6 @@
 
 __BEGIN_API
 
-template<typename ... Tn>
-CPU::Context::Context(void (* func)(Tn ...), Tn ... an) {
-
-    //Setting up _context
-    getcontext(&_context);
-    _context.uc_link            = 0;
-    _context.uc_stack.ss_sp     = malloc(STACK_SIZE); //Can we use 'new' and 'delete'?
-    _context.uc_stack.ss_size   = STACK_SIZE;
-    _context.uc_stack.ss_flags  = 0;
-
-    //Attaching func to _context
-    makecontext(&_context, func(an ...));
-}
-
 void CPU::Context::save()
 {
     getcontext(&_context);
@@ -29,13 +15,14 @@ void CPU::Context::load()
 
 CPU::Context::~Context()
 {
+    //delete _context.uc_stack.ss_sp;
     free(_context.uc_stack.ss_sp);
     //delete _stack; ??
 }
 
 void CPU::switch_context(Context *from, Context *to)
 {
-     //swapcontext()
+     swapcontext(&(from->_context), &(to->_context));
 }
 
 __END_API
