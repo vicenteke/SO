@@ -18,6 +18,7 @@ CPU::Context::~Context()
     //delete _context.uc_stack.ss_sp;
     free(_context.uc_stack.ss_sp);
     //delete _stack; ??
+    VALGRIND_STACK_DEREGISTER(valcontext);
 }
 
 void CPU::switch_context(Context *from, Context *to)

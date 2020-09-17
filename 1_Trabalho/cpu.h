@@ -4,6 +4,8 @@
 #include <ucontext.h>
 #include <iostream>
 #include "traits.h"
+#include <valgrind/valgrind.h>
+
 
 __BEGIN_API
 
@@ -21,11 +23,17 @@ class CPU
             template<typename ... Tn>
             Context(void (* func)(Tn ...), Tn ... an) {
 
+                void *stack;
                 //Setting up _context
                 getcontext(&_context);
+
+                stack = malloc(STACK_SIZE);
+
+                valcontext = VALGRIND_STACK_REGISTER(stack, ((uint8_t*)stack) + STACK_SIZE);
+
                 _context.uc_link            = 0;
                 //_context.uc_stack.ss_sp     = new char [STACK_SIZE]; //Can we use 'new' and 'delete'?
-                _context.uc_stack.ss_sp     = malloc(STACK_SIZE); //Can we use 'new' and 'delete'?
+                _context.uc_stack.ss_sp     = stack; //Can we use 'new' and 'delete'?
                 _stack = (char*) _context.uc_stack.ss_sp;
                 _context.uc_stack.ss_size   = STACK_SIZE;
                 _context.uc_stack.ss_flags  = 0;
@@ -43,6 +51,7 @@ class CPU
             char *_stack;
         public:
             ucontext_t _context;
+            int valcontext;
         };
 
     public:
