@@ -6,6 +6,6 @@ valgrind:
 	g++ main.cc main_class.cc cpu.cc -o s -v
 	valgrind ./s
 
-clear:
-	rm -f *.o *~
+clean:
+	rm -f *.o s
 	clear
