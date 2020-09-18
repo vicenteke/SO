@@ -4,6 +4,8 @@
 #include <ucontext.h>
 #include <iostream>
 #include "traits.h"
+#include <valgrind/valgrind.h>
+
 
 __BEGIN_API
 
@@ -24,8 +26,11 @@ class CPU
                 //Setting up _context
                 getcontext(&_context);
                 _context.uc_link            = 0;
-                //_context.uc_stack.ss_sp     = new char [STACK_SIZE]; //Can we use 'new' and 'delete'?
-                _context.uc_stack.ss_sp     = malloc(STACK_SIZE); //Can we use 'new' and 'delete'?
+                _context.uc_stack.ss_sp     = operator new(STACK_SIZE);
+
+                //Command necessary to avoid Valgrind's misinterpretation of context changing operations
+                valcontext = VALGRIND_STACK_REGISTER(_context.uc_stack.ss_sp, ((uint8_t*)_context.uc_stack.ss_sp) + STACK_SIZE);
+
                 _stack = (char*) _context.uc_stack.ss_sp;
                 _context.uc_stack.ss_size   = STACK_SIZE;
                 _context.uc_stack.ss_flags  = 0;
@@ -43,10 +48,10 @@ class CPU
             char *_stack;
         public:
             ucontext_t _context;
+            int valcontext; //Necessary to avoid Valgrind's misinterpretation of context changing
         };
 
     public:
-
         static void switch_context(Context *from, Context *to);
 
 };
