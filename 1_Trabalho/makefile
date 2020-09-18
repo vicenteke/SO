@@ -5,7 +5,7 @@ make:
 valgrind:
 	g++ main.cc main_class.cc cpu.cc -o s -v
 	valgrind ./s --track-origins=yes
-	
+
 valg:
 	g++ main.cc main_class.cc cpu.cc -o s
 	valgrind ./s --track-origins=yes
