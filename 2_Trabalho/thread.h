@@ -67,6 +67,9 @@ private:
 template<typename ... Tn>
 Thread::Thread(void (* entry)(Tn ...), Tn ... an) {
     _context = new Context(entry, an...);
+
+    if (!running())
+        _running = this;
 }
 
 __END_API
