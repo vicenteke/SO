@@ -1,15 +1,15 @@
 CC_FILES=$(wildcard *.cc)
 
 make:
-	g++ $(CC_FILES) -o s -g
+	g++ -std=c++1z $(CC_FILES) -o s -g
 	./s
 
 valgrind:
-	g++ $(CC_FILES) -o s -v
+	g++ -std=c++1z $(CC_FILES) -o s -v
 	valgrind ./s --track-origins=yes
 
 valg:
-	g++ $(CC_FILES) -o s
+	g++ -std=c++1z $(CC_FILES) -o s
 	valgrind ./s --track-origins=yes
 
 clean:
