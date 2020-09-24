@@ -57,7 +57,7 @@ public:
 private:
     int _id;
     Context * volatile _context;
-    inline static Thread * _running = NULL;
+    inline static Thread * _running;
 
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
