@@ -25,7 +25,7 @@ CPU::Context::~Context()
 void CPU::switch_context(Context *from, Context *to)
 {
     //Switches from context 'from' to 'to'
-    swapcontext(&(from->_context), &(to->_context));
+    errno = swapcontext(&(from->_context), &(to->_context));
 }
 
 __END_API

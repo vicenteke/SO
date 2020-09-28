@@ -36,7 +36,6 @@ class CPU
                 _stack = (char*) _context.uc_stack.ss_sp;
                 _context.uc_stack.ss_size   = STACK_SIZE;
                 _context.uc_stack.ss_flags  = 0;
-                errno = 0;
 
                 //Attaching func to _context
                 makecontext(&(_context), (void (*) (void))func, sizeof...(an), an ...);
