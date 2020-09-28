@@ -58,6 +58,7 @@ private:
     int _id;
     Context * volatile _context;
     inline static Thread * _running;
+    static int _numberofthreads;
 
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
@@ -67,6 +68,9 @@ private:
 template<typename ... Tn>
 Thread::Thread(void (* entry)(Tn ...), Tn ... an) {
     _context = new Context(entry, an...);
+
+    _id = _numberofthreads;
+    _numberofthreads++;
 
     if (!running())
         _running = this;

@@ -2,6 +2,9 @@
 
 __BEGIN_API
 
+//Initialize the static variable _numberofthreads
+int Thread::_numberofthreads = 0;
+
 //Switches contexts. Returns 0 if OK, otherwise returns -1
 int Thread::switch_context(Thread * prev, Thread * next) {
     CPU::switch_context(prev->context(), next->context());
