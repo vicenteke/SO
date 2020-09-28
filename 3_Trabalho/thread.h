@@ -95,9 +95,21 @@ public:
      * Qualquer outro método que você achar necessário para a solução.
      */
 
-     Context * context() {
-         return _context;
-     }
+    Context * context() {
+        return _context;
+    }
+
+    void state(State s) {
+        _state = s;
+    }
+
+    State state() {
+        return _state;
+    }
+
+    Ready_Queue::Element * link() {
+        return &_link;
+    }
 
 private:
     int _id;
@@ -106,7 +118,7 @@ private:
 
     inline static Thread *_main;
     inline static CPU::Context _main_context;
-    inline static Thread _dispatcher;
+    static Thread _dispatcher;
     inline static Ready_Queue _ready;
     Ready_Queue::Element _link;
     volatile State _state;
@@ -118,13 +130,11 @@ private:
 };
 
 template<typename ... Tn>
-inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : /* inicialização de _link */
+inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chrono::duration_cast<std::chrono::microseconds>
+        (std::chrono::high_resolution_clock::now().time_since_epoch()).count()))
 {
     _context = new Context(entry, an...);
     _state = READY;
-
-    _link(this, (std::chrono::duration_cast<std::chrono::microseconds>
-            (std::chrono::high_resolution_clock::now().time_since_epoch()).count()));
 }
 
 __END_API

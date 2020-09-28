@@ -9,14 +9,28 @@
 
 __BEGIN_API
 
-class CPU; //declaração das classes criadas nos trabalhos devem ser colocadas aqui
+//Classes' declarations
+class CPU;
 class Context;
 class Thread;
 class Debug;
 class System;
 class Main;
 
-//declaração da classe Traits
+class List_Element_Rank;
+namespace List_Elements {
+    template<typename T, typename R>
+    class Doubly_Linked_Ordered;
+};
+
+class Lists;
+template<typename T,
+          typename R,
+          typename El,
+          bool relative>
+class Ordered_List;
+
+//Class Traits declaration
 template<typename T>
 struct Traits {
     static const bool debugged = false;
@@ -28,6 +42,8 @@ template<> struct Traits<CPU>
     static const bool debugged = true;
 };
 
+//Sets if debugging levels are active
+//Each class can disable or enable it for itself through (bool) "debugged"
 template<> struct Traits<Debug>: public Traits<void>
 {
     static const bool error = false;
@@ -54,6 +70,16 @@ template<> struct Traits<Thread> : public Traits<void>
 template<> struct Traits<Main> : public Traits<void>
 {
     static const bool debugged = true;
+};
+
+template<> struct Traits<Lists> : public Traits<void>
+{
+    static const bool debugged = false;
+};
+
+template<typename T, typename R, typename El, bool relative> struct Traits<Ordered_List<T, R, El, relative>> : public Traits<void>
+{
+    static const bool debugged = false;
 };
 
 __END_API
