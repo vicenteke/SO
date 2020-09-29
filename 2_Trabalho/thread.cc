@@ -4,8 +4,8 @@ __BEGIN_API
 
 //Switches contexts. Returns 0 if OK, otherwise returns -1
 int Thread::switch_context(Thread * prev, Thread * next) {
-    CPU::switch_context(prev->context(), next->context());
     Thread::_running = next;
+    CPU::switch_context(prev->context(), next->context());
 
     //Debugging implementation. To use it, enable in traits.h
 	//db<Thread>(TRC) << "errno = " << errno << "\n";
