@@ -23,8 +23,9 @@ int Thread::switch_context(Thread * prev, Thread * next) {
  */
 void Thread::thread_exit (int exit_code) {
     _state = FINISHING;
-    Thread::_ready.remove(link());
+    //Thread::_ready.remove(link());
     delete(_context);
+    Thread::yield();
 }
 
 /*
