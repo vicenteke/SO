@@ -8,7 +8,7 @@ int Thread::switch_context(Thread * prev, Thread * next) {
     Thread::_running = next;
 
     //Debugging implementation. To use it, enable in traits.h
-	db<Thread>(TRC) << "errno = " << errno << "\n";
+	//db<Thread>(TRC) << "errno = " << errno << "\n";
     db<Thread>(INF) << "errno = " << errno << "\n";
     db<Thread>(WRN) << "errno = " << errno << "\n";
     db<Thread>(ERR) << "errno = " << errno << "\n";
