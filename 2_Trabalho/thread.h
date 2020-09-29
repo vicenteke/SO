@@ -58,7 +58,7 @@ private:
     int _id;
     Context * volatile _context;
     inline static Thread * _running;
-    static int _numberofthreads;
+    inline static int _numberofthreads = 0;
 
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
