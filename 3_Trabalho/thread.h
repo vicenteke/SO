@@ -114,7 +114,7 @@ public:
 private:
     int _id;
     Context * volatile _context;
-    inline static Thread * _running;
+    inline static Thread * _running = NULL;
 
     inline static Thread *_main;
     inline static CPU::Context _main_context;
@@ -133,14 +133,13 @@ template<typename ... Tn>
 inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chrono::duration_cast<std::chrono::microseconds>
         (std::chrono::high_resolution_clock::now().time_since_epoch()).count()))
 {
-    _context = new Context(entry, an...);
     _state = READY;
 
     _id = _numberofthreads;
     _numberofthreads++;
     db<Thread>(TRC) << "Thread " << _id << " created\n";
 
-    Thread::_ready.insert(_link);
+    Thread::_ready.insert(&_link);
     Thread::yield();
 
 }

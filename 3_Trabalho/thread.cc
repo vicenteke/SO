@@ -23,6 +23,7 @@ int Thread::switch_context(Thread * prev, Thread * next) {
  */
 void Thread::thread_exit (int exit_code) {
     _state = FINISHING;
+    //Thread::_ready.remove(link());
     delete(_context);
     Thread::yield();
 }
@@ -45,7 +46,7 @@ void Thread::dispatcher() {
 db<Thread>(TRC)<<"Dispatcher called\n";
 
     // enquanto existir thread do usuário:
-    while (!Thread::_ready.empty()) {
+    while (Thread::_ready.size() > 2) {
         // escolha uma próxima thread a ser executada
         Ready_Queue::Element * next_link = Thread::_ready.remove();
         Thread * next = next_link->object();
@@ -69,6 +70,7 @@ db<Thread>(TRC)<<"Dispatcher called\n";
         }
     }
 
+    db<Thread>(TRC)<<"Dispatcher saying bye\n";
     // muda o estado da thread dispatcher para FINISHING
     Thread::_dispatcher.state(FINISHING);
 
@@ -86,14 +88,20 @@ db<Thread>(TRC)<<"Dispatcher called\n";
 void Thread::init(void (*main)(void *)) {
 
     //Cria Thread main;
-    Thread* Main = new Thread((void (*) (void))main);
+    std::string main_name = "main";
+    Thread* Main = new Thread((void (*) (char*))main, (char*) main_name.data());
 
     //Cria Thread dispatcher;
     Thread * dispatcher_pointer = new Thread(Thread::dispatcher);
     Thread::_dispatcher = *dispatcher_pointer;
 
+    //Thread::_dispatcher.context()->load();
+
     //Troca o contexto para a Thread main;
-    //Thread::switch_context(this, Main);
+    // CPU::Context * cont = new CPU::Context();
+    // cont->save();
+    // CPU::switch_context(cont, Main->context());
+    // db<Thread>(TRC)<<"Thread::init 1\n";
     Main->context()->load();
 }
 

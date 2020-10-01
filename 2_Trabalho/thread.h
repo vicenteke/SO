@@ -71,6 +71,7 @@ Thread::Thread(void (* entry)(Tn ...), Tn ... an) {
 
     _id = _numberofthreads;
     _numberofthreads++;
+
     db<Thread>(TRC) << "Thread " << _id << " created\n";
 
     if (!running())
