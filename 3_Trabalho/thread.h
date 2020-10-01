@@ -133,15 +133,21 @@ template<typename ... Tn>
 inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chrono::duration_cast<std::chrono::microseconds>
         (std::chrono::high_resolution_clock::now().time_since_epoch()).count()))
 {
-    _state = READY;
-
     _id = _numberofthreads;
     _numberofthreads++;
     db<Thread>(TRC) << "Thread " << _id << " created\n";
 
-    Thread::_ready.insert(&_link);
-    Thread::yield();
+    if (_id == 0) {
+        _running = this;
+        _state = RUNNING;
+    }
 
+    _context = new Context(entry, an...);
+
+    _state = READY;
+    Thread::_ready.insert(&_link);
+
+    Thread::yield();
 }
 
 __END_API

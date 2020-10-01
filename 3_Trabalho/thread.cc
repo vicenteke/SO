@@ -11,6 +11,8 @@ Thread Thread::_dispatcher;
  * Valor de retorno é negativo se houve erro, ou zero.
  */
 int Thread::switch_context(Thread * prev, Thread * next) {
+    db<Thread>(TRC) << "Thread::switch_context called\n";
+
     Thread::_running = next;
     CPU::switch_context(prev->context(), next->context());
     return errno;
@@ -22,6 +24,8 @@ int Thread::switch_context(Thread * prev, Thread * next) {
  * Quando a thread encerra, o controle deve retornar à main.
  */
 void Thread::thread_exit (int exit_code) {
+    db<Thread>(TRC) << "thread_exit called for Thread " << this->id() << "\n";
+
     _state = FINISHING;
     //Thread::_ready.remove(link());
     delete(_context);
@@ -70,7 +74,7 @@ db<Thread>(TRC)<<"Dispatcher called\n";
         }
     }
 
-    db<Thread>(TRC)<<"Dispatcher saying bye\n";
+    db<Thread>(TRC)<<"Dispatcher finishing\n";
     // muda o estado da thread dispatcher para FINISHING
     Thread::_dispatcher.state(FINISHING);
 
@@ -86,6 +90,8 @@ db<Thread>(TRC)<<"Dispatcher called\n";
  * Cria as Threads main e dispatcher.
  */
 void Thread::init(void (*main)(void *)) {
+
+    db<Thread>(TRC) << "Thread::init called\n";
 
     //Cria Thread main;
     std::string main_name = "main";
@@ -155,6 +161,7 @@ void Thread::yield() {
  * Destrutor de uma thread. Realiza todo os procedimentos para manter a consistência da classe.
  */
 Thread::~Thread() {
+    db<Thread>(TRC) << "~Thread() for Thread " << this->id() << "\n";
     thread_exit(0);
 }
 
