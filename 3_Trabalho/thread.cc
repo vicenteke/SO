@@ -57,14 +57,20 @@ void Thread::dispatcher() {
         Ready_Queue::Element * next_link = Thread::_ready.remove();
         Thread * next = next_link->object();
 
-        //next é uma thread do usuário? (!= Main)
-        while (next->id() == Thread::_main->id() && Thread::_ready.size() > 2) {
+        //next é uma thread do usuário? (!= Main e dispatcher)
+
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        int i = 0;
+        while ((next->id() == Thread::_main->id() || next->id() == Thread::_dispatcher.id()) && Thread::_ready.size() > 2 && i++ < 5) {
             db<Thread>(INF) << "next is not user thread, but there are still some. Recalculating.\n";
+
+            Ready_Queue::Element * buffer = next_link;
 
             next_link = Thread::_ready.remove();
             next = next_link->object();
 
-            Thread::_ready.insert(Thread::_main->link());
+            if (i < 4)
+            Thread::_ready.insert(buffer);
         }
 
         // atualiza o status da própria thread dispatacher para READY e reinsire a mesma em _ready
@@ -114,11 +120,12 @@ void Thread::init(void (*main)(void *)) {
     Thread::_main_context = *Main->context();
 
     //Cria Thread dispatcher;
-    Thread * dispatcher_pointer = new Thread(Thread::dispatcher);
+    Thread * dispatcher_pointer = new Thread(&Thread::dispatcher);
     Thread::_dispatcher = *dispatcher_pointer;
 
     //Troca o contexto para a Thread main;
-    Thread::switch_context(&Thread::_dispatcher, Main);
+    // Thread::switch_context(&Thread::_dispatcher, Main);
+    Main->context()->load();
 }
 
 /*
@@ -135,7 +142,7 @@ void Thread::yield() {
 
     // escolha uma próxima thread a ser executada
     //next = dispatcher
-    Ready_Queue::Element * next_link = Thread::_ready.remove();
+    Ready_Queue::Element * next_link = Thread::_ready.remove(Thread::_dispatcher.link());
     Thread * next = next_link->object();
 
     // atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
@@ -171,7 +178,7 @@ void Thread::yield() {
     next->state(RUNNING);
 
     // troca o contexto entre as duas threads
-    Thread::switch_context(exec, next);
+    Thread::switch_context(exec, &Thread::_dispatcher);
 
 }
 

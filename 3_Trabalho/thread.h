@@ -144,8 +144,6 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chr
     Thread::_ready.insert(&_link);
 
     _context = new Context(entry, an...);
-
-    //Thread::yield();
 }
 
 __END_API
