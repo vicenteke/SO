@@ -12,8 +12,10 @@ Thread Thread::_dispatcher;
  */
 int Thread::switch_context(Thread * prev, Thread * next) {
     db<Thread>(TRC) << "Thread::switch_context called\n";
+    db<Thread>(INF) << "From Thread " << prev->id() << " to " << next->id() << "\n";
 
     Thread::_running = next;
+    next->state(RUNNING);
     CPU::switch_context(prev->context(), next->context());
     return errno;
 }
@@ -27,7 +29,7 @@ void Thread::thread_exit (int exit_code) {
     db<Thread>(TRC) << "thread_exit called for Thread " << this->id() << "\n";
 
     _state = FINISHING;
-    //Thread::_ready.remove(link());
+    Thread::_ready.remove(link());
     delete(_context);
     Thread::yield();
 }
@@ -46,14 +48,24 @@ int Thread::id() {
  */
 void Thread::dispatcher() {
 
-// imprima informação usando o debug em nível TRC
-db<Thread>(TRC)<<"Dispatcher called\n";
+    // imprima informação usando o debug em nível TRC
+    db<Thread>(TRC) << "Dispatcher called\n";
 
     // enquanto existir thread do usuário:
     while (Thread::_ready.size() > 2) {
         // escolha uma próxima thread a ser executada
         Ready_Queue::Element * next_link = Thread::_ready.remove();
         Thread * next = next_link->object();
+
+        //next é uma thread do usuário? (!= Main)
+        while (next->id() == Thread::_main->id() && Thread::_ready.size() > 2) {
+            db<Thread>(INF) << "next is not user thread, but there are still some. Recalculating.\n";
+
+            next_link = Thread::_ready.remove();
+            next = next_link->object();
+
+            Thread::_ready.insert(Thread::_main->link());
+        }
 
         // atualiza o status da própria thread dispatacher para READY e reinsire a mesma em _ready
         Thread::_dispatcher.state(READY);
@@ -64,6 +76,8 @@ db<Thread>(TRC)<<"Dispatcher called\n";
 
         // atualiza o estado da próxima thread a ser executada
         next->state(RUNNING);
+
+        db<Thread>(INF) << "Dispatcher: next is Thread " << next->id() << "\n";
 
         // troca o contexto entre as duas threads
         Thread::switch_context(&Thread::_dispatcher, next);
@@ -96,19 +110,15 @@ void Thread::init(void (*main)(void *)) {
     //Cria Thread main;
     std::string main_name = "main";
     Thread* Main = new Thread((void (*) (char*))main, (char*) main_name.data());
+    Thread::_main = Main;
+    Thread::_main_context = *Main->context();
 
     //Cria Thread dispatcher;
     Thread * dispatcher_pointer = new Thread(Thread::dispatcher);
     Thread::_dispatcher = *dispatcher_pointer;
 
-    //Thread::_dispatcher.context()->load();
-
     //Troca o contexto para a Thread main;
-    // CPU::Context * cont = new CPU::Context();
-    // cont->save();
-    // CPU::switch_context(cont, Main->context());
-    // db<Thread>(TRC)<<"Thread::init 1\n";
-    Main->context()->load();
+    Thread::switch_context(&Thread::_dispatcher, Main);
 }
 
 /*
@@ -124,15 +134,21 @@ void Thread::yield() {
     Thread * exec = _running;
 
     // escolha uma próxima thread a ser executada
+    //next = dispatcher
     Ready_Queue::Element * next_link = Thread::_ready.remove();
     Thread * next = next_link->object();
 
     // atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
     // timestamp atual, a fim de reinserí-la na fila de prontos atualizada (cuide de casos especiais, como
     // estado ser FINISHING ou Thread main que não devem ter suas prioridades alteradas)
-    if (exec != Thread::_main) {
+
+    db<Thread>(INF) << "Yield: next is Thread " << next->id() << "\n";
+
+    if (exec->id() != Thread::_main->id()) {
 
         if (exec->state() != FINISHING) {
+            Thread::_ready.remove(exec->link());
+
             exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
                     (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 
@@ -144,6 +160,8 @@ void Thread::yield() {
             Thread::_ready.remove(exec->link());
         }
 
+    // } else {
+    //     Thread::_ready.insert(exec->link());
     }
 
     // atualiza o ponteiro _running para apontar para a próxima thread a ser executada

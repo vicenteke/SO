@@ -137,17 +137,15 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chr
     _numberofthreads++;
     db<Thread>(TRC) << "Thread " << _id << " created\n";
 
-    if (_id == 0) {
+    if (_running == NULL)
         _running = this;
-        _state = RUNNING;
-    }
-
-    _context = new Context(entry, an...);
 
     _state = READY;
     Thread::_ready.insert(&_link);
 
-    Thread::yield();
+    _context = new Context(entry, an...);
+
+    //Thread::yield();
 }
 
 __END_API
