@@ -11,8 +11,8 @@ Thread Thread::_dispatcher;
  * Valor de retorno é negativo se houve erro, ou zero.
  */
 int Thread::switch_context(Thread * prev, Thread * next) {
-    CPU::switch_context(prev->context(), next->context());
     Thread::_running = next;
+    CPU::switch_context(prev->context(), next->context());
     return errno;
 }
 
@@ -24,6 +24,7 @@ int Thread::switch_context(Thread * prev, Thread * next) {
 void Thread::thread_exit (int exit_code) {
     _state = FINISHING;
     delete(_context);
+    Thread::yield();
 }
 
 /*

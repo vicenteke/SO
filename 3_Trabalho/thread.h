@@ -126,7 +126,7 @@ private:
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
      */
-
+    inline static int _numberofthreads = 0;
 };
 
 template<typename ... Tn>
@@ -135,6 +135,14 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chr
 {
     _context = new Context(entry, an...);
     _state = READY;
+
+    _id = _numberofthreads;
+    _numberofthreads++;
+    db<Thread>(TRC) << "Thread " << _id << " created\n";
+
+    Thread::_ready.insert(_link);
+    Thread::yield();
+
 }
 
 __END_API
