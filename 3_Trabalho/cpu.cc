@@ -18,8 +18,8 @@ void CPU::Context::load()
 CPU::Context::~Context()
 {
     //Free allocated memory
-    operator delete(_stack);
     VALGRIND_STACK_DEREGISTER(valcontext);
+    operator delete(_stack);
 }
 
 void CPU::switch_context(Context *from, Context *to)
