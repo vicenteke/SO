@@ -2,7 +2,7 @@
 
 __BEGIN_API
 
-Thread Thread::_dispatcher;
+Thread Thread::_dispatcher = Thread(Thread::dispatcher);
 
 /*
  * Método para trocar o contexto entre duas thread, a anterior (prev)
@@ -39,18 +39,19 @@ void Thread::init(void (*main)(void *)) {
     std::string main_name = "main";
     Thread* Main = new Thread((void (*) (char*))main, (char*) main_name.data());
     Thread::_main = Main;
-    Thread::_main_context = *Main->context();
+    //Thread::_main_context = Main->context();
 
     //Cria Thread dispatcher;
-    Thread * dispatcher_pointer = new Thread(&Thread::dispatcher);
-    Thread::_dispatcher = *dispatcher_pointer;
+    /*Thread * dispatcher_pointer = new Thread(&Thread::dispatcher);
+    Thread::_dispatcher = *dispatcher_pointer;*/
 
     //Troca o contexto para a Thread main;
     // Thread::switch_context(&Thread::_dispatcher, Main);
     Thread::_running = Main;
     Main->state(RUNNING);
     Thread::_ready.remove(Main->link()->object());
-    Main->context()->load();
+    //Main->context()->load();
+    CPU::switch_context(&_main_context, Main->context());
 }
 
 /*
@@ -175,11 +176,6 @@ void Thread::thread_exit (int exit_code) {
     _state = FINISHING;
     Thread::_ready.remove(this->link()->object());
 
-    if (this->id() == 0) {
-        delete(this);
-        return;
-    }
-
     Thread::_running = &Thread::_dispatcher;
     Thread::_dispatcher.state(RUNNING);
     Thread::_ready.remove(Thread::_dispatcher.link()->object());
@@ -192,12 +188,12 @@ void Thread::thread_exit (int exit_code) {
 Thread::~Thread() {
     db<Thread>(TRC) << "~Thread() for Thread " << this->id() << "\n";
 
-    if (this->id() == 0) return;
+    if (this == _main) return;
     delete(_context);
 
-    if (this->id() == 1) {
-        Thread::_main->thread_exit(0);
-        //delete(Thread::_main);
+    if (this == &_dispatcher) {
+        delete(_main->context());
+        delete(Thread::_main);
     }
 }
 

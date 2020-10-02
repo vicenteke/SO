@@ -6,11 +6,11 @@ make:
 
 valgrind:
 	g++ -std=c++1z $(CC_FILES) -o s -v
-	valgrind ./s --track-origins=yes --leak-check=full --show-leak-kinds=all
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./s
 
 valg:
 	g++ -std=c++1z $(CC_FILES) -o s
-	valgrind ./s --track-origins=yes --leak-check=full --show-leak-kinds=all
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./s
 
 clean:
 	rm -f *.o s
