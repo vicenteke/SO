@@ -137,8 +137,7 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chr
     _numberofthreads++;
     db<Thread>(TRC) << "Thread " << _id << " created\n";
 
-    if (_running == NULL)
-        _running = this;
+    //if (_running == NULL) _running = this;
 
     _state = READY;
     Thread::_ready.insert(&_link);

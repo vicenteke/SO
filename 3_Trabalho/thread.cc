@@ -29,9 +29,18 @@ void Thread::thread_exit (int exit_code) {
     db<Thread>(TRC) << "thread_exit called for Thread " << this->id() << "\n";
 
     _state = FINISHING;
-    Thread::_ready.remove(link());
-    delete(_context);
-    Thread::yield();
+    Thread::_ready.remove(this->link()->object());
+
+    if (this->id() == 0) {
+        delete(this);
+        return;
+    }
+
+    Thread::_running = &Thread::_dispatcher;
+    Thread::_dispatcher.state(RUNNING);
+    Thread::_ready.remove(Thread::_dispatcher.link()->object());
+    Thread::switch_context(this, &Thread::_dispatcher);
+    // Thread::_dispatcher.context()->load();
 }
 
 /*
@@ -52,30 +61,29 @@ void Thread::dispatcher() {
     db<Thread>(TRC) << "Dispatcher called\n";
 
     // enquanto existir thread do usuário:
-    while (Thread::_ready.size() > 2) {
+    while (Thread::_ready.size() > 0) {
+
         // escolha uma próxima thread a ser executada
         Ready_Queue::Element * next_link = Thread::_ready.remove();
         Thread * next = next_link->object();
 
         //next é uma thread do usuário? (!= Main e dispatcher)
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        int i = 0;
-        while ((next->id() == Thread::_main->id() || next->id() == Thread::_dispatcher.id()) && Thread::_ready.size() > 2 && i++ < 5) {
-            db<Thread>(INF) << "next is not user thread, but there are still some. Recalculating.\n";
-
-            Ready_Queue::Element * buffer = next_link;
+        bool main_removed = false;
+        while ((next->id() == Thread::_main->id() || next->id() == Thread::_dispatcher.id())) {
+            db<Thread>(INF) << "next is not user thread (" << next->id() << "), but there are still some. Recalculating.\n";
 
             next_link = Thread::_ready.remove();
             next = next_link->object();
 
-            if (i < 4)
-            Thread::_ready.insert(buffer);
+            main_removed = true;
         }
 
         // atualiza o status da própria thread dispatacher para READY e reinsire a mesma em _ready
         Thread::_dispatcher.state(READY);
         Thread::_ready.insert(Thread::_dispatcher.link());
+
+        if (main_removed)
+            Thread::_ready.insert(Thread::_main->link());
 
         // atualiza o ponteiro _running para apontar para a próxima thread a ser executada
         Thread::_running = next;
@@ -90,7 +98,7 @@ void Thread::dispatcher() {
 
         // testa se o estado da próxima thread é FINISHING e caso afirmativo a remova de _ready
         if(next->state() == FINISHING)  {
-            Thread::_ready.remove(next_link);
+            Thread::_ready.remove(next_link->object());
         }
     }
 
@@ -99,7 +107,7 @@ void Thread::dispatcher() {
     Thread::_dispatcher.state(FINISHING);
 
     // remova a thread dispatcher da fila de prontos
-    Thread::_ready.remove(Thread::_dispatcher.link());
+    Thread::_ready.remove(Thread::_dispatcher.link()->object());
 
     // troque o contexto da thread dispatcher para main
     Thread::switch_context(&Thread::_dispatcher, Thread::_main);
@@ -125,6 +133,9 @@ void Thread::init(void (*main)(void *)) {
 
     //Troca o contexto para a Thread main;
     // Thread::switch_context(&Thread::_dispatcher, Main);
+    Thread::_running = Main;
+    Main->state(RUNNING);
+    Thread::_ready.remove(Main->link()->object());
     Main->context()->load();
 }
 
@@ -142,7 +153,7 @@ void Thread::yield() {
 
     // escolha uma próxima thread a ser executada
     //next = dispatcher
-    Ready_Queue::Element * next_link = Thread::_ready.remove(Thread::_dispatcher.link());
+    Ready_Queue::Element * next_link = Thread::_ready.remove(Thread::_dispatcher.link()->object());
     Thread * next = next_link->object();
 
     // atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
@@ -154,7 +165,7 @@ void Thread::yield() {
     if (exec->id() != Thread::_main->id()) {
 
         if (exec->state() != FINISHING) {
-            Thread::_ready.remove(exec->link());
+            //Thread::_ready.remove(exec->link());
 
             exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
                     (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
@@ -162,10 +173,10 @@ void Thread::yield() {
             // reinsira a thread que estava executando na fila de prontos
             Thread::_ready.insert(exec->link());
 
-        } else {
+        } /*else {
             //Remove thread de _ready
             Thread::_ready.remove(exec->link());
-        }
+        }*/
 
     // } else {
     //     Thread::_ready.insert(exec->link());
@@ -179,7 +190,6 @@ void Thread::yield() {
 
     // troca o contexto entre as duas threads
     Thread::switch_context(exec, &Thread::_dispatcher);
-
 }
 
 /*
@@ -187,7 +197,13 @@ void Thread::yield() {
  */
 Thread::~Thread() {
     db<Thread>(TRC) << "~Thread() for Thread " << this->id() << "\n";
-    thread_exit(0);
+    //thread_exit(0);
+    if (this->id() == 0) return;
+    delete(_context);
+
+    if (this->id() == 1) {
+        Thread::_main->thread_exit(0);
+    }
 }
 
 __END_API
