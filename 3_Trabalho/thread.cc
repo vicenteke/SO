@@ -4,6 +4,7 @@ __BEGIN_API
 
 //Cria thread dispatcher
 Thread Thread::_dispatcher = Thread(Thread::dispatcher);
+Thread Thread::_main;
 
 /*
  * Método para trocar o contexto entre duas thread, a anterior (prev)
@@ -38,8 +39,10 @@ void Thread::init(void (*main)(void *)) {
 
     //Cria Thread main;
     std::string main_name = "main";
-    Thread* Main = new Thread((void (*) (char*))main, (char*) main_name.data());
-    Thread::_main = Main;
+    //Thread* Main = new Thread((void (*) (char*))main, (char*) main_name.data());
+    //Thread::_main = Main;
+    new (&_main) Thread((void (*) (char*))main, (char*) main_name.data());
+    Thread* Main = &_main;
 
 
     //Troca o contexto para a Thread main;
@@ -68,7 +71,7 @@ void Thread::dispatcher() {
 
         //next é uma thread do usuário? (!= Main e dispatcher)
         bool main_removed = false;
-        while ((next->id() == Thread::_main->id() || next->id() == Thread::_dispatcher.id())) {
+        while ((next->id() == Thread::_main.id() || next->id() == Thread::_dispatcher.id())) {
             db<Thread>(INF) << "next is not user thread (" << next->id() << "), but there are still some. Recalculating.\n";
 
             next_link = Thread::_ready.remove();
@@ -82,7 +85,7 @@ void Thread::dispatcher() {
         Thread::_ready.insert(Thread::_dispatcher.link());
 
         if (main_removed)
-            Thread::_ready.insert(Thread::_main->link());
+            Thread::_ready.insert(Thread::_main.link());
 
         // atualiza o ponteiro _running para apontar para a próxima thread a ser executada
         Thread::_running = next;
@@ -110,7 +113,7 @@ void Thread::dispatcher() {
     Thread::_ready.remove(Thread::_dispatcher.link()->object());
 
     // troque o contexto da thread dispatcher para main
-    Thread::switch_context(&Thread::_dispatcher, Thread::_main);
+    Thread::switch_context(&Thread::_dispatcher, &Thread::_main);
 }
 
 /*
@@ -131,7 +134,7 @@ void Thread::yield() {
 
     db<Thread>(INF) << "Yield: next is Thread " << next->id() << "\n";
 
-    if (exec->id() != Thread::_main->id()) {
+    if (exec->id() != Thread::_main.id()) {
 
         if (exec->state() != FINISHING) {
 
@@ -178,12 +181,12 @@ void Thread::thread_exit (int exit_code) {
 Thread::~Thread() {
     db<Thread>(TRC) << "~Thread() for Thread " << this->id() << "\n";
 
-    if (this == _main) return;
+    if (this == &_main) return;
     delete(_context);
 
     if (this == &_dispatcher) {
-        delete(_main->context());
-        delete(Thread::_main);
+        delete(_main.context());
+        //delete(Thread::_main);
     }
 }
 

@@ -116,7 +116,7 @@ private:
     Context * volatile _context;
     inline static Thread * _running = NULL;
 
-    inline static Thread *_main;
+    static Thread _main;
     inline static CPU::Context _main_context;
     static Thread _dispatcher;
     inline static Ready_Queue _ready;
