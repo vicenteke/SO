@@ -178,7 +178,6 @@ void Thread::thread_exit (int exit_code) {
 Thread::~Thread() {
     db<Thread>(TRC) << "~Thread() for Thread " << this->id() << "\n";
 
-    _numberofthreads--;
     if (this == _main) return;
     delete(_context);
 
