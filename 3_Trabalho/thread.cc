@@ -2,6 +2,7 @@
 
 __BEGIN_API
 
+//Cria thread dispatcher
 Thread Thread::_dispatcher = Thread(Thread::dispatcher);
 
 /*
@@ -39,18 +40,12 @@ void Thread::init(void (*main)(void *)) {
     std::string main_name = "main";
     Thread* Main = new Thread((void (*) (char*))main, (char*) main_name.data());
     Thread::_main = Main;
-    //Thread::_main_context = Main->context();
 
-    //Cria Thread dispatcher;
-    /*Thread * dispatcher_pointer = new Thread(&Thread::dispatcher);
-    Thread::_dispatcher = *dispatcher_pointer;*/
 
     //Troca o contexto para a Thread main;
-    // Thread::switch_context(&Thread::_dispatcher, Main);
     Thread::_running = Main;
     Main->state(RUNNING);
     Thread::_ready.remove(Main->link()->object());
-    //Main->context()->load();
     CPU::switch_context(&_main_context, Main->context());
 }
 
@@ -130,22 +125,17 @@ void Thread::yield() {
     //Pointeiro para thread em execucao
     Thread * exec = _running;
 
-    // escolha uma próxima thread a ser executada
-    //next = dispatcher
+    // escolhe dispatcher como proxima a ser executada
     Ready_Queue::Element * next_link = Thread::_ready.remove(Thread::_dispatcher.link()->object());
     Thread * next = next_link->object();
-
-    // atualiza a prioridade da tarefa que estava sendo executada (aquela que chamou yield) com o
-    // timestamp atual, a fim de reinserí-la na fila de prontos atualizada (cuide de casos especiais, como
-    // estado ser FINISHING ou Thread main que não devem ter suas prioridades alteradas)
 
     db<Thread>(INF) << "Yield: next is Thread " << next->id() << "\n";
 
     if (exec->id() != Thread::_main->id()) {
 
         if (exec->state() != FINISHING) {
-            //Thread::_ready.remove(exec->link());
 
+            // Atualiza prioridade da thread
             exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
                     (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 
@@ -188,6 +178,7 @@ void Thread::thread_exit (int exit_code) {
 Thread::~Thread() {
     db<Thread>(TRC) << "~Thread() for Thread " << this->id() << "\n";
 
+    _numberofthreads--;
     if (this == _main) return;
     delete(_context);
 
