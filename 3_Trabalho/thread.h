@@ -95,21 +95,21 @@ public:
      * Qualquer outro método que você achar necessário para a solução.
      */
 
-    Context * context() {
-        return _context;
-    }
+     Context * context() const {
+         return _context;
+     }
 
-    void state(State s) {
-        _state = s;
-    }
+     void state(State s) {
+         _state = s;
+     }
 
-    State state() {
-        return _state;
-    }
+     State state() const {
+         return _state;
+     }
 
-    Ready_Queue::Element * link() {
-        return &_link;
-    }
+     Ready_Queue::Element * link() {
+         return &_link;
+     }
 
 private:
     int _id;
@@ -137,10 +137,9 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chr
     _numberofthreads++;
     db<Thread>(TRC) << "Thread " << _id << " created\n";
 
+    _context = new Context(entry, an...);
     _state = READY;
     Thread::_ready.insert(&_link);
-
-    _context = new Context(entry, an...);
 }
 
 __END_API

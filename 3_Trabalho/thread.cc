@@ -2,9 +2,9 @@
 
 __BEGIN_API
 
-//Cria thread dispatcher
-Thread Thread::_dispatcher = Thread(Thread::dispatcher);
+//Inicializa atributos static
 Thread Thread::_main;
+Thread Thread::_dispatcher;
 
 /*
  * Método para trocar o contexto entre duas thread, a anterior (prev)
@@ -37,19 +37,18 @@ void Thread::init(void (*main)(void *)) {
 
     db<Thread>(TRC) << "Thread::init called\n";
 
+    new (&_dispatcher) Thread(Thread::dispatcher);
+
     //Cria Thread main;
     std::string main_name = "main";
-    //Thread* Main = new Thread((void (*) (char*))main, (char*) main_name.data());
-    //Thread::_main = Main;
     new (&_main) Thread((void (*) (char*))main, (char*) main_name.data());
-    Thread* Main = &_main;
 
 
     //Troca o contexto para a Thread main;
-    Thread::_running = Main;
-    Main->state(RUNNING);
-    Thread::_ready.remove(Main->link()->object());
-    CPU::switch_context(&_main_context, Main->context());
+    Thread::_running = &_main;
+    _main.state(RUNNING);
+    Thread::_ready.remove(_main.link()->object());
+    CPU::switch_context(&_main_context, _main.context());
 }
 
 /*
@@ -134,18 +133,14 @@ void Thread::yield() {
 
     db<Thread>(INF) << "Yield: next is Thread " << next->id() << "\n";
 
-    if (exec->id() != Thread::_main.id()) {
+    if (exec != &Thread::_main && exec->state() != FINISHING) {
 
-        if (exec->state() != FINISHING) {
+        // Atualiza prioridade da thread
+        exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
+                (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 
-            // Atualiza prioridade da thread
-            exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
-                    (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
-
-            // reinsira a thread que estava executando na fila de prontos
-            Thread::_ready.insert(exec->link());
-
-        }
+        // reinsira a thread que estava executando na fila de prontos
+        Thread::_ready.insert(exec->link());
     }
 
     // atualiza o ponteiro _running para apontar para a próxima thread a ser executada
@@ -181,13 +176,7 @@ void Thread::thread_exit (int exit_code) {
 Thread::~Thread() {
     db<Thread>(TRC) << "~Thread() for Thread " << this->id() << "\n";
 
-    if (this == &_main) return;
     delete(_context);
-
-    if (this == &_dispatcher) {
-        delete(_main.context());
-        //delete(Thread::_main);
-    }
 }
 
 __END_API
