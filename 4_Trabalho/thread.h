@@ -7,8 +7,6 @@
 #include "list.h"
 #include <ctime>
 #include <chrono>
-#include <mutex>
-#include <condition_variable>
 
 __BEGIN_API
 
@@ -124,12 +122,8 @@ public:
         return &_link;
     }
 
-    std::condition_variable condition() {
-        return _cv;
-    }
-
-    void condtition(std::condition_variable cv) {
-        _cv = cv;
+    int exit_code() {
+        return _exit_code;
     }
 
 private:
@@ -145,8 +139,7 @@ private:
     volatile State _state;
 
     int _exit_code;
-    std::mutex _mutex;
-    std::condition_variable _cv;
+    inline static Ready_Queue _suspended;
 
     /*
      * Qualquer outro atributo que você achar necessário para a solução.
@@ -165,7 +158,6 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chr
     _context = new Context(entry, an...);
     _state = READY;
     Thread::_ready.insert(&_link);
-    _mutex.lock();
 }
 
 __END_API

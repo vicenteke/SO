@@ -46,7 +46,7 @@ template<> struct Traits<CPU>
 //Each class can disable or enable it for itself through (bool) "debugged"
 template<> struct Traits<Debug>: public Traits<void>
 {
-    static const bool error = false;
+    static const bool error = true;
     static const bool warning = false;
     static const bool info = true;
     static const bool trace = true;
@@ -64,7 +64,7 @@ template<> struct Traits<Context> : public Traits<void>
 
 template<> struct Traits<Thread> : public Traits<void>
 {
-    static const bool debugged = false;
+    static const bool debugged = true;
 };
 
 template<> struct Traits<Main> : public Traits<void>

@@ -129,6 +129,7 @@ void Thread::yield() {
 
     // escolhe dispatcher como proxima a ser executada
     Ready_Queue::Element * next_link = Thread::_ready.remove(Thread::_dispatcher.link()->object());
+    if (!next_link) db<Thread> (ERR) << "Error in Thread::yield(): next_link is null\n";
     Thread * next = next_link->object();
 
     db<Thread>(INF) << "Yield: next is Thread " << next->id() << "\n";
@@ -156,22 +157,28 @@ void Thread::yield() {
 // Suspende a Thread até que resume() seja chamado
 void Thread::suspend() {
 
+    db<Thread>(TRC)<<"Thread::suspend() called for " << id() << "\n";
+
     this->state(SUSPENDED);
-    Thread::_ready.remove(this->link()->object());
-    _mutex.lock();
-    // condition().wait(_mutex)
     yield();
 }
 
 // Acorda uma Thread que estava suspensa
 void Thread::resume() {
 
-    this->state(READY);
-    this->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
-            (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+    db<Thread>(TRC)<<"Thread::resume() called for " << id() << "\n";
 
-    Thread::_ready.insert(this->link());
-    _mutex.unlock();
+    Thread * exec = _running;
+
+    exec->state(READY);
+    _ready.insert(exec->link());
+
+    Thread::_running = this;
+    this->state(RUNNING);
+    Thread::switch_context(exec, this);
+    // this->state(READY);
+    // _ready.insert(this->link());
+    // yield();
 }
 
 // Este método deve suspender a thread em execução até que a thread “alvo” finalize
@@ -179,13 +186,14 @@ int Thread::join() {
 
     Thread * exec = _running;
 
-    _ready.remove(this->link()->object());
-    this->link()->rank(0);
-    _ready.insert(this->link());
+    db<Thread>(TRC)<<"Thread " << exec->id() << " joining " << id() << "\n";
 
-    exec->condition(condition());
+    Thread::_ready.remove(exec->link()->object());
+    // exec->link()->next(0);
+    // exec->link()->prev(0);
+
+    _suspended.insert(exec->link());
     exec->suspend();
-    resume();
     return _exit_code;
 }
 
@@ -196,6 +204,7 @@ int Thread::join() {
 * Quando a thread encerra, o controle deve retornar à main.
 */
 void Thread::thread_exit (int exit_code) {
+
     db<Thread>(TRC) << "thread_exit called for Thread " << this->id() << "\n";
 
     _exit_code = exit_code;
@@ -206,7 +215,12 @@ void Thread::thread_exit (int exit_code) {
     Thread::_running = &Thread::_dispatcher;
     Thread::_dispatcher.state(RUNNING);
     Thread::_ready.remove(Thread::_dispatcher.link()->object());
-    condition().notify_all();
+
+    while (_suspended.size() > 0) {
+        Ready_Queue::Element * next_link = Thread::_suspended.remove();
+        next_link->object()->resume();
+    }
+
     Thread::switch_context(this, &Thread::_dispatcher);
 }
 
