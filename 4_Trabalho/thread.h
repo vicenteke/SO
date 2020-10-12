@@ -141,9 +141,6 @@ private:
     int _exit_code;
     inline static Ready_Queue _suspended;
 
-    /*
-     * Qualquer outro atributo que você achar necessário para a solução.
-     */
     inline static int _numberofthreads = 0;
 };
 

@@ -170,15 +170,9 @@ void Thread::resume() {
 
     Thread * exec = _running;
 
-    exec->state(READY);
-    _ready.insert(exec->link());
-
     Thread::_running = this;
     this->state(RUNNING);
     Thread::switch_context(exec, this);
-    // this->state(READY);
-    // _ready.insert(this->link());
-    // yield();
 }
 
 // Este método deve suspender a thread em execução até que a thread “alvo” finalize
@@ -189,8 +183,6 @@ int Thread::join() {
     db<Thread>(TRC)<<"Thread " << exec->id() << " joining " << id() << "\n";
 
     Thread::_ready.remove(exec->link()->object());
-    // exec->link()->next(0);
-    // exec->link()->prev(0);
 
     _suspended.insert(exec->link());
     exec->suspend();
@@ -212,14 +204,15 @@ void Thread::thread_exit (int exit_code) {
     _state = FINISHING;
     Thread::_ready.remove(this->link()->object());
 
-    Thread::_running = &Thread::_dispatcher;
-    Thread::_dispatcher.state(RUNNING);
-    Thread::_ready.remove(Thread::_dispatcher.link()->object());
-
+    // Resumes all suspended threads
     while (_suspended.size() > 0) {
         Ready_Queue::Element * next_link = Thread::_suspended.remove();
         next_link->object()->resume();
     }
+
+    Thread::_running = &Thread::_dispatcher;
+    Thread::_dispatcher.state(RUNNING);
+    Thread::_ready.remove(Thread::_dispatcher.link()->object());
 
     Thread::switch_context(this, &Thread::_dispatcher);
 }
