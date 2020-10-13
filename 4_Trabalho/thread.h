@@ -139,7 +139,7 @@ private:
     volatile State _state;
 
     int _exit_code;
-    inline static Ready_Queue _suspended;
+    Ready_Queue _suspended;
 
     inline static int _numberofthreads = 0;
 };
@@ -148,6 +148,7 @@ template<typename ... Tn>
 inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chrono::duration_cast<std::chrono::microseconds>
         (std::chrono::high_resolution_clock::now().time_since_epoch()).count()))
 {
+    Ready_Queue _suspended;
     _id = _numberofthreads;
     _numberofthreads++;
     db<Thread>(TRC) << "Thread " << _id << " created\n";

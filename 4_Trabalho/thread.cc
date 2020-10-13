@@ -156,8 +156,6 @@ void Thread::resume() {
 
     db<Thread>(TRC)<<"Thread::resume() called for " << id() << "\n";
 
-    Thread * exec = _running;
-
     state(READY);
     _ready.insert(link());
     yield();
