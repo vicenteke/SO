@@ -68,23 +68,9 @@ void Thread::dispatcher() {
         Ready_Queue::Element * next_link = Thread::_ready.remove();
         Thread * next = next_link->object();
 
-        //next é uma thread do usuário? (!= Main e dispatcher)
-        bool main_removed = false;
-        while ((next->id() == Thread::_main.id() || next->id() == Thread::_dispatcher.id())) {
-            db<Thread>(INF) << "next is not user thread (" << next->id() << "), but there are still some. Recalculating.\n";
-
-            next_link = Thread::_ready.remove();
-            next = next_link->object();
-
-            main_removed = true;
-        }
-
         // atualiza o status da própria thread dispatacher para READY e reinsire a mesma em _ready
         Thread::_dispatcher.state(READY);
         Thread::_ready.insert(Thread::_dispatcher.link());
-
-        if (main_removed)
-            Thread::_ready.insert(Thread::_main.link());
 
         // atualiza o ponteiro _running para apontar para a próxima thread a ser executada
         Thread::_running = next;
@@ -134,11 +120,13 @@ void Thread::yield() {
 
     db<Thread>(INF) << "Yield: next is Thread " << next->id() << "\n";
 
-    if (exec != &Thread::_main && exec->state() != FINISHING && exec->state() != SUSPENDED) {
+    if (exec->state() != FINISHING && exec->state() != SUSPENDED) {
 
-        // Atualiza prioridade da thread
-        exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
-                (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+        if (exec != &Thread::_main) {
+            // Atualiza prioridade da thread
+            exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
+                    (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+        }
 
         // reinsira a thread que estava executando na fila de prontos
         Thread::_ready.insert(exec->link());
@@ -170,9 +158,9 @@ void Thread::resume() {
 
     Thread * exec = _running;
 
-    Thread::_running = this;
-    this->state(RUNNING);
-    Thread::switch_context(exec, this);
+    state(READY);
+    _ready.insert(link());
+    yield();
 }
 
 // Este método deve suspender a thread em execução até que a thread “alvo” finalize
