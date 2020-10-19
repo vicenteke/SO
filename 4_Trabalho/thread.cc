@@ -198,12 +198,6 @@ void Thread::thread_exit (int exit_code) {
         next_link->object()->resume();
     }
 
-    // Thread::_running = &Thread::_dispatcher;
-    // Thread::_dispatcher.state(RUNNING);
-    // Thread::_ready.remove(Thread::_dispatcher.link()->object());
-    //
-    // Thread::switch_context(this, &Thread::_dispatcher);
-
     yield();
 }
 
