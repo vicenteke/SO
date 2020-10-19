@@ -139,6 +139,8 @@ void Thread::yield() {
         exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
                 (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 
+        exec->state(READY);
+
         // reinsira a thread que estava executando na fila de prontos
         Thread::_ready.insert(exec->link());
     }
@@ -168,6 +170,8 @@ void Thread::thread_exit (int exit_code) {
     Thread::_dispatcher.state(RUNNING);
     Thread::_ready.remove(Thread::_dispatcher.link()->object());
     Thread::switch_context(this, &Thread::_dispatcher);
+
+    // yield();
 }
 
 /*
