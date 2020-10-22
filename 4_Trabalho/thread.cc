@@ -149,7 +149,9 @@ void Thread::suspend() {
 
     db<Thread>(TRC)<<"Thread::suspend() called for " << id() << "\n";
 
+    _ready.remove(this->link()->object());
     this->state(SUSPENDED);
+    _suspended_queue.insert(this->link());
     yield();
 }
 
@@ -158,6 +160,7 @@ void Thread::resume() {
 
     db<Thread>(TRC)<<"Thread::resume() called for " << id() << "\n";
 
+    _suspended_queue.remove(this->link()->object());
     state(READY);
     _ready.insert(link());
     yield();
@@ -166,14 +169,10 @@ void Thread::resume() {
 // Este método deve suspender a thread em execução até que a thread “alvo” finalize
 int Thread::join() {
 
-    Thread * exec = _running;
+    db<Thread>(TRC)<<"Thread " << _running->id() << " joining " << id() << "\n";
 
-    db<Thread>(TRC)<<"Thread " << exec->id() << " joining " << id() << "\n";
-
-    Thread::_ready.remove(exec->link()->object());
-
-    _suspended.insert(exec->link());
-    exec->suspend();
+    _suspended = _running;
+    _running->suspend();
     return _exit_code;
 }
 
@@ -193,9 +192,16 @@ void Thread::thread_exit (int exit_code) {
     Thread::_ready.remove(this->link()->object());
 
     // Resumes all suspended threads
-    while (_suspended.size() > 0) {
-        Ready_Queue::Element * next_link = Thread::_suspended.remove();
-        next_link->object()->resume();
+    if (_suspended != NULL) {
+        _suspended->resume();
+        _suspended = NULL;
+    }
+
+    if (_ready.size() == 0 && _suspended_queue.size() > 0) {
+        while (_suspended_queue.size() > 0) {
+            Ready_Queue::Element * next_link = _suspended_queue.remove();
+            next_link->object()->resume();
+        }
     }
 
     yield();
