@@ -31,9 +31,6 @@ private:
 private:
     int _count;
     Ready_Queue _waiting;
-
-    // friend class Thread;
-    // friend class CPU;
 };
 
 __END_API

@@ -29,13 +29,17 @@ void CPU::switch_context(Context *from, Context *to)
 }
 
 int CPU::finc(volatile int & number) {
-    // __asm__ ( "MR %number, $1;");
-    // __asm__ ( "lock xadd %number, $1;");
-    return number++;
+
+    // Atomic implementation for incrementing a number
+    __asm__ ( "xadd %%ebx, %%eax" : "=a"(number) : "a"(number), "b"(1));
+    return number;
 }
 
-int CPU::fdec(volatile int & number){
-    return number--;
+int CPU::fdec(volatile int & number) {
+
+    // Atomic implementation for decrementing a number
+    __asm__ ( "xadd %%ebx, %%eax" : "=a"(number) : "a"(number), "b"(-1));
+    return number;
 }
 
 __END_API

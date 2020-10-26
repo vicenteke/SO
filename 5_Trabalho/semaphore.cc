@@ -31,17 +31,19 @@ void Semaphore::v() {
 
     db<Semaphore>(TRC) << "Semaphore::v() called\n";
 
-    if (_count > 0) finc(_count);
-    else if (_waiting.size() > 0) {
+    if (_count > 0 || _waiting.size() == 0)
+        finc(_count);
+    else
         wakeup();
-    } else finc(_count);
 }
 
 // Atomic operations
 int Semaphore::finc(volatile int & number) {
+
     return CPU::finc(number);
 }
 int Semaphore::fdec(volatile int & number) {
+
     return CPU::fdec(number);
 }
 
@@ -59,9 +61,6 @@ void Semaphore::wakeup() {
 
     db<Semaphore>(TRC) << "Semaphore::wakeup() called\n";
 
-    // Thread * exec = Thread::_running;
-    // _waiting.remove(exec->link()->object());
-    // exec->wakeup();
     Ready_Queue::Element * next_link = _waiting.remove();
     next_link->object()->wakeup();
 }
@@ -70,11 +69,8 @@ void Semaphore::wakeup_all() {
 
     db<Semaphore>(TRC) << "Semaphore::wakeup_all() called\n";
 
-    while (_waiting.size() > 0) {
-        Ready_Queue::Element * next_link = _waiting.remove();
-        Thread::_running = next_link->object();
+    while (_waiting.size() > 0)
         wakeup();
-    }
 }
 
 __END_API

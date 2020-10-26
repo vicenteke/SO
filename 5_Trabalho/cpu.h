@@ -57,11 +57,10 @@ class CPU
     public:
         static void switch_context(Context *from, Context *to);
 
-    protected:
+    private:
         static int finc(volatile int & number);
         static int fdec(volatile int & number);
 
-    private:
         friend class Semaphore;
 
 };
