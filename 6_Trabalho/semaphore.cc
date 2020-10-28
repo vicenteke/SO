@@ -7,7 +7,6 @@ Semaphore::Semaphore (int v) {
     db<Semaphore>(TRC) << "Semaphore() constructor called\n";
 
     _count = v;
-    Ready_Queue _waiting;
 }
 
 Semaphore::~Semaphore() {
@@ -21,19 +20,17 @@ void Semaphore::p() {
 
     db<Semaphore>(TRC) << "Semaphore::p() called\n";
 
-    if (_count > 0) fdec(_count);
-    else {
+    //Comparação atômica para o _count (usar fdec//fint para comparar com o valor antigo)
+    if (fdec(_count) == -1)
         sleep();
-    }
 }
 
 void Semaphore::v() {
 
     db<Semaphore>(TRC) << "Semaphore::v() called\n";
 
-    if (_count > 0 || _waiting.size() == 0)
-        finc(_count);
-    else
+    //Sempre executar finc, a partir do valor de retorno definir se chama wakeup()
+    if (finc(_count) == 1)
         wakeup();
 }
 
@@ -52,25 +49,31 @@ void Semaphore::sleep() {
 
     db<Semaphore>(TRC) << "Semaphore::sleep() called\n";
 
-    Thread * exec = Thread::_running;
-    _waiting.insert(exec->link());
-    exec->sleep();
+    //Não liberar o acesso de _running para outras classes
+    //Tratar a fila de espera dentro de um método estático da classe Thread
+    finc(_count);
+    Thread::sleep(_waiting);
 }
 
 void Semaphore::wakeup() {
 
     db<Semaphore>(TRC) << "Semaphore::wakeup() called\n";
 
-    Ready_Queue::Element * next_link = _waiting.remove();
-    next_link->object()->wakeup();
+    fdec(_count);
+    if (!Thread::wakeup(_waiting))
+        finc(_count);
 }
 
 void Semaphore::wakeup_all() {
 
     db<Semaphore>(TRC) << "Semaphore::wakeup_all() called\n";
 
+    //liberar todas de uma só vez antes de chamar a yield()
+    //Tratar caso onde a Thread é deletada por outra
     while (_waiting.size() > 0)
         wakeup();
+
+    Thread::yield();
 }
 
 __END_API

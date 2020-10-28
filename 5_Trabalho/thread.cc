@@ -216,22 +216,34 @@ Thread::~Thread() {
     delete(_context);
 }
 
-void Thread::sleep() {
+void Thread::sleep(Ready_Queue & _waiting) {
 
-    db<Thread>(TRC) << "Thread::sleep() called for thread " << this->id() << "\n";
+    Thread * exec = Thread::_running;
+    db<Thread>(TRC) << "Thread::sleep() called for thread " << exec->id() << "\n";
 
-    state(WAITING);
-    _ready.remove(this->link()->object());
+    _waiting.insert(exec->link());
+    exec->state(WAITING);
+    _ready.remove(exec);
     yield();
 }
 
-void Thread::wakeup() {
+int Thread::wakeup(Ready_Queue & _waiting) {
 
-    db<Thread>(TRC) << "Thread::wakeup() called for thread " << this->id() << "\n";
+    if (Ordered_List<Thread>::Element * next_link = _waiting.remove()) {
 
-    state(READY);
-    _ready.insert(this->link());
-    yield();
+        Thread * next;
+        while (!(next = next_link->object()))
+            next_link = _waiting.remove();
+
+        db<Thread>(TRC) << "Thread::wakeup() called for thread " << next->id() << "\n";
+
+        next->state(READY);
+        _ready.insert(next->link());
+
+        return 1;
+    }
+
+    return 0;
 }
 
 __END_API

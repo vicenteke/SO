@@ -17,6 +17,7 @@ class Debug;
 class System;
 class Main;
 class Semaphore;
+class Timer;
 
 class List_Element_Rank;
 namespace List_Elements {
@@ -86,6 +87,13 @@ template<typename T, typename R, typename El, bool relative> struct Traits<Order
 template<> struct Traits<Semaphore> : public Traits<void>
 {
     static const bool debugged = false;
+};
+
+template<> struct Traits<Timer> : public Traits<void>
+{
+    static const bool debugged = false;
+    static const bool preemptive = true;
+    static const unsigned int QUANTUM = 20000; // in us
 };
 
 __END_API

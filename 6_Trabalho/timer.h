@@ -15,7 +15,7 @@ public:
 
     //period in us
     Timer(const unsigned int period, const Function * handler);
-    
+
     void reset();
 
 private:

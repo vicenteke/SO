@@ -127,8 +127,8 @@ public:
         return _exit_code;
     }
 
-    void sleep();
-    void wakeup();
+    static void sleep(Ordered_List<Thread> &);
+    static int wakeup(Ordered_List<Thread> &);
 
 protected:
     inline static Thread * _running = NULL;

@@ -17,7 +17,6 @@ public:
     void p();
     void v();
 
-    typedef Ordered_List<Thread> Ready_Queue;
 private:
     // Atomic operations
     int finc(volatile int & number);
@@ -30,7 +29,7 @@ private:
 
 private:
     int _count;
-    Ready_Queue _waiting;
+    Ordered_List<Thread> _waiting;
 };
 
 __END_API

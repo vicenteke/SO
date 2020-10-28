@@ -4,7 +4,14 @@ __BEGIN_API
 
 //Inicializa atributos static
 Thread Thread::_main;
-Thread Thread::_dispatcher;
+
+// if (Traits<Timer>::preemptive) {
+//     Timer * Thread::_timer = new Timer(Traits<Timer>::QUANTUM, &Thread::reschedule);
+// } else {
+    Thread Thread::_dispatcher;
+// }
+
+Timer * Thread::_timer = Traits<Timer>::preemptive ? new Timer(Traits<Timer>::QUANTUM, &Thread::reschedule) : NULL;
 
 /*
  * Método para trocar o contexto entre duas thread, a anterior (prev)
@@ -37,12 +44,12 @@ void Thread::init(void (*main)(void *)) {
 
     db<Thread>(TRC) << "Thread::init called\n";
 
-    new (&_dispatcher) Thread(Thread::dispatcher);
+    if (!Traits<Timer>::preemptive)
+        new (&_dispatcher) Thread(Thread::dispatcher);
 
     //Cria Thread main;
     std::string main_name = "main";
     new (&_main) Thread((void (*) (char*))main, (char*) main_name.data());
-
 
     //Troca o contexto para a Thread main;
     Thread::_running = &_main;
@@ -106,6 +113,9 @@ void Thread::dispatcher() {
  * para ser executada.
  */
 void Thread::yield() {
+
+    if (Traits<Timer>::preemptive)
+        return reschedule(0);
 
     // imprima informação usando o debug em nível TRC
     db<Thread>(TRC)<<"Thread::yield called\n";
@@ -216,22 +226,81 @@ Thread::~Thread() {
     delete(_context);
 }
 
-void Thread::sleep() {
+void Thread::sleep(Ready_Queue & _waiting) {
 
-    db<Thread>(TRC) << "Thread::sleep() called for thread " << this->id() << "\n";
+    Thread * exec = Thread::_running;
+    db<Thread>(TRC) << "Thread::sleep() called for thread " << exec->id() << "\n";
 
-    state(WAITING);
-    _ready.remove(this->link()->object());
+    _waiting.insert(exec->link());
+    exec->state(WAITING);
+    _ready.remove(exec);
     yield();
 }
 
-void Thread::wakeup() {
+int Thread::wakeup(Ready_Queue & _waiting) {
 
-    db<Thread>(TRC) << "Thread::wakeup() called for thread " << this->id() << "\n";
+    if (Ordered_List<Thread>::Element * next_link = _waiting.remove()) {
 
-    state(READY);
-    _ready.insert(this->link());
-    yield();
+        Thread * next;
+        while (!(next = next_link->object()))
+            next_link = _waiting.remove();
+
+        db<Thread>(TRC) << "Thread::wakeup() called for thread " << next->id() << "\n";
+
+        next->state(READY);
+        _ready.insert(next->link());
+
+        return 1;
+    }
+
+    return 0;
+}
+
+void Thread::reschedule(int) {
+
+    Thread * exec = _running;
+    // if (exec->state() == RUNNING)
+    //     exec->suspend();
+
+    if (_ready.size() > 0) {
+
+        // escolha uma próxima thread a ser executada
+        Ready_Queue::Element * next_link = Thread::_ready.remove();
+        Thread * next = next_link->object();
+
+        // atualiza o ponteiro _running para apontar para a próxima thread a ser executada
+        Thread::_running = next;
+
+        // exec->state(READY);
+        // _ready.insert(exec->link());
+
+        if (exec != &Thread::_main) {
+            // Atualiza prioridade da thread
+            exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
+                    (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+
+            exec->state(READY);
+
+            // reinsira a thread que estava executando na fila de prontos
+            Thread::_ready.insert(exec->link());
+        }
+
+        // atualiza o estado da próxima thread a ser executada
+        next->state(RUNNING);
+
+        db<Timer>(INF) << "Rescheduling: next is Thread " << next->id() << "\n";
+
+        // Resets timer
+        _timer->reset();
+
+        // troca o contexto entre as duas threads
+        Thread::switch_context(exec, next);
+
+        // testa se o estado da próxima thread é FINISHING e caso afirmativo a remova de _ready
+        if(next->state() == FINISHING)  {
+            Thread::_ready.remove(next_link->object());
+        }
+    }
 }
 
 __END_API

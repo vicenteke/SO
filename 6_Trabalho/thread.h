@@ -5,6 +5,7 @@
 #include "traits.h"
 #include "debug.h"
 #include "list.h"
+#include "timer.h"
 #include <ctime>
 #include <chrono>
 
@@ -98,6 +99,9 @@ public:
     // inicializado?). Como tratar a suspensão e o resumo de uma Thread?
     int join();
 
+    // When preemptive = true, it is called every time QUANTUM ends to reschedule system
+    static void reschedule(int);
+
     /*
      * Destrutor de uma thread. Realiza todo os procedimentos para manter a consistência da classe.
      */
@@ -127,8 +131,10 @@ public:
         return _exit_code;
     }
 
-    void sleep();
-    void wakeup();
+    static void sleep(Ordered_List<Thread> &);
+    static int wakeup(Ordered_List<Thread> &);
+
+    static Timer * _timer;
 
 protected:
     inline static Thread * _running = NULL;
@@ -148,6 +154,7 @@ private:
     Thread * _suspended;
 
     inline static int _numberofthreads = 0;
+
     friend class Semaphore;
 };
 
