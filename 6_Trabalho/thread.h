@@ -99,6 +99,10 @@ public:
     // inicializado?). Como tratar a suspensão e o resumo de uma Thread?
     int join();
 
+    bool joinable() {
+        return _joinable;
+    }
+
     // When preemptive = true, it is called every time QUANTUM ends to reschedule system
     static void reschedule(int);
 
@@ -134,8 +138,6 @@ public:
     static void sleep(Ordered_List<Thread> &);
     static int wakeup(Ordered_List<Thread> &);
 
-    static Timer * _timer;
-
 protected:
     inline static Thread * _running = NULL;
 private:
@@ -152,8 +154,11 @@ private:
     int _exit_code;
     inline static Ready_Queue _suspended_queue;
     Thread * _suspended;
+    bool _joinable;
 
     inline static int _numberofthreads = 0;
+
+    static Timer * _timer;
 
     friend class Semaphore;
 };
@@ -171,6 +176,7 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chr
     Thread::_ready.insert(&_link);
 
     _suspended = NULL;
+    _joinable = true;
 }
 
 __END_API

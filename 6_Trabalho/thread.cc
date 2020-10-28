@@ -4,14 +4,8 @@ __BEGIN_API
 
 //Inicializa atributos static
 Thread Thread::_main;
-
-// if (Traits<Timer>::preemptive) {
-//     Timer * Thread::_timer = new Timer(Traits<Timer>::QUANTUM, &Thread::reschedule);
-// } else {
-    Thread Thread::_dispatcher;
-// }
-
-Timer * Thread::_timer = Traits<Timer>::preemptive ? new Timer(Traits<Timer>::QUANTUM, &Thread::reschedule) : NULL;
+Thread Thread::_dispatcher;
+Timer * Thread::_timer;
 
 /*
  * Método para trocar o contexto entre duas thread, a anterior (prev)
@@ -46,6 +40,10 @@ void Thread::init(void (*main)(void *)) {
 
     if (!Traits<Timer>::preemptive)
         new (&_dispatcher) Thread(Thread::dispatcher);
+    else
+        Thread::_timer = new Timer(Traits<Timer>::QUANTUM, &Thread::reschedule);
+
+    // Timer * Thread::_timer = Traits<Timer>::preemptive ? new Timer(Traits<Timer>::QUANTUM, &Thread::reschedule) : NULL;
 
     //Cria Thread main;
     std::string main_name = "main";
@@ -125,7 +123,9 @@ void Thread::yield() {
 
     // escolhe dispatcher como proxima a ser executada
     Ready_Queue::Element * next_link = Thread::_ready.remove(Thread::_dispatcher.link()->object());
+
     if (!next_link) db<Thread> (ERR) << "Error in Thread::yield(): next_link is null\n";
+
     Thread * next = next_link->object();
 
     db<Thread>(INF) << "Yield: next is Thread " << next->id() << "\n";
@@ -179,10 +179,14 @@ void Thread::resume() {
 // Este método deve suspender a thread em execução até que a thread “alvo” finalize
 int Thread::join() {
 
-    db<Thread>(TRC)<<"Thread " << _running->id() << " joining " << id() << "\n";
+    if (_joinable) {
 
-    _suspended = _running;
-    _suspended->suspend();
+        db<Thread>(TRC)<<"Thread " << _running->id() << " joining " << id() << "\n";
+
+        _suspended = _running;
+        _joinable = false;
+        _suspended->suspend();
+    }
     return _exit_code;
 }
 
@@ -196,9 +200,11 @@ void Thread::thread_exit (int exit_code) {
 
     db<Thread>(TRC) << "thread_exit called for Thread " << this->id() << "\n";
 
-    _exit_code = exit_code;
+    _exit_code = (exit_code > 0) ? exit_code : (exit_code * -1);
 
     _state = FINISHING;
+    _joinable = false;
+
     Thread::_ready.remove(this->link()->object());
 
     // Resumes all suspended threads
@@ -221,7 +227,13 @@ void Thread::thread_exit (int exit_code) {
  * Destrutor de uma thread. Realiza todo os procedimentos para manter a consistência da classe.
  */
 Thread::~Thread() {
+
+    if (!_context) return;
+
     db<Thread>(TRC) << "~Thread() for Thread " << this->id() << "\n";
+
+    if (_state != FINISHING && this != &_dispatcher)
+        thread_exit(-1);
 
     delete(_context);
 }
@@ -259,8 +271,6 @@ int Thread::wakeup(Ready_Queue & _waiting) {
 void Thread::reschedule(int) {
 
     Thread * exec = _running;
-    // if (exec->state() == RUNNING)
-    //     exec->suspend();
 
     if (_ready.size() > 0) {
 
@@ -268,16 +278,23 @@ void Thread::reschedule(int) {
         Ready_Queue::Element * next_link = Thread::_ready.remove();
         Thread * next = next_link->object();
 
+        // while (exec->link() == (next_link = Thread::_ready.remove()))
+        //     next = next_link->object();
+
+
         // atualiza o ponteiro _running para apontar para a próxima thread a ser executada
         Thread::_running = next;
 
         // exec->state(READY);
         // _ready.insert(exec->link());
 
-        if (exec != &Thread::_main) {
-            // Atualiza prioridade da thread
-            exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
-                    (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+        if (exec->state() != FINISHING && exec->state() != SUSPENDED && exec->state() != WAITING) {
+
+            if (exec != &Thread::_main) {
+                // Atualiza prioridade da thread
+                exec->link()->rank(std::chrono::duration_cast<std::chrono::microseconds>
+                        (std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+            }
 
             exec->state(READY);
 
@@ -300,6 +317,10 @@ void Thread::reschedule(int) {
         if(next->state() == FINISHING)  {
             Thread::_ready.remove(next_link->object());
         }
+    } else {
+        // No more threads to reschedule
+
+        delete _timer;
     }
 }
 
