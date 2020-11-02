@@ -129,6 +129,7 @@ public:
 
     static void sleep(Ordered_List<Thread> &);
     static int wakeup(Ordered_List<Thread> &);
+    static void wakeup_all(Ordered_List<Thread> &);
 
 protected:
     inline static Thread * _running = NULL;

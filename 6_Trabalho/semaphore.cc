@@ -64,10 +64,8 @@ void Semaphore::wakeup_all() {
 
     db<Semaphore>(TRC) << "Semaphore::wakeup_all() called\n";
 
-    while (_waiting.size() > 0)
-        wakeup();
+    Thread::wakeup_all(_waiting);
 
-    Thread::yield();
 }
 
 __END_API

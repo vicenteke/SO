@@ -262,10 +262,28 @@ int Thread::wakeup(Ready_Queue & _waiting) {
         next->state(READY);
         _ready.insert(next->link());
 
+        yield();
+
         return 1;
     }
 
     return 0;
+}
+
+void Thread::wakeup_all(Ready_Queue & _waiting) {
+
+    db<Thread>(TRC) << "Thread::wakeup_all() called\n";
+    Thread * next;
+
+    while (Ordered_List<Thread>::Element * next_link = _waiting.remove()) {
+
+        while (!(next = next_link->object()))
+            next_link = _waiting.remove();
+
+        next->state(READY);
+        _ready.insert(next->link());
+        db<Thread>(TRC) << "Thread " << next->id() << " awake\n";
+    }
 }
 
 void Thread::reschedule(int) {

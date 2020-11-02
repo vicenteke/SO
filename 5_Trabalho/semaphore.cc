@@ -70,10 +70,8 @@ void Semaphore::wakeup_all() {
 
     //liberar todas de uma só vez antes de chamar a yield()
     //Tratar caso onde a Thread é deletada por outra
-    while (_waiting.size() > 0)
-        wakeup();
 
-    Thread::yield();
+    Thread::wakeup_all(_waiting);
 }
 
 __END_API
