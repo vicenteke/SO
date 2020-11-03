@@ -31,14 +31,18 @@ void CPU::switch_context(Context *from, Context *to)
 int CPU::finc(volatile int & number) {
 
     // Atomic implementation for incrementing a number
-    __asm__ ( "xadd %%ebx, %%eax" : "=a"(number) : "a"(number), "b"(1));
+    // __asm__ ( "xadd %%ebx, %%eax" : "=a"(number) : "a"(number), "b"(1));
+    int old = 1;
+    asm("lock xadd %0, %2" : "=a"(old) : "a"(old), "m"(number) : "memory");
     return number;
 }
 
 int CPU::fdec(volatile int & number) {
 
     // Atomic implementation for decrementing a number
-    __asm__ ( "xadd %%ebx, %%eax" : "=a"(number) : "a"(number), "b"(-1));
+    // __asm__ ( "xadd %%ebx, %%eax" : "=a"(number) : "a"(number), "b"(-1));
+    int old = -1;
+    asm("lock xadd %0, %2" : "=a"(old) : "a"(old), "m"(number) : "memory");
     return number;
 }
 
