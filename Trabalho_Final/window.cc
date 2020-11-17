@@ -60,7 +60,7 @@ void Window::draw_texture(unsigned int texture, int length, int height, float an
 
 void Window::run()
 {
-    sf::RenderWindow window(sf::VideoMode(500, 500), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(500, 500), "Pac-Man");
 
     //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
     //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
@@ -75,7 +75,7 @@ void Window::run()
             case sf::Event::Closed:
                  window.close();
                  break;
-            
+
             // key pressed
             case sf::Event::KeyPressed:
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
@@ -89,7 +89,7 @@ void Window::run()
                 } else
                     std::cout << "Keyboard pressed = " << event.key.code << std::endl;
                 break;
-            
+
             }
         }
 
@@ -105,7 +105,7 @@ void Window::run()
 
 void Window::load_and_bind_textures()
 {
-    // Bind map textures    
+    // Bind map textures
     maze_tex.loadFromFile("sprites/maze/maze.png");
     maze_sprite.setTexture(maze_tex);
     maze_sprite.scale(2, 2);
