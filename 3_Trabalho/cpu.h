@@ -27,8 +27,9 @@ class CPU
 
                 //Setting up _context
                 getcontext(&_context);
-                _context.uc_link            = 0;
-                _context.uc_stack.ss_sp     = operator new(STACK_SIZE);
+                _context.uc_link            = NULL;
+                new (&_stack) char[STACK_SIZE];
+                //_context.uc_stack.ss_sp     = new char[STACK_SIZE];
 
                 //Command necessary to avoid Valgrind's misinterpretation of context changing operations
                 valcontext = VALGRIND_STACK_REGISTER(_context.uc_stack.ss_sp, ((uint8_t*)_context.uc_stack.ss_sp) + STACK_SIZE);
