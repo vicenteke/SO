@@ -1,7 +1,8 @@
 CC_FILES=$(wildcard *.cc)
+LDLIBS =  -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system -lm  -lpng
 
 make:
-	g++ -g -Wextra -O2 -std=c++1z $(CC_FILES) -o s -g
+	g++ -g -Wextra -O2 -std=c++1z $(CC_FILES) -o s -g $(LDLIBS)
 	./s
 
 valgrind:

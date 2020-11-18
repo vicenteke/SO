@@ -4,6 +4,13 @@
 #include <iostream>
 #include <png.h>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio/Music.hpp>
+#include "tiles.h"
+#include "pacman.h"
+
+
+#define tile Tiles::tile
+#define maze Tiles::maze
 
 class Window
 {
@@ -17,6 +24,8 @@ public:
 private:
     void load_and_bind_textures();
 
+    PacMan _pacman;
+    sf::Sprite _pacman_sprites[3];
 
 private:
 
@@ -143,6 +152,9 @@ private:
     sf::Sprite cherry_sprite;
     sf::Texture strawberry_tex;
     sf::Sprite strawberry_sprite;
+
+    //Sounds
+    sf::Music theme_msc;
 };
 
 #endif

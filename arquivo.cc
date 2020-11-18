@@ -17,26 +17,30 @@ public:
     static int run();
 };
 
-int Main::run() {
-
-    bool win = false;
+void Main::run() {
 
     Jogo jogo = Jogo();
-
-    return win;
 }
 
-
-// Jogo e Tela são uma só
 class Jogo {
 public:
     Jogo(int lifes = 3, int foods = 240, int score = 0) : _lifes(lifes),
     _foods(foods), _score(score) {
 
+        run();
     }
 
     ~Jogo() {
 
+    }
+
+    void run() {
+
+        // Cria maze
+
+        // Cria objetos dos personagens
+        // Inicia as Threads
+        // Join nas Threads?
     }
 
     void addScore (int i) {
@@ -51,6 +55,19 @@ public:
         _food--;
     }
 
+    void updateScreen() {
+        // int x_pm = pacman.getX();
+        // if (x % resolution == 0) updateMatrix();
+
+        // V1
+        // Pega posições dos personagens
+        // Atualiza matriz se necessário
+        // Atualiza tela (animação)
+        // Verifica colisões
+
+        // V2
+    }
+
     static char matriz[][];
     static Semaphore mutex;
 
@@ -59,36 +76,9 @@ private:
     int _foods;
     int _score;
 
-
-};
-
-
-class Tela {
-public:
-
-    Tela() {
-        // Cria maze
-
-        // Cria objetos dos personagens
-        // Inicia as Threads
-        // Join nas Threads
-    }
-
-    void updateScreen() {
-        // int x_pm = pacman.getX();
-        // if (x % resolution == 0) updateMatrix();
-
-        // Pega posições dos personagens
-        // Atualiza matriz se necessário
-        // Atualiza tela (animação)
-        // Verifica colisões
-    }
-
-private:
     PacMan pacman;
     Ghost ghosts[4];
-
-}
+};
 
 
 class Personagem {
@@ -100,7 +90,42 @@ public:
 
     ~Personagem(){}
 
+    // void updateMatrix(char c); // Usa mutex
+
+    int getX() {
+        return _x;
+    }
+
+    int getY() {
+        return _y;
+    }
+
+private:
+    int _x;
+    int _y;
+    sf::Sprite _sprite;
+
+};
+
+
+class PacMan : public Personagem {
+public:
+
+    PacMan() {}
+    ~PacMan() {}
+
+    static void run() {
+
+        while (true) {
+
+        }
+        // get Keyboard
+        // move()
+    }
+
     void move(Direction d) {
+        // V2: Atualiza matriz e checa se há colisões
+
         switch (d) {
             case UP: _y++;
                     break;
@@ -118,35 +143,19 @@ public:
         // if (pos % resolution) updateMatrix();
     }
 
-    // void updateMatrix(); // Usa mutex
-
-    int getX() {
-        return _x;
-    }
-
-    int getY() {
-        return _y;
-    }
-
 private:
-    int _x;
-    int _y;
-    char* _sprite;
+    Direction _last_input;
 
-};
-
-
-class PacMan : public Personagem {
-public:
-    static void run() {
-        // do stuff
-    }
 };
 
 
 class Ghost : public Personagem {
 public:
     static void run() {
+        while (true) {
+            // define target tile
+            // move()
+        }
         // do stuff
     }
 };
@@ -154,14 +163,4 @@ public:
 
 class Ghost1 : public Ghost {
 
-}
-
-
-class Pause {
-public:
-    Pause() {
-        char last = ' ';
-        while (getChar == ' ');
-        if
-    }
-}
+};

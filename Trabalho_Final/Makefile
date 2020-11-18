@@ -1,26 +1,46 @@
-IDIR =.
-CC=g++
-LDLIBS =  -lsfml-graphics -lsfml-window -lsfml-system -lm  -lpng
-CFLAGS=-I$(IDIR) -g -Wextra
+# IDIR =.
+# CC=g++
+# LDLIBS =  -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system -lm  -lpng
+# CFLAGS=-I$(IDIR) -g -Wextra
+#
+# LDFLAGS= $(CFLAGS)
+#
+# ODIR=.
+# LIBS= $(LDLIBS) $(LDFLAGS)
+#
+# _DEPS = window.h
+# DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+#
+# _OBJ = main.o window.o
+# OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+#
+# $(ODIR)/%.o: %.c $(DEPS)
+# 	$(CC) -std=c++14 -c -o $@ $< $(CFLAGS) -Wextra
+#
+# main: $(OBJ)
+# 	$(CC) -std=c++14 -o $@ $^ $(CFLAGS) $(LIBS)
+#
+# .PHONY: clean
+#
+# clean:
+# 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
 
-LDFLAGS= $(CFLAGS)
-
+CC_FILES=$(wildcard *.cc)
+LDLIBS =  -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system -lm  -lpng
 ODIR=.
-LIBS= $(LDLIBS) $(LDFLAGS)
 
-_DEPS = window.h
-DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+make:
+	g++ -g -Wextra -O2 -std=c++1z $(CC_FILES) -o s -g $(LDLIBS)
+	./s
 
-_OBJ = main.o window.o
-OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+valgrind:
+	g++ -g -Wextra -O2 -std=c++1z $(CC_FILES) -o s -v
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./s
 
-$(ODIR)/%.o: %.c $(DEPS)
-	$(CC) -std=c++14 -c -o $@ $< $(CFLAGS) -Wextra
-
-main: $(OBJ)
-	$(CC) -std=c++14 -o $@ $^ $(CFLAGS) $(LIBS)
-
-.PHONY: clean
+valg:
+	g++ -g -Wextra -O2 -std=c++1z $(CC_FILES) -o s
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./s
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
+	clear

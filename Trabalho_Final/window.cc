@@ -12,46 +12,11 @@
  *      O: Big Pill
  *      E: Eaten Big Pill
  */
-/*
-typedef enum {W, G, P, u, o, e, O, E, F} tile;
-
-// 2D array defines the size of the maze and also what each tile contains
-tile maze[28][31] =
-        {
-                {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
-                {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},
-                {W,o,W,W,o,W,W,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,o,o,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,W,W,W,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,W,W,W,W,W,o,W,W,W,W,W,u,W,W,W,W,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,W},
-                {W,o,W,W,W,W,W,o,W,W,o,W,W,W,W,W,u,W,W,W,W,W,W,W,W,o,W,W,W,o,W},
-                {W,o,W,W,W,W,W,o,W,W,o,W,W,W,W,W,u,W,W,W,W,W,W,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,o,o,o,W,W,o,u,u,u,u,u,u,u,u,u,W,W,o,o,o,o,W,W,W,o,W},
-                {W,o,W,W,o,W,W,o,W,W,o,W,W,u,W,W,W,W,W,u,W,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,W,W,o,W,W,o,W,W,u,W,u,u,u,W,u,W,W,o,W,W,o,W,W,W,o,W},
-                {W,o,o,o,o,W,W,o,o,o,o,W,W,u,W,u,u,u,W,u,u,u,o,W,W,o,o,o,o,o,W},
-                {W,o,W,W,W,W,W,u,W,W,W,W,W,u,W,u,u,u,G,u,W,W,W,W,W,o,W,W,W,W,W},
-                {W,o,W,W,W,W,W,u,W,W,W,W,W,u,W,u,u,u,G,u,W,W,W,W,W,o,W,W,W,W,W},
-                {W,o,o,o,o,W,W,o,o,o,o,W,W,u,W,u,u,u,W,u,u,u,o,W,W,o,o,o,o,o,W},
-                {W,o,W,W,o,W,W,o,W,W,o,W,W,u,W,u,u,u,W,u,W,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,W,W,o,W,W,o,W,W,u,W,W,W,W,W,u,W,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,o,o,o,W,W,o,u,u,u,u,u,u,u,u,u,W,W,o,o,o,o,W,W,W,o,W},
-                {W,o,W,W,W,W,W,o,W,W,o,W,W,W,W,W,u,W,W,W,W,W,W,W,W,o,W,W,W,o,W},
-                {W,o,W,W,W,W,W,o,W,W,o,W,W,W,W,W,u,W,W,W,W,W,W,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,W},
-                {W,o,W,W,o,W,W,W,W,W,o,W,W,W,W,W,u,W,W,W,W,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,W,W,W,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,o,o,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,W,W,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
-                {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},
-                {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W}
-        };
-*/
 
 Window::Window()
 {
     load_and_bind_textures();
+    _pacman = PacMan();
 }
 
 void Window::draw_texture(unsigned int texture, int length, int height, float angle)
@@ -60,14 +25,17 @@ void Window::draw_texture(unsigned int texture, int length, int height, float an
 
 void Window::run()
 {
-    sf::RenderWindow window(sf::VideoMode(500, 500), "Pac-Man");
+    sf::RenderWindow window(sf::VideoMode(674, 1000), "Pac Man");
 
     //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
     //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
     window.setKeyRepeatEnabled(false);
 
+    int i = 0;
+
     while (window.isOpen())
     {
+        i++;
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -78,14 +46,88 @@ void Window::run()
 
             // key pressed
             case sf::Event::KeyPressed:
+                Personagem::Direction prev = _pacman.direction();
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-                    std::cout << "Keyboard esquerda!" << std::endl;
+                    // std::cout << "Keyboard esquerda!" << std::endl;
+                    _pacman.direction(Personagem::Direction::LEFT);
+                    _pacman_sprites[0].setRotation(0);
+                    _pacman_sprites[1].setRotation(0);
+                    _pacman_sprites[2].setRotation(0);
+
+                    switch(prev) {
+                        case Personagem::Direction::RIGHT:
+                            _pacman.setX(_pacman.getX() - 45);
+                            _pacman.setY(_pacman.getY() - 45);
+                            break;
+                        case Personagem::Direction::UP:
+                            _pacman.setX(_pacman.getX() - 45);
+                            break;
+                        case Personagem::Direction::DOWN:
+                            _pacman.setY(_pacman.getY() - 45);
+                            break;
+                    }
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                    std::cout << "Keyboard direita!" << std::endl;
+                    // std::cout << "Keyboard direita!" << std::endl;
+                    _pacman.direction(Personagem::Direction::RIGHT);
+                    _pacman_sprites[0].setRotation(180);
+                    _pacman_sprites[1].setRotation(180);
+                    _pacman_sprites[2].setRotation(180);
+
+                    switch(prev) {
+                        case Personagem::Direction::LEFT:
+                            _pacman.setX(_pacman.getX() + 45);
+                            _pacman.setY(_pacman.getY() + 45);
+                            break;
+                        case Personagem::Direction::UP:
+                            _pacman.setY(_pacman.getY() + 45);
+                            break;
+                        case Personagem::Direction::DOWN:
+                            _pacman.setX(_pacman.getX() + 45);
+                            break;
+                    }
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                    std::cout << "Keyboard para baixo!" << std::endl;
+                    // std::cout << "Keyboard para baixo!" << std::endl;
+                    _pacman.direction(Personagem::Direction::DOWN);
+                    _pacman_sprites[0].setRotation(270);
+                    _pacman_sprites[1].setRotation(270);
+                    _pacman_sprites[2].setRotation(270);
+
+                    switch(prev) {
+                        case Personagem::Direction::UP:
+                            _pacman.setX(_pacman.getX() - 45);
+                            _pacman.setY(_pacman.getY() + 45);
+                            break;
+                        case Personagem::Direction::LEFT:
+                            _pacman.setY(_pacman.getY() + 45);
+                            break;
+                        case Personagem::Direction::RIGHT:
+                            _pacman.setX(_pacman.getX() - 45);
+                            break;
+                    }
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                    std::cout << "Keyboard para cima!" << std::endl;
+                    // std::cout << "Keyboard para cima!" << std::endl;
+                    _pacman.direction(Personagem::Direction::UP);
+                    _pacman_sprites[0].setRotation(90);
+                    _pacman_sprites[1].setRotation(90);
+                    _pacman_sprites[2].setRotation(90);
+
+                    switch(prev) {
+                        case Personagem::Direction::DOWN:
+                            _pacman.setX(_pacman.getX() + 45);
+                            _pacman.setY(_pacman.getY() - 45);
+                            break;
+                        case Personagem::Direction::LEFT:
+                            _pacman.setX(_pacman.getX() + 45);
+                            break;
+                        case Personagem::Direction::RIGHT:
+                            _pacman.setY(_pacman.getY() - 45);
+                            break;
+                    }
+                } else if (event.key.code == 57) {
+                    std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
+                    maze[_pacman.getTileX()][_pacman.getTileY()] = tile::O;
+                } else if (event.key.code == 42) {
+                    std::cout << _pacman.getX() << ", " << _pacman.getY() << '\n';
                 } else
                     std::cout << "Keyboard pressed = " << event.key.code << std::endl;
                 break;
@@ -93,11 +135,47 @@ void Window::run()
             }
         }
 
+        for (volatile unsigned int j = 0; j < 10000000; j++);
+        _pacman.move();
+
+        // Not working well; should avoid pacman crossing maze before
+        // int pm_x = _pacman.getX() - 10;
+        // int pm_y = 710 - _pacman.getY();
+        //
+        // if (pm_x % 30 == 0 && pm_y % 24 == 0) {
+        //     switch(maze[pm_x / 30][pm_y / 24]) {
+        //         case tile::o:
+        //             maze[pm_x / 30][pm_y / 24] = tile::e;
+        //             std::cout << "yum ";
+        //                 break;
+        //     }
+        // }
+
+        if (i == 9999999) i = 0;
+
         window.clear();
+
+        for (int k = 0; k < 28; k++) {
+            for (int j = 0; j < 31; j++) {
+                if (maze[k][j] == tile::o) {
+                    // draw small food
+                    pill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
+                    window.draw(pill_sprite);
+                } else if (maze[k][j] == tile::O) {
+                    // draw large food
+                    bigPill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
+                    window.draw(bigPill_sprite);
+                }
+            }
+        }
+
         window.draw(maze_sprite);
-        pac_0_sprite.setPosition(220, 365);
-        window.draw(pac_0_sprite);
-        ghost_r_0_sprite.setPosition(245, 150);
+        // pac_0_sprite.setPosition(310, 398);
+        // window.draw(pac_0_sprite);
+        _pacman_sprites[(i / 5) % 3].setPosition(_pacman.getX(), _pacman.getY());
+
+        window.draw(_pacman_sprites[(i / 5) % 3]);
+        ghost_r_0_sprite.setPosition(315, 350);
         window.draw(ghost_r_0_sprite);
         window.display();
     }
@@ -108,19 +186,24 @@ void Window::load_and_bind_textures()
     // Bind map textures
     maze_tex.loadFromFile("sprites/maze/maze.png");
     maze_sprite.setTexture(maze_tex);
-    maze_sprite.scale(2, 2);
+    maze_sprite.scale(3, 3);
     pill_tex.loadFromFile("sprites/maze/p-0.png");
     pill_sprite.setTexture(pill_tex);
+    pill_sprite.scale(2, 2);
     bigPill_tex.loadFromFile("sprites/maze/p-1.png");
     bigPill_sprite.setTexture(bigPill_tex);
+    bigPill_sprite.scale(2, 2);
 
     // Bind Pacman textures
     pac_0_tex.loadFromFile("sprites/pacman/0.png");
     pac_0_sprite.setTexture(pac_0_tex);
+    pac_0_sprite.scale(3, 3);
     pac_1_tex.loadFromFile("sprites/pacman/1.png");
     pac_1_sprite.setTexture(pac_1_tex);
+    pac_1_sprite.scale(3, 3);
     pac_2_tex.loadFromFile("sprites/pacman/2.png");
     pac_2_sprite.setTexture(pac_2_tex);
+    pac_2_sprite.scale(3, 3);
     dead_0_tex.loadFromFile("sprites/pacman/d-0.png");
     dead_0_sprite.setTexture(dead_0_tex);
     dead_1_tex.loadFromFile("sprites/pacman/d-1.png");
@@ -229,4 +312,15 @@ void Window::load_and_bind_textures()
     cherry_sprite.setTexture(cherry_tex);
     strawberry_tex.loadFromFile("sprites/fruits/strawberry.png");
     strawberry_sprite.setTexture(strawberry_tex);
+
+    //Set theme song
+    theme_msc.openFromFile("sprites/theme.ogg");
+    theme_msc.setVolume(0);
+    theme_msc.play();
+
+    // Sprites arrays for objects
+    _pacman_sprites[0] = pac_0_sprite;
+    _pacman_sprites[1] = pac_1_sprite;
+    _pacman_sprites[2] = pac_2_sprite;
+
 }
