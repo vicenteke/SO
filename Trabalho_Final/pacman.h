@@ -37,7 +37,7 @@ public:
                         _y = 14;
                         break;
                     }
-                    if (maze[getTileX()][getTileY() - 1] != tile::W || getTileY() == 0)
+                    if (maze[getTileX()][getTileY() + 1] != tile::W || getTileY() == 0)
                         _y -= SPEED;
                     if(getTileX() == 0) {
                         int tmp = (_x - 14) % 24;
@@ -52,7 +52,7 @@ public:
                         _y = 734;
                         break;
                     }
-                    if (maze[getTileX()][getTileY() + 1] != tile::W || getTileY() == 0)
+                    if (maze[getTileX()][getTileY() - 1] != tile::W || getTileY() == 0)
                         _y += SPEED;
                     if(getTileX() == 0) {
                         int tmp = (_x - 14) % 24;
@@ -106,13 +106,13 @@ public:
             return 0;
 
         switch (_last_input) {
-            case UP:  return (_x - 14 - 48) / 24;
+            case UP:  return -1 + (_x - 14 - 48 + 48) / 24;
                 break;
-            case DOWN:  return (_x - 14) / 24;
+            case DOWN:  return 1 + (_x - 14) / 24;
                 break;
-            case LEFT: return (_x - 14) / 24;
+            case LEFT: return 1 + (_x - 14) / 24;
                 break;
-            case RIGHT: return (_x - 14 - 48) / 24;
+            case RIGHT: return -1 + (_x - 14 - 48 + 48) / 24;
                 break;
         }
 
@@ -125,13 +125,13 @@ public:
             return 0;
 
         switch (_last_input) {
-            case DOWN:  return (710 - _y - 48) / 24;
+            case DOWN:  return 2 + (710 - _y - 48 + 48) / 24;
                 break;
             case UP:  return (710 - _y) / 24;
                 break;
             case LEFT: return (710 - _y) / 24;
                 break;
-            case RIGHT: return (710 - _y - 48) / 24;
+            case RIGHT: return 2 + (710 - _y - 48 + 48) / 24;
                 break;
         }
 

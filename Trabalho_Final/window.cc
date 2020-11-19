@@ -1,18 +1,5 @@
 #include "window.h"
 
-
-/**
- * Tile defined as an enum where each type is defined as:
- *      W: Wall
- *      G: Ghost Pen Gate
- *      P: Portal
- *      u: Empty path
- *      o: Pill
- *      e: Eaten Pill
- *      O: Big Pill
- *      E: Eaten Big Pill
- */
-
 Window::Window()
 {
     load_and_bind_textures();
@@ -135,7 +122,7 @@ void Window::run()
             }
         }
 
-        for (volatile unsigned int j = 0; j < 10000000; j++);
+        for (volatile unsigned int j = 0; j < 2500000; j++);
         _pacman.move();
 
         // Not working well; should avoid pacman crossing maze before
@@ -172,9 +159,9 @@ void Window::run()
         window.draw(maze_sprite);
         // pac_0_sprite.setPosition(310, 398);
         // window.draw(pac_0_sprite);
-        _pacman_sprites[(i / 5) % 3].setPosition(_pacman.getX(), _pacman.getY());
+        _pacman_sprites[(i / 15) % 3].setPosition(_pacman.getX(), _pacman.getY());
 
-        window.draw(_pacman_sprites[(i / 5) % 3]);
+        window.draw(_pacman_sprites[(i / 15) % 3]);
         ghost_r_0_sprite.setPosition(315, 350);
         window.draw(ghost_r_0_sprite);
         window.display();
