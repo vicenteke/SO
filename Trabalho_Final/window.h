@@ -24,8 +24,14 @@ public:
 private:
     void load_and_bind_textures();
 
+    // Game stats
+    int _lives;
+    int _foods;
+    int _score;
+
+    // Game characters
     PacMan _pacman;
-    sf::Sprite _pacman_sprites[3];
+    sf::Sprite _pacman_sprites[4];
 
 private:
 

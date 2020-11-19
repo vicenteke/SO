@@ -3,6 +3,11 @@
 Window::Window()
 {
     load_and_bind_textures();
+
+    _lives = 3;
+    _foods = 240;
+    _score = 0;
+
     _pacman = PacMan();
 }
 
@@ -123,7 +128,18 @@ void Window::run()
         }
 
         for (volatile unsigned int j = 0; j < 2500000; j++);
-        _pacman.move();
+        switch(_pacman.move()) {
+            case 100:
+                _score += 100;
+                _foods--;
+                std::cout << "Score: " << _score << " | Foods: " << _foods << " | Lives: " << _lives << '\n';
+                break;
+            case 200:
+                _score += 200;
+                _foods--;
+                std::cout << "Score: " << _score << " | Foods: " << _foods << " | Lives: " << _lives << '\n';
+                break;
+        }
 
         // Not working well; should avoid pacman crossing maze before
         // int pm_x = _pacman.getX() - 10;
@@ -144,14 +160,17 @@ void Window::run()
 
         for (int k = 0; k < 28; k++) {
             for (int j = 0; j < 31; j++) {
-                if (maze[k][j] == tile::o) {
-                    // draw small food
-                    pill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
-                    window.draw(pill_sprite);
-                } else if (maze[k][j] == tile::O) {
-                    // draw large food
-                    bigPill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
-                    window.draw(bigPill_sprite);
+                switch(maze[k][j]) {
+                    case tile::o:
+                        // draw small food
+                        pill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
+                        window.draw(pill_sprite);
+                        break;
+                    case tile::O:
+                        // draw large food
+                        bigPill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
+                        window.draw(bigPill_sprite);
+                        break;
                 }
             }
         }
@@ -309,5 +328,6 @@ void Window::load_and_bind_textures()
     _pacman_sprites[0] = pac_0_sprite;
     _pacman_sprites[1] = pac_1_sprite;
     _pacman_sprites[2] = pac_2_sprite;
+    _pacman_sprites[3] = pac_1_sprite;
 
 }
