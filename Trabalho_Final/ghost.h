@@ -79,14 +79,20 @@ public:
         int tile_y = getTileY();
 
         if (tile_x != 0 && tile_y != 0)
-            if (_x < _target_x && (maze[tile_x + 1][tile_y] != tile::W))
+            if (_x < _target_x && maze[tile_x + 1][tile_y] != tile::W && _last_input != LEFT)
                 _last_input = RIGHT;
-            else if (_x > _target_x && (maze[tile_x - 1][tile_y] != tile::W))
+            else if (_x > _target_x && maze[tile_x - 1][tile_y] != tile::W && _last_input != RIGHT)
                 _last_input = LEFT;
-            else if (_y < _target_y && (maze[tile_x][tile_y - 1] != tile::W && maze[tile_x][tile_y - 1] != tile::G))
+            else if (_y < _target_y && maze[tile_x][tile_y - 1] != tile::W && _last_input != UP)
                 _last_input = DOWN;
-            else if (_y > _target_y && (maze[tile_x][tile_y + 1] != tile::W && maze[tile_x][tile_y + 1] != tile::G))
+            else if (_y > _target_y && maze[tile_x][tile_y + 1] != tile::W && _last_input != DOWN)
                 _last_input = UP;
+            else {
+                if (maze[tile_x + 1][tile_y] != tile::W && _last_input != LEFT) _last_input = RIGHT;
+                else if (maze[tile_x - 1][tile_y] != tile::W && _last_input != RIGHT) _last_input = LEFT;
+                else if (maze[tile_x][tile_y - 1] != tile::W && _last_input != UP) _last_input = DOWN;
+                else if (maze[tile_x][tile_y + 1] != tile::W && _last_input != DOWN) _last_input = UP;
+            }
     }
 
 private:
