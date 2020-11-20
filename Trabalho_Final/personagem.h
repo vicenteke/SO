@@ -1,3 +1,6 @@
+#ifndef PERSONAGEM_H
+#define PERSONAGEM_H
+
 #include <iostream>
 #include <png.h>
 #include <SFML/Graphics.hpp>
@@ -14,8 +17,8 @@ public:
 public:
     enum Direction {UP, DOWN, LEFT, RIGHT, STOPPED};
 
-    Personagem(int x, int y, int _speed, Direction dir) :
-    _x(x), _y(y), _speed(_speed), _last_input(dir) {}
+    Personagem(int x, int y, int _speed, Direction dir, sf::Sprite * sprites, int n_sprites) :
+    _x(x), _y(y), _speed(_speed), _last_input(dir), _sprites(sprites), _n_sprites(n_sprites) {}
 
     ~Personagem(){}
 
@@ -45,45 +48,18 @@ public:
         return _last_input;
     }
 
-    int getTileX() {
-        if ((_x - 14) % 24 != 0)
-            return 0;
+    virtual int getTileX() = 0;
+    virtual int getTileY() = 0;
 
-        switch (_last_input) {
-            case UP:  return -1 + (_x - 14 - 48 + 48) / 24;
-                break;
-            case DOWN:  return 1 + (_x - 14) / 24;
-                break;
-            case LEFT: return 1 + (_x - 14) / 24;
-                break;
-            case RIGHT: return -1 + (_x - 14 - 48 + 48) / 24;
-                break;
+    virtual int checkPosition(int, int) = 0;
+
+    void rotateSprite(int angle) {
+        for (int i = 0; i < _n_sprites; i++) {
+            _sprites[i].setRotation(angle);
         }
-
-        return (_x - 3) / 24;
     }
 
-    int getTileY() {
-        if ((_y - 14) % 24 != 0)
-            return 0;
-
-        switch (_last_input) {
-            case DOWN:  return 2 + (710 - _y - 48 + 48) / 24;
-                break;
-            case UP:  return (710 - _y) / 24;
-                break;
-            case LEFT: return (710 - _y) / 24;
-                break;
-            case RIGHT: return 2 + (710 - _y - 48 + 48) / 24;
-                break;
-        }
-
-        return (725 - _y) / 24;
-    }
-
-    virtual int checkPosition() = 0;
-
-    int move() {
+    int move(int a = 0, int b = 0) {
         // V2: Atualiza matriz e checa se há colisões
 
         int tile_x = getTileX();
@@ -116,7 +92,7 @@ public:
                     if(tile_x == 0) {
                         int tmp = (_x - 14) % 24;
                         _x -= tmp;
-                        if (tmp > 12)
+                        if (tmp >= 12)
                         _x += 24;
                         tile_x = getTileX();
                     }
@@ -162,7 +138,7 @@ public:
                     break;
         }
 
-        return checkPosition();
+        return checkPosition(a, b);
     }
 
 protected:
@@ -170,4 +146,8 @@ protected:
     int _y;
     int _speed;
     Direction _last_input;
+    sf::Sprite *_sprites;
+    int _n_sprites;
 };
+
+#endif

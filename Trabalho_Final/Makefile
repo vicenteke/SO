@@ -42,5 +42,5 @@ valg:
 	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./s
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ s
 	clear

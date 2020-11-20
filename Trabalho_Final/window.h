@@ -5,12 +5,11 @@
 #include <png.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio/Music.hpp>
+
 #include "tiles.h"
+#include "defines.h"
 #include "pacman.h"
-
-
-#define tile Tiles::tile
-#define maze Tiles::maze
+#include "ghost.h"
 
 class Window
 {
@@ -20,6 +19,8 @@ public:
     void run();
 
     void draw_texture(unsigned int texture, int length, int height, float angle);
+
+    void eoq();
 
 private:
     void load_and_bind_textures();
@@ -32,6 +33,11 @@ private:
     // Game characters
     PacMan _pacman;
     sf::Sprite _pacman_sprites[4];
+
+    Ghost _ghost;
+    sf::Sprite _ghost_sprites[2];
+
+    // Fruit fruit: thread that checks _foods?
 
 private:
 

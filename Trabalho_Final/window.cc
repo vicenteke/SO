@@ -8,7 +8,8 @@ Window::Window()
     _foods = 240;
     _score = 0;
 
-    _pacman = PacMan();
+    _pacman = PacMan(_pacman_sprites, 4);
+    _ghost = Ghost(_ghost_sprites, 2);
 }
 
 void Window::draw_texture(unsigned int texture, int length, int height, float angle)
@@ -41,85 +42,20 @@ void Window::run()
                 Personagem::Direction prev = _pacman.direction();
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
                     // std::cout << "Keyboard esquerda!" << std::endl;
-                    _pacman.direction(Personagem::Direction::LEFT);
-                    _pacman_sprites[0].setRotation(0);
-                    _pacman_sprites[1].setRotation(0);
-                    _pacman_sprites[2].setRotation(0);
-
-                    switch(prev) {
-                        case Personagem::Direction::RIGHT:
-                            _pacman.setX(_pacman.getX() - 45);
-                            _pacman.setY(_pacman.getY() - 45);
-                            break;
-                        case Personagem::Direction::UP:
-                            _pacman.setX(_pacman.getX() - 45);
-                            break;
-                        case Personagem::Direction::DOWN:
-                            _pacman.setY(_pacman.getY() - 45);
-                            break;
-                    }
+                    _pacman.changeDirection(Personagem::Direction::LEFT);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                     // std::cout << "Keyboard direita!" << std::endl;
-                    _pacman.direction(Personagem::Direction::RIGHT);
-                    _pacman_sprites[0].setRotation(180);
-                    _pacman_sprites[1].setRotation(180);
-                    _pacman_sprites[2].setRotation(180);
-
-                    switch(prev) {
-                        case Personagem::Direction::LEFT:
-                            _pacman.setX(_pacman.getX() + 45);
-                            _pacman.setY(_pacman.getY() + 45);
-                            break;
-                        case Personagem::Direction::UP:
-                            _pacman.setY(_pacman.getY() + 45);
-                            break;
-                        case Personagem::Direction::DOWN:
-                            _pacman.setX(_pacman.getX() + 45);
-                            break;
-                    }
+                    _pacman.changeDirection(Personagem::Direction::RIGHT);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                     // std::cout << "Keyboard para baixo!" << std::endl;
-                    _pacman.direction(Personagem::Direction::DOWN);
-                    _pacman_sprites[0].setRotation(270);
-                    _pacman_sprites[1].setRotation(270);
-                    _pacman_sprites[2].setRotation(270);
-
-                    switch(prev) {
-                        case Personagem::Direction::UP:
-                            _pacman.setX(_pacman.getX() - 45);
-                            _pacman.setY(_pacman.getY() + 45);
-                            break;
-                        case Personagem::Direction::LEFT:
-                            _pacman.setY(_pacman.getY() + 45);
-                            break;
-                        case Personagem::Direction::RIGHT:
-                            _pacman.setX(_pacman.getX() - 45);
-                            break;
-                    }
+                    _pacman.changeDirection(Personagem::Direction::DOWN);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                     // std::cout << "Keyboard para cima!" << std::endl;
-                    _pacman.direction(Personagem::Direction::UP);
-                    _pacman_sprites[0].setRotation(90);
-                    _pacman_sprites[1].setRotation(90);
-                    _pacman_sprites[2].setRotation(90);
-
-                    switch(prev) {
-                        case Personagem::Direction::DOWN:
-                            _pacman.setX(_pacman.getX() + 45);
-                            _pacman.setY(_pacman.getY() - 45);
-                            break;
-                        case Personagem::Direction::LEFT:
-                            _pacman.setX(_pacman.getX() + 45);
-                            break;
-                        case Personagem::Direction::RIGHT:
-                            _pacman.setY(_pacman.getY() - 45);
-                            break;
-                    }
+                    _pacman.changeDirection(Personagem::Direction::UP);
                 } else if (event.key.code == 57) {
-                    std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
-                    maze[_pacman.getTileX()][_pacman.getTileY()] = tile::O;
+                    std::cout << _ghost.direction() << ' ' << _ghost.getTileX() << ", " << _ghost.getTileY() << '\n';
                 } else if (event.key.code == 42) {
-                    std::cout << _pacman.getX() << ", " << _pacman.getY() << '\n';
+                    std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
                 } else
                     std::cout << "Keyboard pressed = " << event.key.code << std::endl;
                 break;
@@ -129,32 +65,21 @@ void Window::run()
 
         for (volatile unsigned int j = 0; j < 2500000; j++);
         switch(_pacman.move()) {
-            case 100:
-                _score += 100;
+            case 10:
+                _score += 10;
                 _foods--;
                 std::cout << "Score: " << _score << " | Foods: " << _foods << " | Lives: " << _lives << '\n';
                 break;
-            case 200:
-                _score += 200;
-                _foods--;
+            case 20:
+                _score += 20;
                 std::cout << "Score: " << _score << " | Foods: " << _foods << " | Lives: " << _lives << '\n';
                 break;
         }
 
-        // Not working well; should avoid pacman crossing maze before
-        // int pm_x = _pacman.getX() - 10;
-        // int pm_y = 710 - _pacman.getY();
-        //
-        // if (pm_x % 30 == 0 && pm_y % 24 == 0) {
-        //     switch(maze[pm_x / 30][pm_y / 24]) {
-        //         case tile::o:
-        //             maze[pm_x / 30][pm_y / 24] = tile::e;
-        //             std::cout << "yum ";
-        //                 break;
-        //     }
-        // }
+        _ghost.getTargetTile(_pacman.getX(), _pacman.getY(), _pacman.direction());
+        _ghost.move(_pacman.getTileX(), _pacman.getTileY());
 
-        if (i == 9999999) i = 0;
+        if (i == 55440) i = 0;
 
         window.clear();
 
@@ -178,11 +103,14 @@ void Window::run()
         window.draw(maze_sprite);
         // pac_0_sprite.setPosition(310, 398);
         // window.draw(pac_0_sprite);
-        _pacman_sprites[(i / 15) % 3].setPosition(_pacman.getX(), _pacman.getY());
+        _pacman_sprites[(i / 15) % 4].setPosition(_pacman.getX(), _pacman.getY());
+        window.draw(_pacman_sprites[(i / 15) % 4]);
 
-        window.draw(_pacman_sprites[(i / 15) % 3]);
-        ghost_r_0_sprite.setPosition(315, 350);
-        window.draw(ghost_r_0_sprite);
+        // ghost_r_0_sprite.setPosition(315, 350);
+        // window.draw(ghost_r_0_sprite);
+        _ghost_sprites[(i / 15) % 2].setPosition(_ghost.getX(), _ghost.getY());
+        window.draw(_ghost_sprites[(i / 15) % 2]);
+
         window.display();
     }
 }
@@ -236,8 +164,10 @@ void Window::load_and_bind_textures()
     // Bind ghost textures
     ghost_r_0_tex.loadFromFile("sprites/ghosts/r-0.png");
     ghost_r_0_sprite.setTexture(ghost_r_0_tex);
+    ghost_r_0_sprite.scale(3, 3);
     ghost_r_1_tex.loadFromFile("sprites/ghosts/r-1.png");
     ghost_r_1_sprite.setTexture(ghost_r_1_tex);
+    ghost_r_1_sprite.scale(3, 3);
     ghost_p_0_tex.loadFromFile("sprites/ghosts/p-0.png");
     ghost_p_0_sprite.setTexture(ghost_p_0_tex);
     ghost_p_1_tex.loadFromFile("sprites/ghosts/p-1.png");
@@ -329,5 +259,8 @@ void Window::load_and_bind_textures()
     _pacman_sprites[1] = pac_1_sprite;
     _pacman_sprites[2] = pac_2_sprite;
     _pacman_sprites[3] = pac_1_sprite;
+
+    _ghost_sprites[0] = ghost_r_0_sprite;
+    _ghost_sprites[1] = ghost_r_1_sprite;
 
 }
