@@ -35,7 +35,7 @@ private:
     sf::Sprite _pacman_sprites[4];
 
     Ghost _ghost;
-    sf::Sprite _ghost_sprites[2];
+    sf::Sprite _ghost_sprites[6];
 
     // Fruit fruit: thread that checks _foods?
 

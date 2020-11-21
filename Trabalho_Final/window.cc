@@ -9,7 +9,7 @@ Window::Window()
     _score = 0;
 
     _pacman = PacMan(_pacman_sprites, 4);
-    _ghost = Ghost(_ghost_sprites, 2);
+    _ghost = Ghost(&_ghost_sprites[2], _ghost_sprites, 2);
 }
 
 void Window::draw_texture(unsigned int texture, int length, int height, float angle)
@@ -109,7 +109,9 @@ void Window::run()
         // ghost_r_0_sprite.setPosition(315, 350);
         // window.draw(ghost_r_0_sprite);
         _ghost_sprites[(i / 15) % 2].setPosition(_ghost.getX(), _ghost.getY());
+        // _ghost.getEye().setPosition(_ghost.getX(), _ghost.getY());
         window.draw(_ghost_sprites[(i / 15) % 2]);
+        window.draw(_ghost.getEye());
 
         window.display();
     }
@@ -192,12 +194,17 @@ void Window::load_and_bind_textures()
      // Bind ghost eye textures
     eye_up_tex.loadFromFile("sprites/eyes/up.png");
     eye_up_sprite.setTexture(eye_up_tex);
+    eye_up_sprite.scale(3, 3);
     eye_right_tex.loadFromFile("sprites/eyes/right.png");
     eye_right_sprite.setTexture(eye_right_tex);
+    eye_right_sprite.scale(3, 3);
     eye_down_tex.loadFromFile("sprites/eyes/down.png");
     eye_down_sprite.setTexture(eye_down_tex);
+    eye_down_sprite.scale(3, 3);
     eye_left_tex.loadFromFile("sprites/eyes/left.png");
     eye_left_sprite.setTexture(eye_left_tex);
+    eye_left_sprite.scale(3, 3);
+
 
     // Bind UI textures
     num_0_tex.loadFromFile("sprites/ui/0.png");
@@ -262,5 +269,9 @@ void Window::load_and_bind_textures()
 
     _ghost_sprites[0] = ghost_r_0_sprite;
     _ghost_sprites[1] = ghost_r_1_sprite;
+    _ghost_sprites[2] = eye_up_sprite;
+    _ghost_sprites[3] = eye_down_sprite;
+    _ghost_sprites[4] = eye_left_sprite;
+    _ghost_sprites[5] = eye_right_sprite;
 
 }
