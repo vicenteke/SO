@@ -1,15 +1,81 @@
 #include "window.h"
 
+sf::Sprite Window::_pacman_sprites[4];
+sf::Sprite Window::_ghost_sprites[6];
+
+// Maze Textures
+sf::Sprite Window::maze_sprite;
+sf::Sprite Window::pill_sprite;
+sf::Sprite Window::bigPill_sprite;
+
+// Pacman Textures
+sf::Sprite Window::pac_0_sprite;
+sf::Sprite Window::pac_1_sprite;
+sf::Sprite Window::pac_2_sprite;
+sf::Sprite Window::dead_0_sprite;
+sf::Sprite Window::dead_1_sprite;
+sf::Sprite Window::dead_2_sprite;
+sf::Sprite Window::dead_3_sprite;
+sf::Sprite Window::dead_4_sprite;
+sf::Sprite Window::dead_5_sprite;
+sf::Sprite Window::dead_6_sprite;
+sf::Sprite Window::dead_7_sprite;
+sf::Sprite Window::dead_8_sprite;
+sf::Sprite Window::dead_9_sprite;
+sf::Sprite Window::dead_10_sprite;
+
+// Ghost Textures
+sf::Sprite Window::ghost_r_0_sprite;
+sf::Sprite Window::ghost_r_1_sprite;
+sf::Sprite Window::ghost_p_0_sprite;
+sf::Sprite Window::ghost_p_1_sprite;
+sf::Sprite Window::ghost_b_0_sprite;
+sf::Sprite Window::ghost_b_1_sprite;
+sf::Sprite Window::ghost_y_0_sprite;
+sf::Sprite Window::ghost_y_1_sprite;
+sf::Sprite Window::ghost_scared_0_sprite;
+sf::Sprite Window::ghost_scared_1_sprite;
+sf::Sprite Window::ghost_scared_2_sprite;
+sf::Sprite Window::ghost_scared_3_sprite;
+
+// Eye Textures
+sf::Sprite Window::eye_up_sprite;
+sf::Sprite Window::eye_right_sprite;
+sf::Sprite Window::eye_down_sprite;
+sf::Sprite Window::eye_left_sprite;
+
+// UI Textures
+sf::Sprite Window::num_0_sprite;
+sf::Sprite Window::num_1_sprite;
+sf::Sprite Window::num_2_sprite;
+sf::Sprite Window::num_3_sprite;
+sf::Sprite Window::num_4_sprite;
+sf::Sprite Window::num_5_sprite;
+sf::Sprite Window::num_6_sprite;
+sf::Sprite Window::num_7_sprite;
+sf::Sprite Window::num_8_sprite;
+sf::Sprite Window::num_9_sprite;
+sf::Sprite Window::score_200_sprite;
+sf::Sprite Window::score_400_sprite;
+sf::Sprite Window::score_800_sprite;
+sf::Sprite Window::score_1600_sprite;
+sf::Sprite Window::ready_sprite;
+sf::Sprite Window::gameover_sprite;
+sf::Sprite Window::life_sprite;
+sf::Sprite Window::score_sprite;
+sf::Sprite Window::high_sprite;
+sf::Sprite Window::score_100_sprite;
+sf::Sprite Window::score_300_sprite;
+
+// Fruit Textures
+sf::Sprite Window::cherry_sprite;
+sf::Sprite Window::strawberry_sprite;
+
+
+
 Window::Window()
 {
     load_and_bind_textures();
-
-    _lives = 3;
-    _foods = 240;
-    _score = 0;
-
-    _pacman = PacMan(_pacman_sprites, 4);
-    _ghost = Ghost(&_ghost_sprites[2], _ghost_sprites, 2);
 }
 
 void Window::draw_texture(unsigned int texture, int length, int height, float angle)
@@ -39,23 +105,26 @@ void Window::run()
 
             // key pressed
             case sf::Event::KeyPressed:
-                Personagem::Direction prev = _pacman.direction();
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
                     // std::cout << "Keyboard esquerda!" << std::endl;
-                    _pacman.changeDirection(Personagem::Direction::LEFT);
+                    // _pacman.changeDirection(Personagem::Direction::LEFT);
+                    PacMan::pacman_dir = LEFT;
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                     // std::cout << "Keyboard direita!" << std::endl;
-                    _pacman.changeDirection(Personagem::Direction::RIGHT);
+                    // _pacman.changeDirection(Personagem::Direction::RIGHT);
+                    PacMan::pacman_dir = RIGHT;
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                     // std::cout << "Keyboard para baixo!" << std::endl;
-                    _pacman.changeDirection(Personagem::Direction::DOWN);
+                    // _pacman.changeDirection(Personagem::Direction::DOWN);
+                    PacMan::pacman_dir = DOWN;
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                     // std::cout << "Keyboard para cima!" << std::endl;
-                    _pacman.changeDirection(Personagem::Direction::UP);
+                    // _pacman.changeDirection(Personagem::Direction::UP);
+                    PacMan::pacman_dir = UP;
                 } else if (event.key.code == 57) {
-                    std::cout << _ghost.direction() << ' ' << _ghost.getTileX() << ", " << _ghost.getTileY() << '\n';
+                    // std::cout << _ghost.direction() << ' ' << _ghost.getTileX() << ", " << _ghost.getTileY() << '\n';
                 } else if (event.key.code == 42) {
-                    std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
+                    // std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
                 } else
                     std::cout << "Keyboard pressed = " << event.key.code << std::endl;
                 break;
@@ -63,21 +132,8 @@ void Window::run()
             }
         }
 
-        for (volatile unsigned int j = 0; j < 2500000; j++);
-        switch(_pacman.move()) {
-            case 10:
-                _score += 10;
-                _foods--;
-                std::cout << "Score: " << _score << " | Foods: " << _foods << " | Lives: " << _lives << '\n';
-                break;
-            case 20:
-                _score += 20;
-                std::cout << "Score: " << _score << " | Foods: " << _foods << " | Lives: " << _lives << '\n';
-                break;
-        }
-
-        _ghost.getTargetTile(_pacman.getX(), _pacman.getY(), _pacman.direction());
-        _ghost.move(_pacman.getTileX(), _pacman.getTileY());
+        for (volatile unsigned int j = 0; j < 250000; j++);
+        // for (volatile unsigned int j = 0; j < 2500000; j++);
 
         if (i == 55440) i = 0;
 
@@ -103,17 +159,19 @@ void Window::run()
         window.draw(maze_sprite);
         // pac_0_sprite.setPosition(310, 398);
         // window.draw(pac_0_sprite);
-        _pacman_sprites[(i / 15) % 4].setPosition(_pacman.getX(), _pacman.getY());
+        _pacman_sprites[(i / 15) % 4].setPosition(PacMan::pacman_x, PacMan::pacman_y);
         window.draw(_pacman_sprites[(i / 15) % 4]);
 
         // ghost_r_0_sprite.setPosition(315, 350);
         // window.draw(ghost_r_0_sprite);
-        _ghost_sprites[(i / 15) % 2].setPosition(_ghost.getX(), _ghost.getY());
-        // _ghost.getEye().setPosition(_ghost.getX(), _ghost.getY());
+        _ghost_sprites[(i / 15) % 2].setPosition(Ghost::ghost_x, Ghost::ghost_y);
+        _ghost_sprites[2 + Ghost::ghost_dir].setPosition(Ghost::ghost_x, Ghost::ghost_y);
         window.draw(_ghost_sprites[(i / 15) % 2]);
-        window.draw(_ghost.getEye());
+        window.draw(_ghost_sprites[2 + Ghost::ghost_dir]);
 
         window.display();
+
+        Thread::yield();
     }
 }
 

@@ -1,14 +1,18 @@
 #ifndef GHOST_H
 #define GHOST_H
+
 #include "personagem.h"
+
+__USING_API
 
 class Ghost : public Personagem {
 public:
 
     // starter tile: 315, 326
-    Ghost(sf::Sprite * eyes = 0, sf::Sprite * sprites = 0, int n_sprites = 0, int x = 310, int y = 254, int speed = GHOST_SPEED, Direction dir = RIGHT)
-    : Personagem(x, y, speed, dir, sprites, n_sprites), _eyes(eyes) {
+    Ghost(sf::Sprite * eyes = 0, sf::Sprite * sprites = 0, int n_sprites = 0, int x = 310, int y = 254, Direction dir = RIGHT)
+    : Personagem(x, y, dir, sprites, n_sprites), _eyes(eyes) {
 
+        _i = 0;
         getTargetTile(310, 398, LEFT);
 
     }
@@ -49,15 +53,6 @@ public:
         }
 
         return (710 - _y) / 24;
-    }
-
-    static void run() {
-
-        while (true) {
-
-        }
-        // get Keyboard
-        // move()
     }
 
     int checkPosition(int pm_t_x, int pm_t_y) {
@@ -119,6 +114,8 @@ public:
             }
         }
 
+        ghost_dir = _last_input;
+
         // if (tile_x != 0 && tile_y != 0)
         //     if (tile_x < _target_x && maze[tile_x + 1][tile_y] != tile::W && _last_input != LEFT)
         //         _last_input = RIGHT;
@@ -154,15 +151,40 @@ public:
         //     // }
     }
 
-    sf::Sprite getEye() {
-        _eyes[_last_input].setPosition(_x, _y);
+    /*sf::Sprite getEye() {
         return _eyes[_last_input];
     }
+
+    sf::Sprite getSprite() {
+        return _sprites[(_i / 15) % 2];
+    }
+
+    void setPositions() {
+        _sprites[(_i / 15) % 2].setPosition(_x, _y);
+        _eyes[_last_input].setPosition(_x, _y);
+    }
+
+    void count() {
+        _i++;
+        if (_i == 55440) _i = 0;
+    }*/
+
+    void updatePosition(int x, int y) {
+        ghost_x = x;
+        ghost_y = y;
+    }
+
+    static int ghost_x;
+    static int ghost_y;
+    static Direction ghost_dir;
 
 private:
     int _target_x;
     int _target_y;
     sf::Sprite * _eyes;
+    int _i;
 };
+
+
 
 #endif

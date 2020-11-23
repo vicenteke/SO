@@ -8,17 +8,14 @@
 #include "tiles.h"
 #include "defines.h"
 
+__USING_API
+
 class Personagem {
 
 public:
-    static const int PACMAN_SPEED = 1;
-    static const int GHOST_SPEED = 1;
 
-public:
-    enum Direction {UP, DOWN, LEFT, RIGHT, STOPPED};
-
-    Personagem(int x, int y, int _speed, Direction dir, sf::Sprite * sprites, int n_sprites) :
-    _x(x), _y(y), _speed(_speed), _last_input(dir), _sprites(sprites), _n_sprites(n_sprites) {}
+    Personagem(int x, int y, Direction dir, sf::Sprite * sprites, int n_sprites) :
+    _x(x), _y(y), _last_input(dir), _sprites(sprites), _n_sprites(n_sprites) {}
 
     ~Personagem(){}
 
@@ -81,7 +78,7 @@ public:
                     }
 
                     if ((maze[tile_x][tile_y + 1] != tile::W && maze[tile_x][tile_y + 1] != tile::G) || tile_y == 0)
-                        _y -= _speed;
+                        _y -= 1;
 
                     break;
             case DOWN:
@@ -97,7 +94,7 @@ public:
                         tile_x = getTileX();
                     }
                     if ((maze[tile_x][tile_y - 1] != tile::W && maze[tile_x][tile_y - 1] != tile::G) || tile_y == 0)
-                        _y += _speed;
+                        _y += 1;
                     break;
             case LEFT:
                     if (_x < 14) {
@@ -115,7 +112,7 @@ public:
                         tile_y = getTileY();
                     }
                     if ((maze[tile_x - 1][tile_y] != tile::W && maze[tile_x - 1][tile_y] != tile::G) || tile_x == 0)
-                        _x -= _speed;
+                        _x -= 1;
                     break;
             case RIGHT:
                     if (_x > 662) {
@@ -134,20 +131,25 @@ public:
                         tile_y = getTileY();
                     }
                     if (maze[tile_x + 1][tile_y] != tile::W || tile_x == 0)
-                        _x += _speed;
+                        _x += 1;
                     break;
         }
+
+        updatePosition(_x, _y);
 
         return checkPosition(a, b);
     }
 
+    virtual void updatePosition(int, int) = 0;
+
 protected:
     int _x;
     int _y;
-    int _speed;
     Direction _last_input;
     sf::Sprite *_sprites;
     int _n_sprites;
 };
+
+
 
 #endif
