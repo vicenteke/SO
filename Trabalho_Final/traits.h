@@ -66,7 +66,7 @@ template<> struct Traits<Context> : public Traits<void>
 
 template<> struct Traits<Thread> : public Traits<void>
 {
-    static const bool debugged = true;
+    static const bool debugged = false;
 };
 
 template<> struct Traits<Main> : public Traits<void>
@@ -92,7 +92,7 @@ template<> struct Traits<Semaphore> : public Traits<void>
 template<> struct Traits<Timer> : public Traits<void>
 {
     static const bool debugged = false;
-    static const bool preemptive = true;
+    static const bool preemptive = false;
     static const unsigned int QUANTUM = 145000; // in us
 };
 

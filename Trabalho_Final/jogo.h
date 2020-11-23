@@ -25,7 +25,7 @@ public:
 
     static void run(void *) {
 
-        Thread window_thread = Thread(_window.run);
+        Thread window_thread = Thread(Window::run);
         Thread pacman_thread = Thread(runPacman);
         Thread ghost_thread = Thread(runGhost);
 

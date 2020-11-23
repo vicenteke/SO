@@ -1,5 +1,7 @@
 #include "window.h"
 
+__USING_API
+
 sf::Sprite Window::_pacman_sprites[4];
 sf::Sprite Window::_ghost_sprites[6];
 
@@ -132,11 +134,6 @@ void Window::run()
             }
         }
 
-        for (volatile unsigned int j = 0; j < 250000; j++);
-        // for (volatile unsigned int j = 0; j < 2500000; j++);
-
-        if (i == 55440) i = 0;
-
         window.clear();
 
         for (int k = 0; k < 28; k++) {
@@ -170,7 +167,10 @@ void Window::run()
         window.draw(_ghost_sprites[2 + Ghost::ghost_dir]);
 
         window.display();
+        std::cout << '1';
+        for (volatile unsigned int j = 0; j < 25000000; j++);
 
+        if (i == 55440) i = 0;
         Thread::yield();
     }
 }
