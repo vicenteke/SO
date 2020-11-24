@@ -156,7 +156,7 @@ private:
                             _pacman.changeDirection(UP);
                         }
                     } else if (event.key.code == 57) {
-                        // std::cout << _ghost2.getX() << ", " << _ghost2.getY() << '\n';
+                        std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
                     } else
                         std::cout << "Keyboard pressed = " << event.key.code << std::endl;
 

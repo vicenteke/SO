@@ -117,6 +117,20 @@ public:
                 break;
         }
 
+        // if(getTileX() == 0) {
+        //     int tmp = (_x - 14) % 24;
+        //     _x -= tmp;
+        //     if (tmp > 12)
+        //         _x += 24;
+        // }
+        //
+        // if(getTileY() == 0) {
+        //     int tmp = (_y - 14) % 24;
+        //     _y -= tmp;
+        //     if (tmp > 12)
+        //         _y += 24;
+        // }
+
         _last_input = direction;
         pacman_x = _x;
         pacman_y = _y;
@@ -139,7 +153,7 @@ public:
                 break;
         }
 
-        return (pacman_x - 3) / 24;
+        // return (pacman_x - 3) / 24;
     }
 
     static int pacmanGetTileY() {
@@ -157,7 +171,7 @@ public:
                 break;
         }
 
-        return (725 - pacman_y) / 24;
+        // return (725 - pacman_y) / 24;
     }
 
     int getTileX() {
