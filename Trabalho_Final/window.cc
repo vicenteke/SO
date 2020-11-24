@@ -1,77 +1,77 @@
 #include "window.h"
 
 __USING_API
-
-sf::Sprite Window::_pacman_sprites[4];
-sf::Sprite Window::_ghost_sprites[6];
-
-// Maze Textures
-sf::Sprite Window::maze_sprite;
-sf::Sprite Window::pill_sprite;
-sf::Sprite Window::bigPill_sprite;
-
-// Pacman Textures
-sf::Sprite Window::pac_0_sprite;
-sf::Sprite Window::pac_1_sprite;
-sf::Sprite Window::pac_2_sprite;
-sf::Sprite Window::dead_0_sprite;
-sf::Sprite Window::dead_1_sprite;
-sf::Sprite Window::dead_2_sprite;
-sf::Sprite Window::dead_3_sprite;
-sf::Sprite Window::dead_4_sprite;
-sf::Sprite Window::dead_5_sprite;
-sf::Sprite Window::dead_6_sprite;
-sf::Sprite Window::dead_7_sprite;
-sf::Sprite Window::dead_8_sprite;
-sf::Sprite Window::dead_9_sprite;
-sf::Sprite Window::dead_10_sprite;
-
-// Ghost Textures
-sf::Sprite Window::ghost_r_0_sprite;
-sf::Sprite Window::ghost_r_1_sprite;
-sf::Sprite Window::ghost_p_0_sprite;
-sf::Sprite Window::ghost_p_1_sprite;
-sf::Sprite Window::ghost_b_0_sprite;
-sf::Sprite Window::ghost_b_1_sprite;
-sf::Sprite Window::ghost_y_0_sprite;
-sf::Sprite Window::ghost_y_1_sprite;
-sf::Sprite Window::ghost_scared_0_sprite;
-sf::Sprite Window::ghost_scared_1_sprite;
-sf::Sprite Window::ghost_scared_2_sprite;
-sf::Sprite Window::ghost_scared_3_sprite;
-
-// Eye Textures
-sf::Sprite Window::eye_up_sprite;
-sf::Sprite Window::eye_right_sprite;
-sf::Sprite Window::eye_down_sprite;
-sf::Sprite Window::eye_left_sprite;
-
-// UI Textures
-sf::Sprite Window::num_0_sprite;
-sf::Sprite Window::num_1_sprite;
-sf::Sprite Window::num_2_sprite;
-sf::Sprite Window::num_3_sprite;
-sf::Sprite Window::num_4_sprite;
-sf::Sprite Window::num_5_sprite;
-sf::Sprite Window::num_6_sprite;
-sf::Sprite Window::num_7_sprite;
-sf::Sprite Window::num_8_sprite;
-sf::Sprite Window::num_9_sprite;
-sf::Sprite Window::score_200_sprite;
-sf::Sprite Window::score_400_sprite;
-sf::Sprite Window::score_800_sprite;
-sf::Sprite Window::score_1600_sprite;
-sf::Sprite Window::ready_sprite;
-sf::Sprite Window::gameover_sprite;
-sf::Sprite Window::life_sprite;
-sf::Sprite Window::score_sprite;
-sf::Sprite Window::high_sprite;
-sf::Sprite Window::score_100_sprite;
-sf::Sprite Window::score_300_sprite;
-
-// Fruit Textures
-sf::Sprite Window::cherry_sprite;
-sf::Sprite Window::strawberry_sprite;
+// 
+// sf::Sprite Window::_pacman_sprites[4];
+// sf::Sprite Window::_ghost_sprites[6];
+//
+// // Maze Textures
+// sf::Sprite Window::maze_sprite;
+// sf::Sprite Window::pill_sprite;
+// sf::Sprite Window::bigPill_sprite;
+//
+// // Pacman Textures
+// sf::Sprite Window::pac_0_sprite;
+// sf::Sprite Window::pac_1_sprite;
+// sf::Sprite Window::pac_2_sprite;
+// sf::Sprite Window::dead_0_sprite;
+// sf::Sprite Window::dead_1_sprite;
+// sf::Sprite Window::dead_2_sprite;
+// sf::Sprite Window::dead_3_sprite;
+// sf::Sprite Window::dead_4_sprite;
+// sf::Sprite Window::dead_5_sprite;
+// sf::Sprite Window::dead_6_sprite;
+// sf::Sprite Window::dead_7_sprite;
+// sf::Sprite Window::dead_8_sprite;
+// sf::Sprite Window::dead_9_sprite;
+// sf::Sprite Window::dead_10_sprite;
+//
+// // Ghost Textures
+// sf::Sprite Window::ghost_r_0_sprite;
+// sf::Sprite Window::ghost_r_1_sprite;
+// sf::Sprite Window::ghost_p_0_sprite;
+// sf::Sprite Window::ghost_p_1_sprite;
+// sf::Sprite Window::ghost_b_0_sprite;
+// sf::Sprite Window::ghost_b_1_sprite;
+// sf::Sprite Window::ghost_y_0_sprite;
+// sf::Sprite Window::ghost_y_1_sprite;
+// sf::Sprite Window::ghost_scared_0_sprite;
+// sf::Sprite Window::ghost_scared_1_sprite;
+// sf::Sprite Window::ghost_scared_2_sprite;
+// sf::Sprite Window::ghost_scared_3_sprite;
+//
+// // Eye Textures
+// sf::Sprite Window::eye_up_sprite;
+// sf::Sprite Window::eye_right_sprite;
+// sf::Sprite Window::eye_down_sprite;
+// sf::Sprite Window::eye_left_sprite;
+//
+// // UI Textures
+// sf::Sprite Window::num_0_sprite;
+// sf::Sprite Window::num_1_sprite;
+// sf::Sprite Window::num_2_sprite;
+// sf::Sprite Window::num_3_sprite;
+// sf::Sprite Window::num_4_sprite;
+// sf::Sprite Window::num_5_sprite;
+// sf::Sprite Window::num_6_sprite;
+// sf::Sprite Window::num_7_sprite;
+// sf::Sprite Window::num_8_sprite;
+// sf::Sprite Window::num_9_sprite;
+// sf::Sprite Window::score_200_sprite;
+// sf::Sprite Window::score_400_sprite;
+// sf::Sprite Window::score_800_sprite;
+// sf::Sprite Window::score_1600_sprite;
+// sf::Sprite Window::ready_sprite;
+// sf::Sprite Window::gameover_sprite;
+// sf::Sprite Window::life_sprite;
+// sf::Sprite Window::score_sprite;
+// sf::Sprite Window::high_sprite;
+// sf::Sprite Window::score_100_sprite;
+// sf::Sprite Window::score_300_sprite;
+//
+// // Fruit Textures
+// sf::Sprite Window::cherry_sprite;
+// sf::Sprite Window::strawberry_sprite;
 
 
 
@@ -166,6 +166,7 @@ void Window::run()
         window.draw(_ghost_sprites[(i / 15) % 2]);
         window.draw(_ghost_sprites[2 + Ghost::ghost_dir]);
 
+        window.display();
         window.display();
         std::cout << '1';
         for (volatile unsigned int j = 0; j < 25000000; j++);

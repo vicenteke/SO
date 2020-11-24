@@ -7,12 +7,14 @@
 
 #include "tiles.h"
 #include "defines.h"
+#include "semaphore.h"
 
 __USING_API
 
 class Personagem {
 
 public:
+    Semaphore _mutex;
 
     Personagem(int x, int y, Direction dir, sf::Sprite * sprites, int n_sprites) :
     _x(x), _y(y), _last_input(dir), _sprites(sprites), _n_sprites(n_sprites) {}
@@ -59,8 +61,12 @@ public:
     int move(int a = 0, int b = 0) {
         // V2: Atualiza matriz e checa se há colisões
 
+        _mutex.p();
+
         int tile_x = getTileX();
         int tile_y = getTileY();
+
+        updateDirection();
 
         switch (_last_input) {
             case UP:
@@ -119,7 +125,7 @@ public:
                         _x = 662;
                         break;
                     }
-                    if (_y == 374  && _x == 662) {
+                    if ((_y == 374 || _y == 326)  && _x == 662) {
                         _x = 59;
                         break;
                     }
@@ -141,6 +147,7 @@ public:
     }
 
     virtual void updatePosition(int, int) = 0;
+    virtual void updateDirection() = 0;
 
 protected:
     int _x;

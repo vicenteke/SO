@@ -64,6 +64,8 @@ public:
             if (tile_x == pm_t_x && tile_y == pm_t_y) {
                 std::cout << "you lost!!!!!!!!!!!!!!!!\n";
             }
+
+        _mutex.v();
     }
 
     int getDistance(int _x1, int _y1, int _x2, int _y2) {
@@ -172,6 +174,10 @@ public:
     void updatePosition(int x, int y) {
         ghost_x = x;
         ghost_y = y;
+    }
+
+    void updateDirection() {
+        _last_input = ghost_dir;
     }
 
     static int ghost_x;

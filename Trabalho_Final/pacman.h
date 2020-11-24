@@ -148,6 +148,7 @@ public:
         //         break;
         // }
 
+        _mutex.v();
         switch(current_tile) {
             case tile::o:
                     maze[tile_x][tile_y] = tile::e;
@@ -160,10 +161,12 @@ public:
         }
     }
 
-    void changeDirection(Direction direction = pacman_dir) {
+    void changeDirection(Direction direction) {
 
         if (direction == _last_input)
             return;
+
+        pacman_dir = direction;
 
         switch (direction) {
             case LEFT:
@@ -235,6 +238,8 @@ public:
         _last_input = direction;
         pacman_x = _x;
         pacman_y = _y;
+
+        _mutex.v();
     }
 
     static int pacmanGetTileX() {
@@ -285,7 +290,11 @@ public:
         pacman_x = x;
         pacman_y = y;
     }
-    
+
+    void updateDirection() {
+        _last_input = pacman_dir;
+    }
+
 public:
     static int pacman_x;
     static int pacman_y;
