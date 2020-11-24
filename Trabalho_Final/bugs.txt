@@ -1,6 +1,6 @@
 Geral:
     1. SOLVED? Quando compila, costuma dar uma erro "Alarm clock"
-    2. Pause: com dispatcher trava; com timer continua rodando as outras mas devagar
+    2. Pause: com dispatcher trava
 
 PacMan:
 

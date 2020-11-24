@@ -1,7 +1,7 @@
 #ifndef JOGO_H
 #define JOGO_H
 
-#define DE_LEI 800000
+#define DE_LEI 1000000
 
 #include "thread.h"
 #include "window.h"
@@ -66,7 +66,11 @@ private:
     static Thread * paused_thread;
 
     static void runPaused() {
-        while(true);
+        while(true) {
+            if (!Traits<Timer>::preemptive) {
+                Thread::yield();
+            }
+        }
     }
 
     static void runPacman() {
@@ -75,22 +79,21 @@ private:
 
             if (_isPaused) {
                 int status = paused_thread->join();
+            } else {
+                switch(_pacman.move()) {
+                    case 10:
+                        Jogo::_score += 10;
+                        Jogo::_foods--;
+                        std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
+                        break;
+                    case 20:
+                        Jogo::_score += 20;
+                        std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
+                        break;
+                }
+                for (volatile unsigned int j = 0; j < DE_LEI; j++);
+                Thread::yield();
             }
-
-            // std::cout << '1';
-            switch(_pacman.move()) {
-                case 10:
-                    Jogo::_score += 10;
-                    Jogo::_foods--;
-                    std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
-                    break;
-                case 20:
-                    Jogo::_score += 20;
-                    std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
-                    break;
-            }
-            for (volatile unsigned int j = 0; j < DE_LEI; j++);
-            Thread::yield();
         }
     }
 
@@ -100,27 +103,26 @@ private:
 
             if (_isPaused) {
                 int status = paused_thread->join();
+            } else {
+                _pacman._mutex.p();
+                int pm_x = PacMan::pacman_x;
+                int pm_y = PacMan::pacman_y;
+                Direction pm_d = PacMan::pacman_dir;
+                int pm_t_x = PacMan::pacmanGetNearTileX();
+                int pm_t_y = PacMan::pacmanGetNearTileY();
+                _pacman._mutex.v();
+
+                _ghost1.getTargetTile(pm_x, pm_y, pm_d);
+                _ghost1.move(pm_t_x, pm_t_y);
+                _ghost2.getTargetTile(pm_x, pm_y, pm_d);
+                _ghost2.move(pm_t_x, pm_t_y);
+                _ghost3.getTargetTile(pm_x, pm_y, pm_d);
+                _ghost3.move(pm_t_x, pm_t_y);
+                _ghost4.getTargetTile(pm_x, pm_y, pm_d);
+                _ghost4.move(pm_t_x, pm_t_y);
+                for (volatile unsigned int j = 0; j < DE_LEI; j++);
+                Thread::yield();
             }
-            // std::cout << '2';
-
-            _pacman._mutex.p();
-            int pm_x = PacMan::pacman_x;
-            int pm_y = PacMan::pacman_y;
-            Direction pm_d = PacMan::pacman_dir;
-            int pm_t_x = PacMan::pacmanGetNearTileX();
-            int pm_t_y = PacMan::pacmanGetNearTileY();
-            _pacman._mutex.v();
-
-            _ghost1.getTargetTile(pm_x, pm_y, pm_d);
-            _ghost1.move(pm_t_x, pm_t_y);
-            _ghost2.getTargetTile(pm_x, pm_y, pm_d);
-            _ghost2.move(pm_t_x, pm_t_y);
-            _ghost3.getTargetTile(pm_x, pm_y, pm_d);
-            _ghost3.move(pm_t_x, pm_t_y);
-            _ghost4.getTargetTile(pm_x, pm_y, pm_d);
-            _ghost4.move(pm_t_x, pm_t_y);
-            for (volatile unsigned int j = 0; j < DE_LEI; j++);
-            Thread::yield();
         }
     }
 
@@ -202,114 +204,69 @@ private:
         {
             if (_isPaused) {
                 int status = paused_thread->join();
-            }
+            } else {
 
-            i++;
-            // sf::Event event;
-            // while (window.pollEvent(event))
-            // {
-            //     switch (event.type) {
-            //     case sf::Event::Closed:
-            //          window.close();
-            //          break;
-            //
-            //     // key pressed
-            //     case sf::Event::KeyPressed:
-            //         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            //             // std::cout << "Keyboard esquerda!" << std::endl;
-            //             if (PacMan::pacman_dir != LEFT) {
-            //                 _window._mutex_w.p();
-            //                 _pacman._mutex.p();
-            //                 _pacman.changeDirection(LEFT);
-            //             }
-            //         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            //             // std::cout << "Keyboard direita!" << std::endl;
-            //             if (PacMan::pacman_dir != RIGHT) {
-            //                 _window._mutex_w.p();
-            //                 _pacman._mutex.p();
-            //                 _pacman.changeDirection(RIGHT);
-            //             }
-            //         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            //             // std::cout << "Keyboard para baixo!" << std::endl;
-            //             if (PacMan::pacman_dir != DOWN) {
-            //                 _window._mutex_w.p();
-            //                 _pacman._mutex.p();
-            //                 _pacman.changeDirection(DOWN);
-            //             }
-            //         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            //             // std::cout << "Keyboard para cima!" << std::endl;
-            //             if (PacMan::pacman_dir != UP) {
-            //                 _window._mutex_w.p();
-            //                 _pacman._mutex.p();
-            //                 _pacman.changeDirection(UP);
-            //             }
-            //         } else if (event.key.code == 57) {
-            //             std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
-            //         } else
-            //             std::cout << "Keyboard pressed = " << event.key.code << std::endl;
-            //
-            //         // Thread::yield();
-            //         break;
-            //
-            //     }
-            // }
+                i++;
 
-            window.clear();
+                window.clear();
 
-            for (int k = 0; k < 28; k++) {
-                for (int j = 0; j < 31; j++) {
-                    switch(maze[k][j]) {
-                        case tile::o:
-                            // draw small food
-                            _window.pill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
-                            window.draw(_window.pill_sprite);
-                            break;
-                        case tile::O:
-                            // draw large food
-                            _window.bigPill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
-                            window.draw(_window.bigPill_sprite);
-                            break;
+                for (int k = 0; k < 28; k++) {
+                    for (int j = 0; j < 31; j++) {
+                        switch(maze[k][j]) {
+                            case tile::o:
+                                // draw small food
+                                _window.pill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
+                                window.draw(_window.pill_sprite);
+                                break;
+                            case tile::O:
+                                // draw large food
+                                if (i % 60 > 30) {
+                                    _window.bigPill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
+                                    window.draw(_window.bigPill_sprite);
+                                }
+                                break;
+                        }
                     }
                 }
+
+                window.draw(_window.maze_sprite);
+                // pac_0_sprite.setPosition(310, 398);
+                // window.draw(pac_0_sprite);
+                _pacman._mutex.p();
+                _window._pacman_sprites[(i / 15) % 4].setPosition(PacMan::pacman_x, PacMan::pacman_y);
+                _pacman._mutex.v();
+                window.draw(_window._pacman_sprites[(i / 15) % 4]);
+
+                // ghost_r_0_sprite.setPosition(315, 350);
+                // window.draw(ghost_r_0_sprite);
+                _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                _window._ghost_sprites[2 + Ghost1::ghost1_dir].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                window.draw(_window._ghost_sprites[(i / 15) % 2]);
+                window.draw(_window._ghost_sprites[2 + Ghost1::ghost1_dir]);
+
+                _window._ghost_sprites2[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                _window._ghost_sprites2[2 + Ghost2::ghost2_dir].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                window.draw(_window._ghost_sprites2[(i / 15) % 2]);
+                window.draw(_window._ghost_sprites2[2 + Ghost2::ghost2_dir]);
+
+                _window._ghost_sprites3[(i / 15) % 2].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                _window._ghost_sprites3[2 + Ghost3::ghost3_dir].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                window.draw(_window._ghost_sprites3[(i / 15) % 2]);
+                window.draw(_window._ghost_sprites3[2 + Ghost3::ghost3_dir]);
+
+                _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                _window._ghost_sprites4[2 + Ghost4::ghost4_dir].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                window.draw(_window._ghost_sprites4[(i / 15) % 2]);
+                window.draw(_window._ghost_sprites4[2 + Ghost4::ghost4_dir]);
+
+                window.display();
+                for (volatile unsigned int j = 0; j < DE_LEI; j++);
+
+                if (i == 55440) i = 0;
+
+                // _window._mutex_w.v();
+                Thread::yield();
             }
-
-            window.draw(_window.maze_sprite);
-            // pac_0_sprite.setPosition(310, 398);
-            // window.draw(pac_0_sprite);
-            _pacman._mutex.p();
-            _window._pacman_sprites[(i / 15) % 4].setPosition(PacMan::pacman_x, PacMan::pacman_y);
-            _pacman._mutex.v();
-            window.draw(_window._pacman_sprites[(i / 15) % 4]);
-
-            // ghost_r_0_sprite.setPosition(315, 350);
-            // window.draw(ghost_r_0_sprite);
-            _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
-            _window._ghost_sprites[2 + Ghost1::ghost1_dir].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
-            window.draw(_window._ghost_sprites[(i / 15) % 2]);
-            window.draw(_window._ghost_sprites[2 + Ghost1::ghost1_dir]);
-
-            _window._ghost_sprites2[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
-            _window._ghost_sprites2[2 + Ghost2::ghost2_dir].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
-            window.draw(_window._ghost_sprites2[(i / 15) % 2]);
-            window.draw(_window._ghost_sprites2[2 + Ghost2::ghost2_dir]);
-
-            _window._ghost_sprites3[(i / 15) % 2].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
-            _window._ghost_sprites3[2 + Ghost3::ghost3_dir].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
-            window.draw(_window._ghost_sprites3[(i / 15) % 2]);
-            window.draw(_window._ghost_sprites3[2 + Ghost3::ghost3_dir]);
-
-            _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
-            _window._ghost_sprites4[2 + Ghost4::ghost4_dir].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
-            window.draw(_window._ghost_sprites4[(i / 15) % 2]);
-            window.draw(_window._ghost_sprites4[2 + Ghost4::ghost4_dir]);
-
-            window.display();
-            for (volatile unsigned int j = 0; j < DE_LEI; j++);
-
-            if (i == 55440) i = 0;
-
-            // _window._mutex_w.v();
-            Thread::yield();
         }
     }
 };
