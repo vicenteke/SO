@@ -53,15 +53,63 @@ public:
         return (710 - _y) / 24;
     }
 
-    int checkPosition(int pm_t_x, int pm_t_y) {
-
+    int getNearTileX() {
         int tile_x = getTileX();
+
+        if (tile_x == 0 ){
+            int tmp = (_x - 14) % 24;
+            if (tmp > 12) tmp -= 24;
+
+            switch (_last_input) {
+                case UP:  tile_x = 1 + (_x - tmp - 14) / 24;
+                    break;
+                case DOWN:  tile_x = 1 + (_x - tmp - 14) / 24;
+                    break;
+                case LEFT: tile_x = 1 + (_x - tmp - 14) / 24;
+                    break;
+                case RIGHT: tile_x = 1 + (_x - tmp - 14) / 24;
+                    break;
+            }
+        }
+
+        return tile_x;
+    }
+
+    int getNearTileY() {
         int tile_y = getTileY();
 
-        if (tile_x != 0 && tile_y != 0)
+        if (tile_y == 0) {
+            int tmp = (_y - 14) % 24;
+            if (tmp > 12) tmp -= 24;
+
+            switch (_last_input) {
+                case DOWN:  tile_y = (710 - _y + tmp) / 24;
+                    break;
+                case UP:  tile_y = (710 - _y + tmp) / 24;
+                    break;
+                case LEFT: tile_y = (710 - _y + tmp) / 24;
+                    break;
+                case RIGHT: tile_y = (710 - _y + tmp) / 24;
+                    break;
+            }
+        }
+
+        return tile_y;
+    }
+
+    int checkPosition(int pm_t_x, int pm_t_y) {
+
+        int tile_x = getNearTileX();
+        int tile_y = getNearTileY();
+
+        // if (tile_x != 0 && tile_y != 0)
             if (tile_x == pm_t_x && tile_y == pm_t_y) {
                 std::cout << "you lost!!!!!!!!!!!!!!!!\n";
             }
+
+        // if (abs(_x - pm_t_x) < 50 && abs(_y - pm_t_y) < 50) {
+        //     std::cout << "you lost!!!!!!!!!!!!!!!!\n";
+        // }
 
         _mutex.v();
     }

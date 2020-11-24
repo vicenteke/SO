@@ -1,12 +1,12 @@
 Geral:
-    1. Quando compila, costuma dar uma erro "Alarm clock"
+    1. SOLVED? Quando compila, costuma dar uma erro "Alarm clock"
 
 PacMan:
 
-    1. Entrando em alguns muros, principalmente na cage
-    2. Nas esquinas, às vezes não come a pill
+    1. SOLVED Entrando em alguns muros, principalmente na cage
+    2. Nas esquinas, às vezes não come a pill (Talvez resolvido)
 
 Ghost:
 
     1. Muito burro
-    2. Se o PacMan vai na direção dele, não perde
+    2. SOLVED Se o PacMan vai na direção dele, não perde

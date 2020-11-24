@@ -10,6 +10,9 @@ int Jogo::_lives = 3;
 int Jogo::_foods = 240;
 int Jogo::_score = 0;
 
+bool Jogo::_isPaused;
+Thread * Jogo::paused_thread;
+
 int main(void)
 {
     Jogo jogo = Jogo();

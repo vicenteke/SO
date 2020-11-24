@@ -191,6 +191,84 @@ public:
         _last_input = pacman_dir;
     }
 
+    static int pacmanGetNearTileX() {
+        int tile_x = pacmanGetTileX();
+
+        if (tile_x == 0) {
+            int tmp = (pacman_x - 14) % 24;
+            // _x -= tmp;
+            if (tmp > 12)
+                tmp -= 24;
+            // tile_x = getTileX();
+
+            switch (pacman_dir) {
+                case UP:  tile_x = -1 + (pacman_x - tmp - 14) / 24;
+                    break;
+                case DOWN:  tile_x = 1 + (pacman_x - tmp - 14) / 24;
+                    break;
+                case LEFT: tile_x = 1 + (pacman_x - tmp - 14) / 24;
+                    break;
+                case RIGHT: tile_x = -1 + (pacman_x - tmp - 14) / 24;
+                    break;
+            }
+
+            // if (((pacman_x - 14) % 24) > 12)
+            //     tile_x = 1;
+            //
+            // switch (pacman_dir) {
+            //     case UP:  tile_x += -1 + (pacman_x - 14) / 24;
+            //         break;
+            //     case DOWN:  tile_x += 1 + (pacman_x - 14) / 24;
+            //         break;
+            //     case LEFT: tile_x += 1 + (pacman_x - 14) / 24;
+            //         break;
+            //     case RIGHT: tile_x += -1 + (pacman_x - 14) / 24;
+            //         break;
+            // }
+
+        }
+
+        return tile_x;
+    }
+
+    static int pacmanGetNearTileY() {
+        int tile_y = pacmanGetTileY();
+
+        if (tile_y == 0) {
+            int tmp = (734 - pacman_y) % 24;
+            if (tmp > 12)
+                tmp -= 24;
+            // tile_x = getTileX();
+
+            switch (pacman_dir) {
+                case DOWN:  tile_y = 2 + (710 - pacman_y + tmp) / 24;
+                    break;
+                case UP:  tile_y = (710 - pacman_y + tmp) / 24;
+                    break;
+                case LEFT: tile_y = (710 - pacman_y + tmp) / 24;
+                    break;
+                case RIGHT: tile_y = 2 + (710 - pacman_y + tmp) / 24;
+                    break;
+            }
+
+            // if (((734 - pacman_y) % 24) <= 12)
+            //     tile_y = -1;
+            //
+            // switch (pacman_dir) {
+            //     case DOWN:  tile_y += 2 + (710 - pacman_y) / 24;
+            //         break;
+            //     case UP:  tile_y += (710 - pacman_y) / 24;
+            //         break;
+            //     case LEFT: tile_y += (710 - pacman_y) / 24;
+            //         break;
+            //     case RIGHT: tile_y += 2 + (710 - pacman_y) / 24;
+            //         break;
+            // }
+        }
+
+        return tile_y;
+    }
+
 public:
     static int pacman_x;
     static int pacman_y;
