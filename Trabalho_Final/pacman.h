@@ -15,9 +15,11 @@ public:
     PacMan(sf::Sprite * sprites = 0, int n_sprites = 0, int x = 310, int y = 398, Direction dir = LEFT)
     : Personagem(x, y, dir, sprites, n_sprites) {
 
-        pacman_x = _x;
-        pacman_y = _y;
-        pacman_dir = _last_input;
+        pacman_x = x;
+        pacman_y = y;
+        pacman_dir = dir;
+
+        rotateSprite(0);
     }
 
     ~PacMan() {

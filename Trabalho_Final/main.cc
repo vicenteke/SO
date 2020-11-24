@@ -13,6 +13,8 @@ int Jogo::_score = 0;
 bool Jogo::_isPaused;
 Thread * Jogo::paused_thread;
 
+sf::RenderWindow * Jogo::_window_render;
+
 int main(void)
 {
     Jogo jogo = Jogo();

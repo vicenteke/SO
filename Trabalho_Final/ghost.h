@@ -103,15 +103,19 @@ public:
         int tile_y = getNearTileY();
 
         // if (tile_x != 0 && tile_y != 0)
-            if (tile_x == pm_t_x && tile_y == pm_t_y) {
-                std::cout << "you lost!!!!!!!!!!!!!!!!\n";
-            }
+        if (tile_x == pm_t_x && tile_y == pm_t_y) {
+            std::cout << "you lost!!!!!!!!!!!!!!!!\n";
+            _mutex.v();
+            return 1;
+        }
+
+        _mutex.v();
+        return 0;
 
         // if (abs(_x - pm_t_x) < 50 && abs(_y - pm_t_y) < 50) {
         //     std::cout << "you lost!!!!!!!!!!!!!!!!\n";
         // }
 
-        _mutex.v();
     }
 
     int getDistance(int _x1, int _y1, int _x2, int _y2) {

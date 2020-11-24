@@ -55,6 +55,8 @@ public:
 
 private:
 
+    static sf::RenderWindow * _window_render;
+
     // Characters
     static PacMan _pacman;
     static Ghost1 _ghost1;
@@ -71,6 +73,26 @@ private:
                 Thread::yield();
             }
         }
+    }
+
+    static void loseLife() {
+        if (--_lives > 0) {
+            Tiles::resetTiles();
+
+            _pacman = PacMan(_window.getPacmanSprites(), 4);
+            _ghost1 = Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
+            _ghost2 = Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
+            _ghost3 = Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
+            _ghost4 = Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
+            _isPaused = false;
+            _foods = 240;
+        } else {
+            finishGame();
+        }
+    }
+
+    static void finishGame() {
+        _window_render->close();
     }
 
     static void runPacman() {
@@ -99,6 +121,8 @@ private:
 
     static void runGhost() {
 
+        int lost = 0;
+
         while (true) {
 
             if (_isPaused) {
@@ -113,29 +137,34 @@ private:
                 _pacman._mutex.v();
 
                 _ghost1.getTargetTile(pm_x, pm_y, pm_d);
-                _ghost1.move(pm_t_x, pm_t_y);
+                lost += _ghost1.move(pm_t_x, pm_t_y);
                 _ghost2.getTargetTile(pm_x, pm_y, pm_d);
-                _ghost2.move(pm_t_x, pm_t_y);
+                lost += _ghost2.move(pm_t_x, pm_t_y);
                 _ghost3.getTargetTile(pm_x, pm_y, pm_d);
-                _ghost3.move(pm_t_x, pm_t_y);
+                lost += _ghost3.move(pm_t_x, pm_t_y);
                 _ghost4.getTargetTile(pm_x, pm_y, pm_d);
-                _ghost4.move(pm_t_x, pm_t_y);
+                lost += _ghost4.move(pm_t_x, pm_t_y);
+
+                if (lost > 0) {
+                    lost = 0;
+                    loseLife();
+                }
                 for (volatile unsigned int j = 0; j < DE_LEI; j++);
                 Thread::yield();
             }
         }
     }
 
-    static void runInput(sf::RenderWindow * window) {
-        while (window->isOpen())
+    static void runInput() {
+        while (_window_render->isOpen())
         {
             sf::Event event;
-            while (window->pollEvent(event))
+            while (_window_render->pollEvent(event))
             {
                 switch (event.type) {
 
                     case sf::Event::Closed:
-                         window->close();
+                         _window_render->close();
                          break;
 
                     // key pressed
@@ -176,6 +205,8 @@ private:
                                 delete paused_thread;
                             }
                             Thread::yield();
+                        } else if (event.key.code == 16) {
+                            finishGame();
                         } else if (event.key.code == 57) {
                             std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
                         } else
@@ -191,6 +222,7 @@ private:
     static void runWindow()
     {
         sf::RenderWindow window(sf::VideoMode(674, 1000), "Pac Man");
+        _window_render = &window;
 
         //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
         //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
@@ -198,7 +230,7 @@ private:
 
         int i = 0;
 
-        Thread input_thread = Thread(runInput, &window);
+        Thread input_thread = Thread(runInput);
 
         while (window.isOpen())
         {
