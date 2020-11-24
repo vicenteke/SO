@@ -1,12 +1,12 @@
 #ifndef JOGO_H
 #define JOGO_H
 
-#define DE_LEI 950000
+#define DE_LEI 1100000
 
 #include "thread.h"
 #include "window.h"
 #include "pacman.h"
-#include "ghost.h"
+#include "ghost2.h"
 
 __USING_API
 
@@ -16,7 +16,7 @@ public:
 
         // _window = Window();
         _pacman = PacMan(_window.getPacmanSprites(), 4);
-        _ghost = Ghost(&(_window.getGhostSprites()[2]), _window.getGhostSprites(), 2);
+        _ghost = Ghost2(&(_window.getGhostSprites()[2]), _window.getGhostSprites(), 2);
         //
         // run();
     }
@@ -49,7 +49,7 @@ private:
 
     // Characters
     static PacMan _pacman;
-    static Ghost _ghost;
+    static Ghost2 _ghost;
 
     static void runPacman() {
 
@@ -108,24 +108,32 @@ private:
                 case sf::Event::KeyPressed:
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
                         // std::cout << "Keyboard esquerda!" << std::endl;
-                        _window._mutex_w.p();
-                        _pacman._mutex.p();
-                        _pacman.changeDirection(LEFT);
+                        if (PacMan::pacman_dir != LEFT) {
+                            _window._mutex_w.p();
+                            _pacman._mutex.p();
+                            _pacman.changeDirection(LEFT);
+                        }
                     } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                         // std::cout << "Keyboard direita!" << std::endl;
-                        _window._mutex_w.p();
-                        _pacman._mutex.p();
-                        _pacman.changeDirection(RIGHT);
+                        if (PacMan::pacman_dir != RIGHT) {
+                            _window._mutex_w.p();
+                            _pacman._mutex.p();
+                            _pacman.changeDirection(RIGHT);
+                        }
                     } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                         // std::cout << "Keyboard para baixo!" << std::endl;
-                        _window._mutex_w.p();
-                        _pacman._mutex.p();
-                        _pacman.changeDirection(DOWN);
+                        if (PacMan::pacman_dir != DOWN) {
+                            _window._mutex_w.p();
+                            _pacman._mutex.p();
+                            _pacman.changeDirection(DOWN);
+                        }
                     } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                         // std::cout << "Keyboard para cima!" << std::endl;
-                        _window._mutex_w.p();
-                        _pacman._mutex.p();
-                        _pacman.changeDirection(UP);
+                        if (PacMan::pacman_dir != UP) {
+                            _window._mutex_w.p();
+                            _pacman._mutex.p();
+                            _pacman.changeDirection(UP);
+                        }
                     } else if (event.key.code == 57) {
                         // std::cout << _ghost.getX() << ", " << _ghost.getY() << '\n';
                     } else
@@ -166,10 +174,10 @@ private:
 
             // ghost_r_0_sprite.setPosition(315, 350);
             // window.draw(ghost_r_0_sprite);
-            _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost::ghost_x, Ghost::ghost_y);
-            _window._ghost_sprites[2 + Ghost::ghost_dir].setPosition(Ghost::ghost_x, Ghost::ghost_y);
+            _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+            _window._ghost_sprites[2 + Ghost2::ghost2_dir].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
             window.draw(_window._ghost_sprites[(i / 15) % 2]);
-            window.draw(_window._ghost_sprites[2 + Ghost::ghost_dir]);
+            window.draw(_window._ghost_sprites[2 + Ghost2::ghost2_dir]);
 
             window.display();
             for (volatile unsigned int j = 0; j < DE_LEI; j++);

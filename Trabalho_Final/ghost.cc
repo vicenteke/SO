@@ -1,5 +1,5 @@
-#include "ghost.h"
+#include "ghost2.h"
 
-int Ghost::ghost_x;
-int Ghost::ghost_y;
-Direction Ghost::ghost_dir;
+int Ghost2::ghost2_x;
+int Ghost2::ghost2_y;
+Direction Ghost2::ghost2_dir;
