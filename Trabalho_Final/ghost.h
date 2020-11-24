@@ -104,7 +104,7 @@ public:
 
         // if (tile_x != 0 && tile_y != 0)
         if (tile_x == pm_t_x && tile_y == pm_t_y) {
-            std::cout << "you lost!!!!!!!!!!!!!!!!\n";
+            // std::cout << "you lost!!!!!!!!!!!!!!!!\n";
             _mutex.v();
             return 1;
         }

@@ -87,12 +87,23 @@ private:
             _isPaused = false;
             _foods = 240;
         } else {
-            finishGame();
+            _isPaused = true;
+            paused_thread = new Thread(runPaused);
+            // finishGame();
         }
     }
 
     static void finishGame() {
         _window_render->close();
+        if (paused_thread) delete paused_thread;
+    }
+
+    static void restartGame() {
+        _lives = 4;
+        _score = 0;
+        if (_isPaused) delete paused_thread;
+        _isPaused = false;
+        loseLife();
     }
 
     static void runPacman() {
@@ -207,6 +218,8 @@ private:
                             Thread::yield();
                         } else if (event.key.code == 16) {
                             finishGame();
+                        } else if (event.key.code == 17) {
+                            restartGame();
                         } else if (event.key.code == 57) {
                             std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
                         } else
