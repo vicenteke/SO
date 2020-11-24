@@ -65,6 +65,10 @@ private:
     static bool _isPaused;
     static Thread * paused_thread;
 
+    static void runPaused() {
+        while(true);
+    }
+
     static void runPacman() {
 
         while (true) {
@@ -73,6 +77,7 @@ private:
                 int status = paused_thread->join();
             }
 
+            // std::cout << '1';
             switch(_pacman.move()) {
                 case 10:
                     Jogo::_score += 10;
@@ -96,6 +101,7 @@ private:
             if (_isPaused) {
                 int status = paused_thread->join();
             }
+            // std::cout << '2';
 
             _pacman._mutex.p();
             int pm_x = PacMan::pacman_x;
@@ -134,28 +140,28 @@ private:
                     case sf::Event::KeyPressed:
                         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
                             // std::cout << "Keyboard esquerda!" << std::endl;
-                            if (PacMan::pacman_dir != LEFT) {
+                            if (PacMan::pacman_dir != LEFT && !_isPaused) {
                                 // _window._mutex_w.p();
                                 _pacman._mutex.p();
                                 _pacman.changeDirection(LEFT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                             // std::cout << "Keyboard direita!" << std::endl;
-                            if (PacMan::pacman_dir != RIGHT) {
+                            if (PacMan::pacman_dir != RIGHT && !_isPaused) {
                                 // _window._mutex_w.p();
                                 _pacman._mutex.p();
                                 _pacman.changeDirection(RIGHT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                             // std::cout << "Keyboard para baixo!" << std::endl;
-                            if (PacMan::pacman_dir != DOWN) {
+                            if (PacMan::pacman_dir != DOWN && !_isPaused) {
                                 // _window._mutex_w.p();
                                 _pacman._mutex.p();
                                 _pacman.changeDirection(DOWN);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                             // std::cout << "Keyboard para cima!" << std::endl;
-                            if (PacMan::pacman_dir != UP) {
+                            if (PacMan::pacman_dir != UP && !_isPaused) {
                                 // _window._mutex_w.p();
                                 _pacman._mutex.p();
                                 _pacman.changeDirection(UP);
@@ -163,10 +169,11 @@ private:
                         } else if (event.key.code == 15) {
                             _isPaused = !_isPaused;
                             if (_isPaused) {
-                                
+                                paused_thread = new Thread(runPaused);
                             } else {
-
+                                delete paused_thread;
                             }
+                            Thread::yield();
                         } else if (event.key.code == 57) {
                             std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
                         } else
