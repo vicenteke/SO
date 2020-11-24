@@ -28,8 +28,13 @@ public:
         return _pacman_sprites;
     }
 
-    sf::Sprite * getGhostSprites() {
-        return _ghost_sprites;
+    sf::Sprite * getGhostSprites(int n) {
+        switch (n) {
+            case 1: return _ghost_sprites;
+            case 2: return _ghost_sprites2;
+            case 3: return _ghost_sprites3;
+            case 4: return _ghost_sprites4;
+        }
     }
 
 public:
@@ -38,6 +43,9 @@ public:
     // Game characters
     sf::Sprite _pacman_sprites[4];
     sf::Sprite _ghost_sprites[6];
+    sf::Sprite _ghost_sprites2[6];
+    sf::Sprite _ghost_sprites3[6];
+    sf::Sprite _ghost_sprites4[6];
 
     // Fruit fruit: thread that checks _foods?
 

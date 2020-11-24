@@ -1,79 +1,6 @@
 #include "window.h"
 
 __USING_API
-//
-// sf::Sprite Window::_pacman_sprites[4];
-// sf::Sprite Window::_ghost_sprites[6];
-//
-// // Maze Textures
-// sf::Sprite Window::maze_sprite;
-// sf::Sprite Window::pill_sprite;
-// sf::Sprite Window::bigPill_sprite;
-//
-// // Pacman Textures
-// sf::Sprite Window::pac_0_sprite;
-// sf::Sprite Window::pac_1_sprite;
-// sf::Sprite Window::pac_2_sprite;
-// sf::Sprite Window::dead_0_sprite;
-// sf::Sprite Window::dead_1_sprite;
-// sf::Sprite Window::dead_2_sprite;
-// sf::Sprite Window::dead_3_sprite;
-// sf::Sprite Window::dead_4_sprite;
-// sf::Sprite Window::dead_5_sprite;
-// sf::Sprite Window::dead_6_sprite;
-// sf::Sprite Window::dead_7_sprite;
-// sf::Sprite Window::dead_8_sprite;
-// sf::Sprite Window::dead_9_sprite;
-// sf::Sprite Window::dead_10_sprite;
-//
-// // Ghost Textures
-// sf::Sprite Window::ghost_r_0_sprite;
-// sf::Sprite Window::ghost_r_1_sprite;
-// sf::Sprite Window::ghost_p_0_sprite;
-// sf::Sprite Window::ghost_p_1_sprite;
-// sf::Sprite Window::ghost_b_0_sprite;
-// sf::Sprite Window::ghost_b_1_sprite;
-// sf::Sprite Window::ghost_y_0_sprite;
-// sf::Sprite Window::ghost_y_1_sprite;
-// sf::Sprite Window::ghost_scared_0_sprite;
-// sf::Sprite Window::ghost_scared_1_sprite;
-// sf::Sprite Window::ghost_scared_2_sprite;
-// sf::Sprite Window::ghost_scared_3_sprite;
-//
-// // Eye Textures
-// sf::Sprite Window::eye_up_sprite;
-// sf::Sprite Window::eye_right_sprite;
-// sf::Sprite Window::eye_down_sprite;
-// sf::Sprite Window::eye_left_sprite;
-//
-// // UI Textures
-// sf::Sprite Window::num_0_sprite;
-// sf::Sprite Window::num_1_sprite;
-// sf::Sprite Window::num_2_sprite;
-// sf::Sprite Window::num_3_sprite;
-// sf::Sprite Window::num_4_sprite;
-// sf::Sprite Window::num_5_sprite;
-// sf::Sprite Window::num_6_sprite;
-// sf::Sprite Window::num_7_sprite;
-// sf::Sprite Window::num_8_sprite;
-// sf::Sprite Window::num_9_sprite;
-// sf::Sprite Window::score_200_sprite;
-// sf::Sprite Window::score_400_sprite;
-// sf::Sprite Window::score_800_sprite;
-// sf::Sprite Window::score_1600_sprite;
-// sf::Sprite Window::ready_sprite;
-// sf::Sprite Window::gameover_sprite;
-// sf::Sprite Window::life_sprite;
-// sf::Sprite Window::score_sprite;
-// sf::Sprite Window::high_sprite;
-// sf::Sprite Window::score_100_sprite;
-// sf::Sprite Window::score_300_sprite;
-//
-// // Fruit Textures
-// sf::Sprite Window::cherry_sprite;
-// sf::Sprite Window::strawberry_sprite;
-
-
 
 Window::Window()
 {
@@ -231,16 +158,22 @@ void Window::load_and_bind_textures()
     ghost_r_1_sprite.scale(3, 3);
     ghost_p_0_tex.loadFromFile("sprites/ghosts/p-0.png");
     ghost_p_0_sprite.setTexture(ghost_p_0_tex);
+    ghost_p_0_sprite.scale(3, 3);
     ghost_p_1_tex.loadFromFile("sprites/ghosts/p-1.png");
     ghost_p_1_sprite.setTexture(ghost_p_1_tex);
+    ghost_p_1_sprite.scale(3, 3);
     ghost_b_0_tex.loadFromFile("sprites/ghosts/b-0.png");
     ghost_b_0_sprite.setTexture(ghost_b_0_tex);
+    ghost_b_0_sprite.scale(3, 3);
     ghost_b_1_tex.loadFromFile("sprites/ghosts/b-1.png");
     ghost_b_1_sprite.setTexture(ghost_b_1_tex);
+    ghost_b_1_sprite.scale(3, 3);
     ghost_y_0_tex.loadFromFile("sprites/ghosts/y-0.png");
     ghost_y_0_sprite.setTexture(ghost_y_0_tex);
+    ghost_y_0_sprite.scale(3, 3);
     ghost_y_1_tex.loadFromFile("sprites/ghosts/y-1.png");
     ghost_y_1_sprite.setTexture(ghost_y_1_tex);
+    ghost_y_1_sprite.scale(3, 3);
     ghost_scared_0_tex.loadFromFile("sprites/ghosts/s-0.png");
     ghost_scared_0_sprite.setTexture(ghost_scared_0_tex);
     ghost_scared_1_tex.loadFromFile("sprites/ghosts/s-1.png");
@@ -332,5 +265,26 @@ void Window::load_and_bind_textures()
     _ghost_sprites[3] = eye_down_sprite;
     _ghost_sprites[4] = eye_left_sprite;
     _ghost_sprites[5] = eye_right_sprite;
+
+    _ghost_sprites2[0] = ghost_b_0_sprite;
+    _ghost_sprites2[1] = ghost_b_1_sprite;
+    _ghost_sprites2[2] = eye_up_sprite;
+    _ghost_sprites2[3] = eye_down_sprite;
+    _ghost_sprites2[4] = eye_left_sprite;
+    _ghost_sprites2[5] = eye_right_sprite;
+
+    _ghost_sprites3[0] = ghost_p_0_sprite;
+    _ghost_sprites3[1] = ghost_p_1_sprite;
+    _ghost_sprites3[2] = eye_up_sprite;
+    _ghost_sprites3[3] = eye_down_sprite;
+    _ghost_sprites3[4] = eye_left_sprite;
+    _ghost_sprites3[5] = eye_right_sprite;
+
+    _ghost_sprites4[0] = ghost_y_0_sprite;
+    _ghost_sprites4[1] = ghost_y_1_sprite;
+    _ghost_sprites4[2] = eye_up_sprite;
+    _ghost_sprites4[3] = eye_down_sprite;
+    _ghost_sprites4[4] = eye_left_sprite;
+    _ghost_sprites4[5] = eye_right_sprite;
 
 }
