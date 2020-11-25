@@ -357,7 +357,11 @@ private:
                 //Draw Score
                 _window.score_sprite.setPosition(0,745);
                 window.draw(_window.score_sprite);
-                
+                for (int aa = 0; aa < 8; aa++){
+                    _window.num_sprite[aa].setPosition((120+ aa*24 ),745);
+                    window.draw(_window.num_sprite[aa]);
+                }
+
                 // Draw PacMan
                 _pacman._mutex.p();
                 _window._pacman_sprites[(i / 15) % 4].setPosition(PacMan::pacman_x, PacMan::pacman_y);
