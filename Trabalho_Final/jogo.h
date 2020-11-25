@@ -357,8 +357,12 @@ private:
                 //Draw Score
                 _window.score_sprite.setPosition(0,745);
                 window.draw(_window.score_sprite);
+                int _score_held = _score;
                 for (int aa = 0; aa < 8; aa++){
-                    _window.num_sprite[aa].setPosition((120+ aa*24 ),745);
+                    int digito = _score_held % 10;
+                    _score_held /= 10;
+                    _window.num_sprite[aa].setTexture(_window.num_tex[digito]);
+                    _window.num_sprite[aa].setPosition((125+ aa*24 ),745);
                     window.draw(_window.num_sprite[aa]);
                 }
 
