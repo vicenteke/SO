@@ -3,6 +3,7 @@ Geral:
     2. Pause: com dispatcher trava
     3. Trocar nomes de start/stopComeCuDeGhost, fuck_this
     4. Tirar comentários e prints inúteis
+    5. Quando perde uma vida "reseta" as bolinhas
 
 PacMan:
 
