@@ -102,38 +102,39 @@ public:
         return tile_y;
     }
 
-    int checkPosition(int pm_t_x, int pm_t_y) {
-
-        int tile_x = getNearTileX();
-        int tile_y = getNearTileY();
-
-        // if (tile_x != 0 && tile_y != 0)
-        if (tile_x == pm_t_x && tile_y == pm_t_y) {
-            // std::cout << "you lost!!!!!!!!!!!!!!!!\n";
-            _mutex.v();
-            if (!_isScared)
-                return 1;
-
-            else {
-                isJailed(true);
-                isScared(false);
-                _x = _jail_x;
-                _y = _jail_y;
-                _last_input = STOPPED;
-                updatePosition(_x, _y);
-                updateDirection();
-                return -1;
-            }
-        }
-
-        _mutex.v();
-        return 0;
-
-        // if (abs(_x - pm_t_x) < 50 && abs(_y - pm_t_y) < 50) {
-        //     std::cout << "you lost!!!!!!!!!!!!!!!!\n";
-        // }
-
-    }
+    int checkPosition(int pm_t_x, int pm_t_y);
+    // int checkPosition(int pm_t_x, int pm_t_y) {
+    //
+    //     int tile_x = getNearTileX();
+    //     int tile_y = getNearTileY();
+    //
+    //     // if (tile_x != 0 && tile_y != 0)
+    //     if (tile_x == pm_t_x && tile_y == pm_t_y) {
+    //         // std::cout << "you lost!!!!!!!!!!!!!!!!\n";
+    //         _mutex.v();
+    //         if (!_isScared)
+    //             return 1;
+    //
+    //         else {
+    //             isJailed(true);
+    //             isScared(false);
+    //             _x = _jail_x;
+    //             _y = _jail_y;
+    //             _last_input = STOPPED;
+    //             updatePosition(_x, _y);
+    //             updateDirection();
+    //             return -1;
+    //         }
+    //     }
+    //
+    //     _mutex.v();
+    //     return 0;
+    //
+    //     // if (abs(_x - pm_t_x) < 50 && abs(_y - pm_t_y) < 50) {
+    //     //     std::cout << "you lost!!!!!!!!!!!!!!!!\n";
+    //     // }
+    //
+    // }
 
     int getDistance(int _x1, int _y1, int _x2, int _y2) {
         return (_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2);
@@ -242,6 +243,7 @@ public:
     virtual void updatePosition(int x, int y) {}
 
     virtual void updateDirection() {}
+    virtual void updateDirection(Direction) {}
 
     void scareRunAway(int pm_x, int pm_y) {
         // Used instead of getTargetTile when _isScared = true

@@ -117,6 +117,11 @@ public:
         }
     }
 
+    void updateDirection(Direction dir) {
+        ghost3_dir = dir;
+        _last_input = dir;
+    }
+
     static int ghost3_x;
     static int ghost3_y;
     static Direction ghost3_dir;
