@@ -361,9 +361,9 @@ private:
                 for (int aa = 0; aa < 8; aa++){
                     int digito = _score_held % 10;
                     _score_held /= 10;
-                    _window.num_sprite[(7 - aa)].setTexture(_window.num_tex[digito]);
-                    _window.num_sprite[(7 - aa)].setPosition((125+ aa*24 ),745);
-                    window.draw(_window.num_sprite[(7 - aa)]);
+                    _window.num_sprite[aa].setTexture(_window.num_tex[digito]);
+                    _window.num_sprite[aa].setPosition((125+ 7*24 - aa*24 ),745);
+                    window.draw(_window.num_sprite[aa]);
                 }
 
                 // Draw PacMan
