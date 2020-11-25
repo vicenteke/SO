@@ -11,6 +11,9 @@
 #include "ghost2.h"
 #include "ghost3.h"
 #include "ghost4.h"
+#include <iostream>
+#include <fstream>
+#include <string>
 
 __USING_API
 
@@ -54,6 +57,7 @@ public:
     static int _lives;
     static int _foods;
     static int _score;
+    static int _highscore;
 
 private:
 
@@ -310,6 +314,13 @@ private:
         //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
         //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
         window.setKeyRepeatEnabled(false);
+
+        std::ifstream myFile;
+        myFile.open("recorde.txt");
+        std::string helper;
+        getline(myFile, helper);
+        _highscore = std::stoi(helper);
+        std::cout << _highscore;
 
         int i = 0;
 
