@@ -318,6 +318,9 @@ private:
         while (window.isOpen())
         {
             if (isPaused()) {
+                _window.pause_sprite.setPosition(288,405);
+                window.draw(_window.pause_sprite);
+                window.display();
                 if (Traits<Timer>::preemptive)
                     int status = paused_thread->join();
                 else

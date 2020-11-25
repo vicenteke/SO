@@ -167,6 +167,8 @@ public:
     sf::Sprite score_sprite;
     sf::Texture high_tex;
     sf::Sprite high_sprite;
+    sf::Texture pause_tex;
+    sf::Sprite pause_sprite;
     sf::Texture score_100_tex;
     sf::Sprite score_100_sprite;
     sf::Texture score_300_tex;
