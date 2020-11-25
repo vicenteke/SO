@@ -129,6 +129,7 @@ public:
     sf::Sprite eye_left_sprite;
 
     // UI Textures
+    /*
     sf::Texture num_0_tex;
     sf::Sprite num_0_sprite;
     sf::Texture num_1_tex;
@@ -149,6 +150,11 @@ public:
     sf::Sprite num_8_sprite;
     sf::Texture num_9_tex;
     sf::Sprite num_9_sprite;
+    */
+   //TESTE
+   sf::Texture num_tex[10];
+   sf::Sprite num_sprite[8];
+   //TESTE
     sf::Texture score_200_tex;
     sf::Sprite score_200_sprite;
     sf::Texture score_400_tex;

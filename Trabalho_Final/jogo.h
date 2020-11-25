@@ -319,9 +319,7 @@ private:
         {
             if (isPaused()) {
                 _window.pause_sprite.setPosition(288,405);
-                _window.score_sprite.setPosition(0,745);
                 window.draw(_window.pause_sprite);
-                window.draw(_window.score_sprite);
                 window.display();
                 if (Traits<Timer>::preemptive)
                     int status = paused_thread->join();
@@ -356,6 +354,10 @@ private:
 
                 window.draw(_window.maze_sprite);
 
+                //Draw Score
+                _window.score_sprite.setPosition(0,745);
+                window.draw(_window.score_sprite);
+                
                 // Draw PacMan
                 _pacman._mutex.p();
                 _window._pacman_sprites[(i / 15) % 4].setPosition(PacMan::pacman_x, PacMan::pacman_y);

@@ -203,6 +203,7 @@ void Window::load_and_bind_textures()
 
 
     // Bind UI textures
+    /*
     num_0_tex.loadFromFile("sprites/ui/0.png");
     num_0_sprite.setTexture(num_0_tex);
     num_0_sprite.scale(3, 3);
@@ -232,7 +233,36 @@ void Window::load_and_bind_textures()
     num_8_sprite.scale(3, 3);
     num_9_tex.loadFromFile("sprites/ui/9.png");
     num_9_sprite.setTexture(num_9_tex);
-    num_3_sprite.scale(3, 3);
+    num_9_sprite.scale(3, 3);
+    */
+   //TESTE
+    num_tex[0].loadFromFile("sprites/ui/0.png");
+    num_tex[1].loadFromFile("sprites/ui/1.png");
+    num_tex[2].loadFromFile("sprites/ui/2.png");
+    num_tex[3].loadFromFile("sprites/ui/3.png");
+    num_tex[4].loadFromFile("sprites/ui/4.png");
+    num_tex[5].loadFromFile("sprites/ui/5.png");
+    num_tex[6].loadFromFile("sprites/ui/6.png");
+    num_tex[7].loadFromFile("sprites/ui/7.png");
+    num_tex[8].loadFromFile("sprites/ui/8.png");
+    num_tex[9].loadFromFile("sprites/ui/9.png");
+    num_sprite[0].setTexture(num_tex[0]);
+    num_sprite[0].scale(3, 3);    
+    num_sprite[1].setTexture(num_tex[0]);
+    num_sprite[1].scale(3, 3);    
+    num_sprite[2].setTexture(num_tex[0]);
+    num_sprite[2].scale(3, 3);    
+    num_sprite[3].setTexture(num_tex[0]);
+    num_sprite[3].scale(3, 3);    
+    num_sprite[4].setTexture(num_tex[0]);
+    num_sprite[4].scale(3, 3);    
+    num_sprite[5].setTexture(num_tex[0]);
+    num_sprite[5].scale(3, 3);    
+    num_sprite[6].setTexture(num_tex[0]);
+    num_sprite[6].scale(3, 3);    
+    num_sprite[7].setTexture(num_tex[0]);
+    num_sprite[7].scale(3, 3);
+   //TESTE
     score_200_tex.loadFromFile("sprites/ui/200.png");
     score_200_sprite.setTexture(score_200_tex);
     score_200_sprite.scale(3, 3);
