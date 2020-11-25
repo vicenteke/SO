@@ -304,7 +304,7 @@ private:
 
     static void runWindow()
     {
-        sf::RenderWindow window(sf::VideoMode(674, 1000), "Pac Man");
+        sf::RenderWindow window(sf::VideoMode(674, 810), "Pac Man");
         _window_render = &window;
 
         //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
@@ -319,7 +319,9 @@ private:
         {
             if (isPaused()) {
                 _window.pause_sprite.setPosition(288,405);
+                _window.score_sprite.setPosition(0,745);
                 window.draw(_window.pause_sprite);
+                window.draw(_window.score_sprite);
                 window.display();
                 if (Traits<Timer>::preemptive)
                     int status = paused_thread->join();
