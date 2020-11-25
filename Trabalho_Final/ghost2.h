@@ -18,7 +18,9 @@ public:
 
     void getTargetTile(int pm_x, int pm_y, Direction dir) {
 
-        if (isScared()) {
+        if (isJailed()) {
+            return;
+        } else if (isScared()) {
             return scareRunAway(pm_x, pm_y);
         }
 
@@ -107,7 +109,11 @@ public:
     }
 
     void updateDirection() {
-        _last_input = ghost2_dir;
+        if (_last_input == STOPPED) {
+            ghost2_dir = _last_input;
+        } else {
+            _last_input = ghost2_dir;
+        }
     }
 
     static int ghost2_x;

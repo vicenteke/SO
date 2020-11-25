@@ -15,6 +15,9 @@ public:
 
         _i = 0;
         _isScared = false;
+        _jail_x = 310;
+        _jail_y = 310;
+        _isJailed = false;
     }
 
     ~Ghost() {}
@@ -111,7 +114,16 @@ public:
             if (!_isScared)
                 return 1;
 
-            else return -1;
+            else {
+                isJailed(true);
+                isScared(false);
+                _x = _jail_x;
+                _y = _jail_y;
+                _last_input = STOPPED;
+                updatePosition(_x, _y);
+                updateDirection();
+                return -1;
+            }
         }
 
         _mutex.v();
@@ -312,6 +324,17 @@ public:
         return tmp;
     }
 
+    void isJailed(bool b) {
+        _isJailed = b;
+    }
+
+    bool isJailed() {
+        _mutex_scared.p();
+        bool tmp = _isJailed;
+        _mutex_scared.v();
+        return tmp;
+    }
+
 protected:
     int _target_x;
     int _target_y;
@@ -319,6 +342,9 @@ protected:
     int _i;
 
     bool _isScared;
+    int _jail_x;
+    int _jail_y;
+    bool _isJailed;
 };
 
 

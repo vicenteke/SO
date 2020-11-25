@@ -12,13 +12,16 @@ public:
     : Ghost(eyes, sprites, n_sprites, x, y, dir)
     {
         getTargetTile(310, 398, LEFT);
+        _jail_x = 334;
     }
 
     ~Ghost3() {}
 
     void getTargetTile(int pm_x, int pm_y, Direction dir) {
 
-        if (isScared()) {
+        if (isJailed()) {
+            return;
+        } else if (isScared()) {
             return scareRunAway(pm_x, pm_y);
         }
 
@@ -107,7 +110,11 @@ public:
     }
 
     void updateDirection() {
-        _last_input = ghost3_dir;
+        if (_last_input == STOPPED) {
+            ghost3_dir = _last_input;
+        } else {
+            _last_input = ghost3_dir;
+        }
     }
 
     static int ghost3_x;

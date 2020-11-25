@@ -190,7 +190,11 @@ public:
     }
 
     void updateDirection() {
-        _last_input = pacman_dir;
+        if (_last_input == STOPPED) {
+            pacman_dir = _last_input;
+        } else {
+            _last_input = pacman_dir;
+        }
     }
 
     static int pacmanGetNearTileX() {

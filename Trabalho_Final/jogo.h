@@ -305,8 +305,8 @@ private:
                 }
 
                 window.draw(_window.maze_sprite);
-                // pac_0_sprite.setPosition(310, 398);
-                // window.draw(pac_0_sprite);
+
+                // Draw PacMan
                 _pacman._mutex.p();
                 _window._pacman_sprites[(i / 15) % 4].setPosition(PacMan::pacman_x, PacMan::pacman_y);
                 _pacman._mutex.v();
@@ -345,8 +345,8 @@ private:
                 _window._ghost_sprites3[2 + Ghost3::ghost3_dir].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
                 window.draw(_window._ghost_sprites3[2 + Ghost3::ghost3_dir]);
 
-                // Draw Ghost 3
-                if (!_ghost3.isScared()) {
+                // Draw Ghost 4
+                if (!_ghost4.isScared()) {
                     _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
                     window.draw(_window._ghost_sprites4[(i / 15) % 2]);
                 } else {
