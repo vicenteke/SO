@@ -16,7 +16,7 @@ public:
         _i = 0;
         _isScared = false;
         _jail_x = 310;
-        _jail_y = 310;
+        _jail_y = 334;
         _isJailed = false;
     }
 

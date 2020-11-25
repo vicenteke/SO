@@ -12,6 +12,7 @@ public:
     : Ghost(eyes, sprites, n_sprites, x, y, dir)
     {
         getTargetTile(310, 398, LEFT);
+        _jail_x -= 12;
     }
 
     ~Ghost2() {}

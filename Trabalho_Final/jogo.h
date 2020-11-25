@@ -28,6 +28,7 @@ public:
         // run();
 
         _isPaused = false;
+        _semaphore_pause.p();
     }
 
     ~Jogo() {
@@ -68,10 +69,29 @@ private:
     static bool _isPaused;
     static Thread * paused_thread;
     static Thread * stopComeCuDeGhost_thread;
+    static Semaphore fuck_this;
+
+    static bool isPaused() {
+        fuck_this.p();
+        bool aux = _isPaused;
+        fuck_this.v();
+        return aux;
+    }
+
+    static Semaphore _semaphore_pause;
 
     static void runPeriod(int seconds, void (* callBack)()) {
         std::time_t start_time = std::time(0);
+        std::time_t paused_time = start_time;
         while (std::difftime(std::time(0), start_time) < seconds) {
+            if(isPaused()) {
+                if (int aux = std::difftime(std::time(0), paused_time) > 0) {
+                    seconds += aux;
+                    paused_time = std::time(0);
+                }
+            }
+            if (Traits<Timer>::preemptive)
+                for (volatile int i = 0; i < 50000; i++);
             Thread::yield();
         }
         return callBack();
@@ -97,9 +117,9 @@ private:
 
     static void runPaused() {
         while(true) {
-            if (!Traits<Timer>::preemptive) {
-                Thread::yield();
-            }
+            if (Traits<Timer>::preemptive)
+                for (volatile int i = 0; i < 50000; i++);
+            else Thread::yield();
         }
     }
 
@@ -116,7 +136,8 @@ private:
             _foods = 240;
         } else {
             _isPaused = true;
-            paused_thread = new Thread(runPaused);
+            if (Traits<Timer>::preemptive)
+                paused_thread = new Thread(runPaused);
             // finishGame();
         }
     }
@@ -130,7 +151,7 @@ private:
     static void restartGame() {
         _lives = 4;
         _score = 0;
-        if (_isPaused) delete paused_thread;
+        if (Traits<Timer>::preemptive && isPaused()) delete paused_thread;
         _isPaused = false;
         loseLife();
     }
@@ -139,8 +160,13 @@ private:
 
         while (true) {
 
-            if (_isPaused) {
-                int status = paused_thread->join();
+            if (isPaused()) {
+                if (Traits<Timer>::preemptive)
+                    int status = paused_thread->join();
+                else
+                // std::cout << '2';
+                    _semaphore_pause.p();
+                // std::cout << '3';
             } else {
                 switch(_pacman.move()) {
                     case 10:
@@ -166,8 +192,13 @@ private:
 
         while (true) {
 
-            if (_isPaused) {
-                int status = paused_thread->join();
+            if (isPaused()) {
+                if (Traits<Timer>::preemptive)
+                    int status = paused_thread->join();
+                else
+                // std::cout << '4';
+                _semaphore_pause.p();
+                // std::cout << '5';
             } else {
                 _pacman._mutex.p();
                 int pm_x = PacMan::pacman_x;
@@ -212,52 +243,61 @@ private:
                     case sf::Event::KeyPressed:
                         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
                             // std::cout << "Keyboard esquerda!" << std::endl;
-                            if (PacMan::pacman_dir != LEFT && !_isPaused) {
+                            if (PacMan::pacman_dir != LEFT && !isPaused()) {
                                 // _window._mutex_w.p();
                                 _pacman._mutex.p();
                                 _pacman.changeDirection(LEFT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                             // std::cout << "Keyboard direita!" << std::endl;
-                            if (PacMan::pacman_dir != RIGHT && !_isPaused) {
+                            if (PacMan::pacman_dir != RIGHT && !isPaused()) {
                                 // _window._mutex_w.p();
                                 _pacman._mutex.p();
                                 _pacman.changeDirection(RIGHT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                             // std::cout << "Keyboard para baixo!" << std::endl;
-                            if (PacMan::pacman_dir != DOWN && !_isPaused) {
+                            if (PacMan::pacman_dir != DOWN && !isPaused()) {
                                 // _window._mutex_w.p();
                                 _pacman._mutex.p();
                                 _pacman.changeDirection(DOWN);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                             // std::cout << "Keyboard para cima!" << std::endl;
-                            if (PacMan::pacman_dir != UP && !_isPaused) {
+                            if (PacMan::pacman_dir != UP && !isPaused()) {
                                 // _window._mutex_w.p();
                                 _pacman._mutex.p();
                                 _pacman.changeDirection(UP);
                             }
                         } else if (event.key.code == 15) {
-                            _isPaused = !_isPaused;
-                            if (_isPaused) {
-                                paused_thread = new Thread(runPaused);
+                            _isPaused = !isPaused();
+                            if (isPaused()) {
+                                if (Traits<Timer>::preemptive) {
+                                    paused_thread = new Thread(runPaused);
+                                    // Thread::yield();
+                                }
+                                // _semaphore_pause.p();
                             } else {
-                                delete paused_thread;
+                                if (!Traits<Timer>::preemptive)
+                                    _semaphore_pause.wakeup_all();
+                                else delete paused_thread;
                             }
-                            Thread::yield();
+                            // Thread::yield();
                         } else if (event.key.code == 16) {
                             finishGame();
                         } else if (event.key.code == 17) {
                             restartGame();
                         } else if (event.key.code == 57) {
-                            std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
+                            // std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
                         } else
                             std::cout << "Keyboard pressed = " << event.key.code << std::endl;
                         break;
 
                 }
             }
+            if (Traits<Timer>::preemptive && isPaused())
+                for (volatile int i = 0; i < DE_LEI; i++);
+            // std::cout << '9';
             Thread::yield();
         }
     }
@@ -277,8 +317,13 @@ private:
 
         while (window.isOpen())
         {
-            if (_isPaused) {
-                int status = paused_thread->join();
+            if (isPaused()) {
+                if (Traits<Timer>::preemptive)
+                    int status = paused_thread->join();
+                else
+                // std::cout << '0';
+                    _semaphore_pause.p();
+                // std::cout << '1';
             } else {
 
                 i++;
@@ -316,45 +361,45 @@ private:
                 if (!_ghost1.isScared()) {
                     _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
                     window.draw(_window._ghost_sprites[(i / 15) % 2]);
+                    _window._ghost_sprites[2 + Ghost1::ghost1_dir - (Ghost1::ghost1_dir == STOPPED)].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                    window.draw(_window._ghost_sprites[2 + Ghost1::ghost1_dir - (Ghost1::ghost1_dir == STOPPED)]);
                 } else {
                     _window._scared_sprites[(i / 15) % 4].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
                     window.draw(_window._scared_sprites[(i / 15) % 4]);
                 }
-                _window._ghost_sprites[2 + Ghost1::ghost1_dir].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
-                window.draw(_window._ghost_sprites[2 + Ghost1::ghost1_dir]);
 
                 // Draw Ghost 2
                 if (!_ghost2.isScared()) {
                     _window._ghost_sprites2[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
                     window.draw(_window._ghost_sprites2[(i / 15) % 2]);
+                    _window._ghost_sprites2[2 + Ghost2::ghost2_dir - (Ghost2::ghost2_dir == STOPPED)].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                    window.draw(_window._ghost_sprites2[2 + Ghost2::ghost2_dir - (Ghost2::ghost2_dir == STOPPED)]);
                 } else {
                     _window._scared_sprites[(i / 15) % 4].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
                     window.draw(_window._scared_sprites[(i / 15) % 4]);
                 }
-                _window._ghost_sprites2[2 + Ghost2::ghost2_dir].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
-                window.draw(_window._ghost_sprites2[2 + Ghost2::ghost2_dir]);
 
                 // Draw Ghost 3
                 if (!_ghost3.isScared()) {
                     _window._ghost_sprites3[(i / 15) % 2].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
                     window.draw(_window._ghost_sprites3[(i / 15) % 2]);
+                    _window._ghost_sprites3[2 + Ghost3::ghost3_dir - (Ghost3::ghost3_dir == STOPPED)].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                    window.draw(_window._ghost_sprites3[2 + Ghost3::ghost3_dir - (Ghost3::ghost3_dir == STOPPED)]);
                 } else {
                     _window._scared_sprites[(i / 15) % 4].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
                     window.draw(_window._scared_sprites[(i / 15) % 4]);
                 }
-                _window._ghost_sprites3[2 + Ghost3::ghost3_dir].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
-                window.draw(_window._ghost_sprites3[2 + Ghost3::ghost3_dir]);
 
                 // Draw Ghost 4
                 if (!_ghost4.isScared()) {
                     _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
                     window.draw(_window._ghost_sprites4[(i / 15) % 2]);
+                    _window._ghost_sprites4[2 + Ghost4::ghost4_dir - (Ghost4::ghost4_dir == STOPPED)].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                    window.draw(_window._ghost_sprites4[2 + Ghost4::ghost4_dir - (Ghost4::ghost4_dir == STOPPED)]);
                 } else {
                     _window._scared_sprites[(i / 15) % 4].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
                     window.draw(_window._scared_sprites[(i / 15) % 4]);
                 }
-                _window._ghost_sprites4[2 + Ghost4::ghost4_dir].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
-                window.draw(_window._ghost_sprites4[2 + Ghost4::ghost4_dir]);
 
                 window.display();
                 for (volatile unsigned int j = 0; j < DE_LEI; j++);

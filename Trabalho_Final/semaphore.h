@@ -16,6 +16,7 @@ public:
 
     void p();
     void v();
+    void wakeup_all();
 
 private:
     // Atomic operations
@@ -25,7 +26,6 @@ private:
     // Thread operations
     void sleep();
     void wakeup();
-    void wakeup_all();
 
 private:
     int _count;

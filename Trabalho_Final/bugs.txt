@@ -1,6 +1,8 @@
 Geral:
     1. SOLVED? Quando compila, costuma dar uma erro "Alarm clock"
     2. Pause: com dispatcher trava
+    3. Trocar nomes de start/stopComeCuDeGhost, fuck_this
+    4. Tirar comentários e prints inúteis
 
 PacMan:
 
