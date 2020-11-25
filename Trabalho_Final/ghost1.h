@@ -166,6 +166,11 @@ public:
             _last_input = ghost1_dir;
         }
     }
+    
+    void updateDirection(Direction dir) {
+        ghost1_dir = dir;
+        _last_input = dir;
+    }
 
     static int ghost1_x;
     static int ghost1_y;

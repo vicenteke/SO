@@ -1,7 +1,7 @@
 #ifndef JOGO_H
 #define JOGO_H
 
-#define DE_LEI 1000000
+#define DE_LEI 1200000
 
 #include <ctime>
 #include "thread.h"
@@ -20,10 +20,10 @@ public:
 
         // _window = Window();
         _pacman = PacMan(_window.getPacmanSprites(), 4);
-        _ghost1 = Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
-        _ghost2 = Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
-        _ghost3 = Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
-        _ghost4 = Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
+        _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
+        _ghost2 = new Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
+        _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
+        _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
         //
         // run();
 
@@ -32,7 +32,7 @@ public:
     }
 
     ~Jogo() {
-
+        finishGame();
     }
 
     static void run(void *) {
@@ -55,21 +55,6 @@ public:
     static int _foods;
     static int _score;
 
-private:
-
-    static sf::RenderWindow * _window_render;
-
-    // Characters
-    static PacMan _pacman;
-    static Ghost1 _ghost1;
-    static Ghost2 _ghost2;
-    static Ghost3 _ghost3;
-    static Ghost4 _ghost4;
-
-    static bool _isPaused;
-    static Thread * paused_thread;
-    static Thread * stopComeCuDeGhost_thread;
-    static Semaphore fuck_this;
 
     static bool isPaused() {
         fuck_this.p();
@@ -78,9 +63,48 @@ private:
         return aux;
     }
 
+    static void timerJail(int ghost) {
+
+        if (ghost <= 0) return;
+        _score += 400;
+
+        switch(ghost) {
+            case 1:
+                timerJail_thread[0] = new Thread(Jogo::runPeriod, (int)(std::time(0) % 7) + 1, getOutJail, 1);
+                break;
+            case 2:
+                timerJail_thread[1] = new Thread(Jogo::runPeriod, (int)(std::time(0) % 7) + 1, getOutJail, 2);
+                break;
+            case 3:
+                timerJail_thread[2] = new Thread(Jogo::runPeriod, (int)(std::time(0) % 7) + 1, getOutJail, 3);
+                break;
+            case 4:
+                timerJail_thread[3] = new Thread(Jogo::runPeriod, (int)(std::time(0) % 7) + 1, getOutJail, 4);
+                break;
+        }
+    }
+
+private:
+
+    static sf::RenderWindow * _window_render;
+
+    // Characters
+    static PacMan _pacman;
+    static Ghost1 * _ghost1;
+    static Ghost2 * _ghost2;
+    static Ghost3 * _ghost3;
+    static Ghost4 * _ghost4;
+
+    static bool _isPaused;
+    static Thread * paused_thread;
+    static Thread * stopComeCuDeGhost_thread;
+    static Semaphore fuck_this;
+
+    static Thread * timerJail_thread[4];
+
     static Semaphore _semaphore_pause;
 
-    static void runPeriod(int seconds, void (* callBack)()) {
+    static void runPeriod(int seconds, void (* callBack)(int), int a = 0) {
         std::time_t start_time = std::time(0);
         std::time_t paused_time = start_time;
         while (std::difftime(std::time(0), start_time) < seconds) {
@@ -91,26 +115,67 @@ private:
                 }
             }
             if (Traits<Timer>::preemptive)
-                for (volatile int i = 0; i < 50000; i++);
+                for (volatile int i = 0; i < 5000; i++);
+            // std::cout << '1';
             Thread::yield();
         }
-        return callBack();
+        return callBack(a);
+    }
+
+    static void getOutJail(int ghost) {
+
+        // _isPaused = true;
+        // if (Traits<Timer>::preemptive) {
+        //     paused_thread = new Thread(runPaused);
+        //     // Thread::yield();
+        // }
+
+        switch(ghost) {
+            case 1:
+                // _ghost1->_mutex.p();
+                delete _ghost1;
+                _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
+                // _ghost1->_mutex.v();
+                break;
+            case 2:
+                // _ghost2->_mutex.p();
+                delete _ghost2;
+                _ghost2 = new Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
+                // _ghost2->_mutex.v();
+                break;
+            case 3:
+                // _ghost3->_mutex.p();
+                delete _ghost3;
+                _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
+                // _ghost3->_mutex.v();
+                break;
+            case 4:
+                // _ghost4->_mutex.p();
+                delete _ghost4;
+                _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
+                // _ghost4->_mutex.v();
+                break;
+        }
+        delete timerJail_thread[ghost - 1];
+        // if (!Traits<Timer>::preemptive)
+        //     _semaphore_pause.wakeup_all();
+        // else delete paused_thread;
     }
 
     static void startComeCuDeGhost() {
-        _ghost1.isScared(true);
-        _ghost2.isScared(true);
-        _ghost3.isScared(true);
-        _ghost4.isScared(true);
+        _ghost1->isScared(true);
+        _ghost2->isScared(true);
+        _ghost3->isScared(true);
+        _ghost4->isScared(true);
 
-        stopComeCuDeGhost_thread = new Thread(runPeriod, 4, stopComeCuDeGhost);
+        stopComeCuDeGhost_thread = new Thread(runPeriod, 4, stopComeCuDeGhost, -1);
     }
 
-    static void stopComeCuDeGhost() {
-        _ghost1.isScared(false);
-        _ghost2.isScared(false);
-        _ghost3.isScared(false);
-        _ghost4.isScared(false);
+    static void stopComeCuDeGhost(int) {
+        _ghost1->isScared(false);
+        _ghost2->isScared(false);
+        _ghost3->isScared(false);
+        _ghost4->isScared(false);
 
         delete stopComeCuDeGhost_thread;
     }
@@ -128,10 +193,14 @@ private:
             Tiles::resetTiles();
 
             _pacman = PacMan(_window.getPacmanSprites(), 4);
-            _ghost1 = Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
-            _ghost2 = Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
-            _ghost3 = Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
-            _ghost4 = Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
+            delete _ghost1;
+            _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
+            delete _ghost2;
+            _ghost2 = new Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
+            delete _ghost3;
+            _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
+            delete _ghost4;
+            _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
             _isPaused = false;
             _foods = 240;
         } else {
@@ -144,8 +213,15 @@ private:
 
     static void finishGame() {
         _window_render->close();
+        if (_ghost1) delete _ghost1;
+        if (_ghost2) delete _ghost2;
+        if (_ghost3) delete _ghost3;
+        if (_ghost4) delete _ghost4;
         if (paused_thread) delete paused_thread;
         if (stopComeCuDeGhost_thread) delete stopComeCuDeGhost_thread;
+        for (int i = 0; i < 4; i++) {
+            if (timerJail_thread[i]) delete timerJail_thread[i];
+        }
     }
 
     static void restartGame() {
@@ -175,7 +251,7 @@ private:
                         std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                         break;
                     case 20:
-                        Jogo::_score += 20;
+                        Jogo::_score += 50;
                         startComeCuDeGhost();
                         std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                         break;
@@ -208,14 +284,14 @@ private:
                 int pm_t_y = PacMan::pacmanGetNearTileY();
                 _pacman._mutex.v();
 
-                _ghost1.getTargetTile(pm_x, pm_y, pm_d);
-                lost += _ghost1.move(pm_t_x, pm_t_y);
-                _ghost2.getTargetTile(pm_x, pm_y, pm_d);
-                lost += _ghost2.move(pm_t_x, pm_t_y);
-                _ghost3.getTargetTile(pm_x, pm_y, pm_d);
-                lost += _ghost3.move(pm_t_x, pm_t_y);
-                _ghost4.getTargetTile(pm_x, pm_y, pm_d);
-                lost += _ghost4.move(pm_t_x, pm_t_y);
+                _ghost1->getTargetTile(pm_x, pm_y, pm_d);
+                lost += _ghost1->move(pm_t_x, pm_t_y);
+                _ghost2->getTargetTile(pm_x, pm_y, pm_d);
+                lost += _ghost2->move(pm_t_x, pm_t_y);
+                _ghost3->getTargetTile(pm_x, pm_y, pm_d);
+                lost += _ghost3->move(pm_t_x, pm_t_y);
+                _ghost4->getTargetTile(pm_x, pm_y, pm_d);
+                lost += _ghost4->move(pm_t_x, pm_t_y);
 
                 if (lost > 0) {
                     lost = 0;
@@ -373,7 +449,7 @@ private:
                 window.draw(_window._pacman_sprites[(i / 15) % 4]);
 
                 // Draw Ghost 1
-                if (!_ghost1.isScared()) {
+                if (!_ghost1->isScared()) {
                     _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
                     window.draw(_window._ghost_sprites[(i / 15) % 2]);
                     _window._ghost_sprites[2 + Ghost1::ghost1_dir - (Ghost1::ghost1_dir == STOPPED)].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
@@ -384,7 +460,7 @@ private:
                 }
 
                 // Draw Ghost 2
-                if (!_ghost2.isScared()) {
+                if (!_ghost2->isScared()) {
                     _window._ghost_sprites2[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
                     window.draw(_window._ghost_sprites2[(i / 15) % 2]);
                     _window._ghost_sprites2[2 + Ghost2::ghost2_dir - (Ghost2::ghost2_dir == STOPPED)].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
@@ -395,7 +471,7 @@ private:
                 }
 
                 // Draw Ghost 3
-                if (!_ghost3.isScared()) {
+                if (!_ghost3->isScared()) {
                     _window._ghost_sprites3[(i / 15) % 2].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
                     window.draw(_window._ghost_sprites3[(i / 15) % 2]);
                     _window._ghost_sprites3[2 + Ghost3::ghost3_dir - (Ghost3::ghost3_dir == STOPPED)].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
@@ -406,7 +482,7 @@ private:
                 }
 
                 // Draw Ghost 4
-                if (!_ghost4.isScared()) {
+                if (!_ghost4->isScared()) {
                     _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
                     window.draw(_window._ghost_sprites4[(i / 15) % 2]);
                     _window._ghost_sprites4[2 + Ghost4::ghost4_dir - (Ghost4::ghost4_dir == STOPPED)].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
