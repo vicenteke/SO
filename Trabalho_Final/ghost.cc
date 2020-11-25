@@ -15,3 +15,5 @@ Direction Ghost3::ghost3_dir;
 int Ghost4::ghost4_x;
 int Ghost4::ghost4_y;
 Direction Ghost4::ghost4_dir;
+
+// Semaphore Ghost::_mutex_scared;// = Semaphore();

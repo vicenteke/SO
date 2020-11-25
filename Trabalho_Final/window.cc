@@ -176,12 +176,16 @@ void Window::load_and_bind_textures()
     ghost_y_1_sprite.scale(3, 3);
     ghost_scared_0_tex.loadFromFile("sprites/ghosts/s-0.png");
     ghost_scared_0_sprite.setTexture(ghost_scared_0_tex);
+    ghost_scared_0_sprite.scale(3, 3);
     ghost_scared_1_tex.loadFromFile("sprites/ghosts/s-1.png");
     ghost_scared_1_sprite.setTexture(ghost_scared_1_tex);
+    ghost_scared_1_sprite.scale(3, 3);
     ghost_scared_2_tex.loadFromFile("sprites/ghosts/s-2.png");
     ghost_scared_2_sprite.setTexture(ghost_scared_2_tex);
+    ghost_scared_2_sprite.scale(3, 3);
     ghost_scared_3_tex.loadFromFile("sprites/ghosts/s-3.png");
     ghost_scared_3_sprite.setTexture(ghost_scared_3_tex);
+    ghost_scared_3_sprite.scale(3, 3);
 
      // Bind ghost eye textures
     eye_up_tex.loadFromFile("sprites/eyes/up.png");
@@ -287,4 +291,8 @@ void Window::load_and_bind_textures()
     _ghost_sprites4[4] = eye_left_sprite;
     _ghost_sprites4[5] = eye_right_sprite;
 
+    _scared_sprites[0] = ghost_scared_0_sprite;
+    _scared_sprites[1] = ghost_scared_1_sprite;
+    _scared_sprites[2] = ghost_scared_2_sprite;
+    _scared_sprites[3] = ghost_scared_3_sprite;
 }

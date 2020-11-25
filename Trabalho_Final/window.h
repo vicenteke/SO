@@ -46,6 +46,7 @@ public:
     sf::Sprite _ghost_sprites2[6];
     sf::Sprite _ghost_sprites3[6];
     sf::Sprite _ghost_sprites4[6];
+    sf::Sprite _scared_sprites[4];
 
     // Fruit fruit: thread that checks _foods?
 

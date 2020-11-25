@@ -18,6 +18,10 @@ public:
 
     void getTargetTile(int pm_x, int pm_y, Direction dir) {
 
+        if (isScared()) {
+            return scareRunAway(pm_x, pm_y);
+        }
+
         int tile_x = getTileX();
         int tile_y = getTileY();
 

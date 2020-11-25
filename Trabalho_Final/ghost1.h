@@ -18,6 +18,10 @@ public:
 
     void getTargetTile(int pm_x, int pm_y, Direction dir) {
 
+        if (isScared()) {
+            return scareRunAway(pm_x, pm_y);
+        }
+
         _mutex.p();
 
         int tile_x = getTileX();

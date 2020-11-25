@@ -3,6 +3,7 @@
 
 #define DE_LEI 1000000
 
+#include <ctime>
 #include "thread.h"
 #include "window.h"
 #include "pacman.h"
@@ -66,6 +67,33 @@ private:
 
     static bool _isPaused;
     static Thread * paused_thread;
+    static Thread * stopComeCuDeGhost_thread;
+
+    static void runPeriod(int seconds, void (* callBack)()) {
+        std::time_t start_time = std::time(0);
+        while (std::difftime(std::time(0), start_time) < seconds) {
+            Thread::yield();
+        }
+        return callBack();
+    }
+
+    static void startComeCuDeGhost() {
+        _ghost1.isScared(true);
+        _ghost2.isScared(true);
+        _ghost3.isScared(true);
+        _ghost4.isScared(true);
+
+        stopComeCuDeGhost_thread = new Thread(runPeriod, 4, stopComeCuDeGhost);
+    }
+
+    static void stopComeCuDeGhost() {
+        _ghost1.isScared(false);
+        _ghost2.isScared(false);
+        _ghost3.isScared(false);
+        _ghost4.isScared(false);
+
+        delete stopComeCuDeGhost_thread;
+    }
 
     static void runPaused() {
         while(true) {
@@ -96,6 +124,7 @@ private:
     static void finishGame() {
         _window_render->close();
         if (paused_thread) delete paused_thread;
+        if (stopComeCuDeGhost_thread) delete stopComeCuDeGhost_thread;
     }
 
     static void restartGame() {
@@ -121,6 +150,7 @@ private:
                         break;
                     case 20:
                         Jogo::_score += 20;
+                        startComeCuDeGhost();
                         std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                         break;
                 }
@@ -282,26 +312,48 @@ private:
                 _pacman._mutex.v();
                 window.draw(_window._pacman_sprites[(i / 15) % 4]);
 
-                // ghost_r_0_sprite.setPosition(315, 350);
-                // window.draw(ghost_r_0_sprite);
-                _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                // Draw Ghost 1
+                if (!_ghost1.isScared()) {
+                    _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                    window.draw(_window._ghost_sprites[(i / 15) % 2]);
+                } else {
+                    _window._scared_sprites[(i / 15) % 4].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                    window.draw(_window._scared_sprites[(i / 15) % 4]);
+                }
                 _window._ghost_sprites[2 + Ghost1::ghost1_dir].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
-                window.draw(_window._ghost_sprites[(i / 15) % 2]);
                 window.draw(_window._ghost_sprites[2 + Ghost1::ghost1_dir]);
 
-                _window._ghost_sprites2[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                // Draw Ghost 2
+                if (!_ghost2.isScared()) {
+                    _window._ghost_sprites2[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                    window.draw(_window._ghost_sprites2[(i / 15) % 2]);
+                } else {
+                    _window._scared_sprites[(i / 15) % 4].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                    window.draw(_window._scared_sprites[(i / 15) % 4]);
+                }
                 _window._ghost_sprites2[2 + Ghost2::ghost2_dir].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
-                window.draw(_window._ghost_sprites2[(i / 15) % 2]);
                 window.draw(_window._ghost_sprites2[2 + Ghost2::ghost2_dir]);
 
-                _window._ghost_sprites3[(i / 15) % 2].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                // Draw Ghost 3
+                if (!_ghost3.isScared()) {
+                    _window._ghost_sprites3[(i / 15) % 2].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                    window.draw(_window._ghost_sprites3[(i / 15) % 2]);
+                } else {
+                    _window._scared_sprites[(i / 15) % 4].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                    window.draw(_window._scared_sprites[(i / 15) % 4]);
+                }
                 _window._ghost_sprites3[2 + Ghost3::ghost3_dir].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
-                window.draw(_window._ghost_sprites3[(i / 15) % 2]);
                 window.draw(_window._ghost_sprites3[2 + Ghost3::ghost3_dir]);
 
-                _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                // Draw Ghost 3
+                if (!_ghost3.isScared()) {
+                    _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                    window.draw(_window._ghost_sprites4[(i / 15) % 2]);
+                } else {
+                    _window._scared_sprites[(i / 15) % 4].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                    window.draw(_window._scared_sprites[(i / 15) % 4]);
+                }
                 _window._ghost_sprites4[2 + Ghost4::ghost4_dir].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
-                window.draw(_window._ghost_sprites4[(i / 15) % 2]);
                 window.draw(_window._ghost_sprites4[2 + Ghost4::ghost4_dir]);
 
                 window.display();
