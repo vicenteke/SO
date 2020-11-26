@@ -103,44 +103,12 @@ public:
     }
 
     int checkPosition(int pm_t_x, int pm_t_y);
-    // int checkPosition(int pm_t_x, int pm_t_y) {
-    //
-    //     int tile_x = getNearTileX();
-    //     int tile_y = getNearTileY();
-    //
-    //     // if (tile_x != 0 && tile_y != 0)
-    //     if (tile_x == pm_t_x && tile_y == pm_t_y) {
-    //         // std::cout << "you lost!!!!!!!!!!!!!!!!\n";
-    //         _mutex.v();
-    //         if (!_isScared)
-    //             return 1;
-    //
-    //         else {
-    //             isJailed(true);
-    //             isScared(false);
-    //             _x = _jail_x;
-    //             _y = _jail_y;
-    //             _last_input = STOPPED;
-    //             updatePosition(_x, _y);
-    //             updateDirection();
-    //             return -1;
-    //         }
-    //     }
-    //
-    //     _mutex.v();
-    //     return 0;
-    //
-    //     // if (abs(_x - pm_t_x) < 50 && abs(_y - pm_t_y) < 50) {
-    //     //     std::cout << "you lost!!!!!!!!!!!!!!!!\n";
-    //     // }
-    //
-    // }
 
     int getDistance(int _x1, int _y1, int _x2, int _y2) {
-        return (_x1 - _x2) * (_x1 - _x2) + (_y1 - _y2) * (_y1 - _y2);
+        return abs(_x1 - _x2) + abs(_y1 - _y2);
     }
 
-    virtual void getTargetTile(int pm_x, int pm_y, Direction dir) = 0;
+    virtual void getTargetTile(int, int, Direction) = 0;
     // {
     //
     //     int tile_x = getTileX();
@@ -253,64 +221,23 @@ public:
         int tile_x = getTileX();
         int tile_y = getTileY();
 
-        int dist = getDistance(_x, _y, pm_x, pm_y);
-        int dist_r = getDistance(_x + 24, _y, pm_x, pm_y);
-        int dist_l = getDistance(_x - 24, _y, pm_x, pm_y);
-        int dist_d = getDistance(_x, _y + 24, pm_x, pm_y);
-        int dist_u = getDistance(_x, _y - 24, pm_x, pm_y);
-
         _target_x = pm_x;
         _target_y = pm_y;
 
-        if (dist_r >= dist_l) {
-            if (dist_r >= dist_u) {
-                if (dist_r >= dist_d && maze[tile_x + 1][tile_y] != tile::W && _last_input != LEFT) {
-                    _last_input = RIGHT;
-                } else if (maze[tile_x][tile_y - 1] != tile::W && maze[tile_x][tile_y - 1] != tile::G && _last_input != UP) {
-                    _last_input = DOWN;
-                } else {
-                    goto GET_ANY;
-                }
-            } else {
-                if (dist_u >= dist_d && maze[tile_x][tile_y + 1] != tile::W  && _last_input != DOWN) {
-                    _last_input = UP;
-                } else if (maze[tile_x][tile_y - 1] != tile::W && maze[tile_x][tile_y - 1] != tile::G && _last_input != UP) {
-                    _last_input = DOWN;
-                } else {
-                    goto GET_ANY;
-                }
-            }
-        } else {
-            if (dist_l >= dist_u) {
-                if (dist_l >= dist_d && maze[tile_x - 1][tile_y] != tile::W  && _last_input != RIGHT) {
-                    _last_input = LEFT;
-                } else if (maze[tile_x][tile_y - 1] != tile::W && maze[tile_x][tile_y - 1] != tile::G && _last_input != UP) {
-                    _last_input = DOWN;
-                } else {
-                    goto GET_ANY;
-                }
-            } else {
-                if (dist_u >= dist_d && maze[tile_x][tile_y + 1] != tile::W  && _last_input != DOWN) {
-                    _last_input = UP;
-                } else if (maze[tile_x][tile_y - 1] != tile::W && maze[tile_x][tile_y - 1] != tile::G && _last_input != UP) {
-                    _last_input = DOWN;
-                } else {
-                    GET_ANY:
-                    if (maze[tile_x][tile_y + 1] != tile::W) // && _last_input != DOWN)
-                        _last_input = UP;
-                    else if (maze[tile_x - 1][tile_y] != tile::W) // && _last_input != RIGHT)
-                        _last_input = LEFT;
-                    else if (maze[tile_x + 1][tile_y] != tile::W) // && _last_input != LEFT)
-                        _last_input = RIGHT;
-                    else {
-                        std::cout << "Não faz sentido\n";
-                        _last_input = DOWN;
-                    }
-                }
-            }
-        }
+        int dist_r = (maze[tile_x + 1][tile_y] == tile::W || _last_input == LEFT)? -1 : 1;
+        int dist_l = (maze[tile_x - 1][tile_y] == tile::W  || _last_input == RIGHT)? -1 : 1;
+        int dist_d = (maze[tile_x][tile_y - 1] == tile::W || maze[tile_x][tile_y - 1] == tile::G || _last_input == UP)? -1 : 1;
+        int dist_u = (maze[tile_x][tile_y + 1] == tile::W  || _last_input == DOWN)? -1 : 1;
 
-        updateDirection();
+        if (dist_u > 0 && tile_y > _target_y) _last_input = UP;
+        else if (dist_d > 0 && tile_y < _target_y) _last_input = DOWN;
+        else if (dist_r > 0 && tile_x > _target_x) _last_input = RIGHT;
+        else if (dist_l > 0) _last_input = LEFT;
+        else if (dist_u > 0) _last_input = UP;
+        else if (dist_d > 0) _last_input = DOWN;
+        else if (dist_r > 0) _last_input = RIGHT;
+
+        updateDirection(_last_input);
 
         _mutex.v();
     }

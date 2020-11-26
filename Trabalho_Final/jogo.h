@@ -1,7 +1,7 @@
 #ifndef JOGO_H
 #define JOGO_H
 
-#define DE_LEI 1200000
+#define DE_LEI 800000
 
 #include <ctime>
 #include "thread.h"
@@ -131,7 +131,6 @@ private:
             }
             // if (Traits<Timer>::preemptive)
                 for (volatile int i = 0; i < 50000; i++);
-            std::cout << '1';
             Thread::yield();
         }
         return callBack(a);
@@ -199,49 +198,36 @@ private:
         while(true) {
             // if (Traits<Timer>::preemptive)
                 for (volatile int i = 0; i < 50000; i++);
-                std::cout << '7';
             Thread::yield();
         }
     }
 
     static void loseLife() {
-        std::cout << 'a';
         if (--_lives > 0) {
             // Tiles::resetTiles();
-            std::cout << 'b';
 
             _pacman = PacMan(_window.getPacmanSprites(), 4);
-            std::cout << 'c';
             delete _ghost1;
             _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
-            std::cout << 'd';
             delete _ghost2;
             _ghost2 = new Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
-            std::cout << 'e';
             delete _ghost3;
             _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
-            std::cout << 'f';
             delete _ghost4;
             _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
-            std::cout << 'g';
             _isPaused = false;
             // if (!Traits<Timer>::preemptive)
                 _semaphore_pause.wakeup_all();
             // else if (paused_thread) delete paused_thread;
-            std::cout << 'h';
             // _foods = 240;
         } else {
-            std::cout << 'i';
             if (!isPaused()) {
-                std::cout << 'j';
                 _isPaused = true;
                 // if (Traits<Timer>::preemptive && !paused_thread)
                 //     paused_thread = new Thread(runPaused);
-                std::cout << 'k';
             }
             // finishGame();
         }
-        std::cout << 'm';
     }
 
     static void finishGame() {
@@ -277,13 +263,11 @@ private:
 
             if (isPaused()) {
                 if (!done) {
-                    std::cout << '4';
                     done = true;
                     // if (Traits<Timer>::preemptive)
                     // int status = paused_thread->join();
                     // else
                     _semaphore_pause.p();
-                    std::cout << '5';
                 }
             } else {
                 done = false;
@@ -310,35 +294,54 @@ private:
         int lost = 0;
         bool done = false;
 
+        // _pacman._mutex.p();
+        // Direction pm_d = PacMan::pacman_dir;
+        // int pm_t_x = PacMan::pacmanGetNearTileX();
+        // int pm_t_y = PacMan::pacmanGetNearTileY();
+        // _pacman._mutex.v();
+        //
+        // _ghost1->getTargetTile(pm_t_x, pm_t_y, pm_d);
+        // lost += _ghost1->move(pm_t_x, pm_t_y);
+        // for (volatile unsigned long j = 0; j < (unsigned long)(DE_LEI * 500); j++);
+        //
+        // _ghost2->getTargetTile(pm_t_x, pm_t_y, pm_d);
+        // lost += _ghost2->move(pm_t_x, pm_t_y);
+        // for (volatile unsigned long j = 0; j < (unsigned long)(DE_LEI * 500); j++);
+        //
+        // _ghost3->getTargetTile(pm_t_x, pm_t_y, pm_d);
+        // lost += _ghost3->move(pm_t_x, pm_t_y);
+        // for (volatile unsigned long j = 0; j < (unsigned long)(DE_LEI * 500); j++);
+        //
+        // _ghost4->getTargetTile(pm_t_x, pm_t_y, pm_d);
+        // lost += _ghost4->move(pm_t_x, pm_t_y);
+
         while (true) {
 
             if (isPaused()) {
                 if (!done) {
-                    std::cout << '2';
                     done = true;
                     // if (Traits<Timer>::preemptive);
                     // int status = paused_thread->join();
                     // else
                     _semaphore_pause.p();
-                    std::cout << '3';
                 }
             } else {
                 done = false;
                 _pacman._mutex.p();
-                int pm_x = PacMan::pacman_x;
-                int pm_y = PacMan::pacman_y;
+                // int pm_x = PacMan::pacman_x;
+                // int pm_y = PacMan::pacman_y;
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
                 _pacman._mutex.v();
 
-                _ghost1->getTargetTile(pm_x, pm_y, pm_d);
+                _ghost1->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost += _ghost1->move(pm_t_x, pm_t_y);
-                _ghost2->getTargetTile(pm_x, pm_y, pm_d);
+                _ghost2->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost += _ghost2->move(pm_t_x, pm_t_y);
-                _ghost3->getTargetTile(pm_x, pm_y, pm_d);
+                _ghost3->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost += _ghost3->move(pm_t_x, pm_t_y);
-                _ghost4->getTargetTile(pm_x, pm_y, pm_d);
+                _ghost4->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost += _ghost4->move(pm_t_x, pm_t_y);
 
                 if (lost > 0) {
@@ -400,16 +403,13 @@ private:
 
                                 // if (Traits<Timer>::preemptive) {
                                     // paused_thread = new Thread(runPaused);
-                                    std::cout<<'8';
                                     // Thread::yield();
                                 // }
                                 // _semaphore_pause.p();
                             } else {
                                 // if (!Traits<Timer>::preemptive)
-                                std::cout<<'~';
                                     _semaphore_pause.wakeup_all();
                                 // else {
-                                    std::cout<<'6';
                                     // delete paused_thread;
                                 // }
                                 if (_lives <= 0) {
@@ -430,8 +430,7 @@ private:
                 }
             }
             // if (Traits<Timer>::preemptive)
-                for (volatile int i = 0; i < DE_LEI + (_isPaused * 2 * DE_LEI); i++);
-            std::cout << '9';
+                for (volatile int i = 0; i < DE_LEI + (_isPaused * 5 * DE_LEI); i++);
             Thread::yield();
         }
     }
@@ -454,17 +453,14 @@ private:
         {
             if (isPaused()) {
                 if (!done) {
-                    std::cout << '0';
                     _window.pause_sprite.setPosition(288,405);
                     window.draw(_window.pause_sprite);
                     window.display();
-                    std::cout << '!';
                     done = true;
                     // if (Traits<Timer>::preemptive)
                     //     int status = paused_thread->join();
                     // else
                         _semaphore_pause.p();
-                    std::cout << '1';
                 }
             } else {
 

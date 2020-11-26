@@ -12,7 +12,7 @@ public:
     // Last Tile: 614 , 686
     // Tile size: 24 , 24
     // Starter Tile: 310, 398
-    PacMan(sf::Sprite * sprites = 0, int n_sprites = 0, int x = 310, int y = 398, Direction dir = LEFT)
+    PacMan(sf::Sprite * sprites = 0, int n_sprites = 0, int x = 310, int y = 542, Direction dir = LEFT)
     : Personagem(x, y, dir, sprites, n_sprites) {
 
         pacman_x = x;

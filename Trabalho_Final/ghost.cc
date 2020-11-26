@@ -43,13 +43,13 @@ int Ghost::checkPosition(int pm_t_x, int pm_t_y) {
                     Jogo::timerJail(1); // Ghost1
                     break;
                 case 298:
-                    Jogo::timerJail(2); // Ghost1
+                    Jogo::timerJail(2); // Ghost2
                     break;
                 case 331:
-                    Jogo::timerJail(3); // Ghost1
+                    Jogo::timerJail(3); // Ghost3
                     break;
                 case 365:
-                    Jogo::timerJail(4); // Ghost1
+                    Jogo::timerJail(4); // Ghost4
                     break;
             }
             // Jogo::timerJail();
