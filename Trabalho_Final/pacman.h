@@ -36,10 +36,13 @@ public:
         switch(current_tile) {
             case tile::o:
                     maze[tile_x][tile_y] = tile::e;
-                return 10;
+                return 1;
             case tile::O:
                     maze[tile_x][tile_y] = tile::E;
-                return 20;
+                return 2;
+            case tile::F:
+                maze[tile_x][tile_y] = tile::u;
+                return 3;
             default:
                 return 0;
         }

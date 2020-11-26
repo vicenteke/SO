@@ -247,36 +247,36 @@ void Window::load_and_bind_textures()
     num_tex[8].loadFromFile("sprites/ui/8.png");
     num_tex[9].loadFromFile("sprites/ui/9.png");
     num_sprite[0].setTexture(num_tex[0]);
-    num_sprite[0].scale(3, 3);    
+    num_sprite[0].scale(3, 3);
     num_sprite[1].setTexture(num_tex[0]);
-    num_sprite[1].scale(3, 3);    
+    num_sprite[1].scale(3, 3);
     num_sprite[2].setTexture(num_tex[0]);
-    num_sprite[2].scale(3, 3);    
+    num_sprite[2].scale(3, 3);
     num_sprite[3].setTexture(num_tex[0]);
-    num_sprite[3].scale(3, 3);    
+    num_sprite[3].scale(3, 3);
     num_sprite[4].setTexture(num_tex[0]);
-    num_sprite[4].scale(3, 3);    
+    num_sprite[4].scale(3, 3);
     num_sprite[5].setTexture(num_tex[0]);
-    num_sprite[5].scale(3, 3);    
+    num_sprite[5].scale(3, 3);
     num_sprite[6].setTexture(num_tex[0]);
-    num_sprite[6].scale(3, 3);    
+    num_sprite[6].scale(3, 3);
     num_sprite[7].setTexture(num_tex[0]);
     num_sprite[7].scale(3, 3);
-    
+
     num_high[0].setTexture(num_tex[0]);
-    num_high[0].scale(3, 3);    
+    num_high[0].scale(3, 3);
     num_high[1].setTexture(num_tex[0]);
-    num_high[1].scale(3, 3);    
+    num_high[1].scale(3, 3);
     num_high[2].setTexture(num_tex[0]);
-    num_high[2].scale(3, 3);    
+    num_high[2].scale(3, 3);
     num_high[3].setTexture(num_tex[0]);
-    num_high[3].scale(3, 3);    
+    num_high[3].scale(3, 3);
     num_high[4].setTexture(num_tex[0]);
-    num_high[4].scale(3, 3);    
+    num_high[4].scale(3, 3);
     num_high[5].setTexture(num_tex[0]);
-    num_high[5].scale(3, 3);    
+    num_high[5].scale(3, 3);
     num_high[6].setTexture(num_tex[0]);
-    num_high[6].scale(3, 3);    
+    num_high[6].scale(3, 3);
     num_high[7].setTexture(num_tex[0]);
     num_high[7].scale(3, 3);
    //TESTE
@@ -320,10 +320,10 @@ void Window::load_and_bind_textures()
     // Fruit textures
     cherry_tex.loadFromFile("sprites/fruits/cherry.png");
     cherry_sprite.setTexture(cherry_tex);
-    cherry_sprite.scale(3, 3);
+    cherry_sprite.scale(1.4, 1.4);
     strawberry_tex.loadFromFile("sprites/fruits/strawberry.png");
     strawberry_sprite.setTexture(strawberry_tex);
-    strawberry_sprite.scale(3, 3);
+    strawberry_sprite.scale(1.4, 1.4);
 
     //Set theme song
     theme_msc.openFromFile("sprites/theme.ogg");

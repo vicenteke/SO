@@ -272,17 +272,26 @@ private:
             } else {
                 done = false;
                 switch(_pacman.move()) {
-                    case 10:
+                    case 1:
                         Jogo::_score += 10;
                         Jogo::_foods--;
                         std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                         break;
-                    case 20:
+                    case 2:
                         Jogo::_score += 50;
                         startComeCuDeGhost();
                         std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                         break;
+                    case 3:
+                        Jogo::_score += 100;
+                        break;
                 }
+
+                if (_foods == 170 || _foods == 70)
+                    maze[13][13] = tile::F;
+                else if (_foods <= 0)
+                    _isPaused = true;
+
                 for (volatile unsigned int j = 0; j < DE_LEI; j++);
                 Thread::yield();
             }
@@ -412,7 +421,7 @@ private:
                                 // else {
                                     // delete paused_thread;
                                 // }
-                                if (_lives <= 0) {
+                                if (_lives <= 0 || _foods <= 0) {
                                    restartGame();
                                }
                             }
@@ -485,6 +494,16 @@ private:
                                 }
                                 break;
                         }
+                    }
+                }
+
+                if(maze[13][13] == tile::F) {
+                    if (_foods > 70) {
+                        _window.cherry_sprite.setPosition(24 * 13 + 3, 710 - 24 * 13);
+                        window.draw(_window.cherry_sprite);
+                    } else {
+                        _window.strawberry_sprite.setPosition(24 * 13 + 3, 710 - 24 * 13);
+                        window.draw(_window.strawberry_sprite);
                     }
                 }
 
