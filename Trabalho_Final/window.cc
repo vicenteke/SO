@@ -262,6 +262,23 @@ void Window::load_and_bind_textures()
     num_sprite[6].scale(3, 3);    
     num_sprite[7].setTexture(num_tex[0]);
     num_sprite[7].scale(3, 3);
+    
+    num_high[0].setTexture(num_tex[0]);
+    num_high[0].scale(3, 3);    
+    num_high[1].setTexture(num_tex[0]);
+    num_high[1].scale(3, 3);    
+    num_high[2].setTexture(num_tex[0]);
+    num_high[2].scale(3, 3);    
+    num_high[3].setTexture(num_tex[0]);
+    num_high[3].scale(3, 3);    
+    num_high[4].setTexture(num_tex[0]);
+    num_high[4].scale(3, 3);    
+    num_high[5].setTexture(num_tex[0]);
+    num_high[5].scale(3, 3);    
+    num_high[6].setTexture(num_tex[0]);
+    num_high[6].scale(3, 3);    
+    num_high[7].setTexture(num_tex[0]);
+    num_high[7].scale(3, 3);
    //TESTE
     score_200_tex.loadFromFile("sprites/ui/200.png");
     score_200_sprite.setTexture(score_200_tex);
