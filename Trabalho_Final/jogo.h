@@ -49,8 +49,8 @@ public:
         Thread pacman_thread = Thread(runPacman);
         Thread ghost_thread = Thread(runGhost);
 
-        // int pacman_status = pacman_thread.join();
-        // int ghost_status = ghost_thread.join();
+        int pacman_status = pacman_thread.join();
+        int ghost_status = ghost_thread.join();
         int window_status = window_thread.join();
 
         std::ifstream myFile;
