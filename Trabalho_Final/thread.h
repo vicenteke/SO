@@ -157,6 +157,8 @@ private:
     Thread * _suspended;
     bool _joinable;
 
+    inline static unsigned int _sleeping_threads = 0;
+
     inline static int _numberofthreads = 0;
 
     static Timer * _timer;

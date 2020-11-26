@@ -246,6 +246,7 @@ void Thread::sleep(Ready_Queue & _waiting) {
     _waiting.insert(exec->link());
     exec->state(WAITING);
     _ready.remove(exec);
+    ++_sleeping_threads;
     yield();
 }
 
@@ -261,6 +262,7 @@ int Thread::wakeup(Ready_Queue & _waiting) {
 
         next->state(READY);
         _ready.insert(next->link());
+        --_sleeping_threads;
 
         yield();
 
@@ -282,18 +284,25 @@ void Thread::wakeup_all(Ready_Queue & _waiting) {
 
         next->state(READY);
         _ready.insert(next->link());
+        --_sleeping_threads;
         db<Thread>(TRC) << "Thread " << next->id() << " awake\n";
     }
 }
 
 void Thread::reschedule(int) {
 
+    db<Timer>(INF) << "Rescheduler called\n";
+
     Thread * exec = _running;
 
+    db<Timer>(INF) << "a\n";
+
     if (_ready.size() > 0) {
+        db<Timer>(INF) << "b\n";
 
         // escolha uma próxima thread a ser executada
         Ready_Queue::Element * next_link = Thread::_ready.remove();
+        db<Timer>(INF) << "c\n";
         Thread * next = next_link->object();
 
         // while (exec->link() == (next_link = Thread::_ready.remove()))
@@ -335,9 +344,11 @@ void Thread::reschedule(int) {
         if(next->state() == FINISHING)  {
             Thread::_ready.remove(next_link->object());
         }
+    } else if (_sleeping_threads > 0){
+        return;
     } else {
         // No more threads to reschedule
-
+        db<Timer>(INF) << "Rescheduler: deleting timer\n";
         delete _timer;
     }
 }

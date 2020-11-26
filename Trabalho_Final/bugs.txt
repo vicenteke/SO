@@ -1,17 +1,17 @@
 Geral:
-    1. SOLVED? Quando compila, costuma dar uma erro "Alarm clock"
-    2. Pause: com dispatcher trava
+    1. SOLVED? Erro "Alarm clock"
+    2. SOLVED Pause: às vezes trava com timer
     3. Trocar nomes de start/stopComeCuDeGhost, fuck_this
     4. Tirar comentários e prints inúteis
-    5. Quando perde uma vida "reseta" as bolinhas
+    5. SOLVED Quando perde uma vida "reseta" as bolinhas
 
 PacMan:
 
     1. SOLVED Entrando em alguns muros, principalmente na cage
-    2. Nas esquinas, às vezes não come a pill (Talvez resolvido)
+    2. Nas esquinas, às vezes não come a pill
 
 Ghost:
 
     1. Muito burro
     2. SOLVED Se o PacMan vai na direção dele, não perde
-    3. Se eu como eles, eles não saem mais da jaula (BIRL)
+    3. SOLVED Se eu como eles, eles não saem mais da jaula (BIRL)

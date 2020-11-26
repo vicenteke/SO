@@ -11,7 +11,7 @@ int Jogo::_foods = 240;
 int Jogo::_score = 0;
 
 bool Jogo::_isPaused;
-Thread * Jogo::paused_thread;
+// Thread * Jogo::paused_thread;
 Thread * Jogo::stopComeCuDeGhost_thread;
 Semaphore Jogo::_semaphore_pause;
 Semaphore Jogo::fuck_this;
