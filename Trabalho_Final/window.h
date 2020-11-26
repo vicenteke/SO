@@ -154,6 +154,7 @@ public:
    //TESTE
    sf::Texture num_tex[10];
    sf::Sprite num_sprite[8];
+   sf::Sprite num_high[8];
    //TESTE
     sf::Texture score_200_tex;
     sf::Sprite score_200_sprite;

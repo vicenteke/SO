@@ -11,6 +11,9 @@
 #include "ghost2.h"
 #include "ghost3.h"
 #include "ghost4.h"
+#include <iostream>
+#include <fstream>
+#include <string>
 
 __USING_API
 
@@ -50,6 +53,13 @@ public:
         // int ghost_status = ghost_thread.join();
         int window_status = window_thread.join();
 
+        std::ifstream myFile;
+        myFile.open("recorde.txt");
+        std::string helper;
+        getline(myFile, helper);
+        _highscore = std::stoi(helper);
+        std::cout << _highscore;
+        myFile.close();
     }
 
     static Window _window;
@@ -58,6 +68,7 @@ public:
     static int _lives;
     static int _foods;
     static int _score;
+    static int _highscore;
 
 
     static bool isPaused() {
@@ -493,6 +504,14 @@ private:
                     _window.num_sprite[aa].setTexture(_window.num_tex[digito]);
                     _window.num_sprite[aa].setPosition((125+ 7*24 - aa*24 ),745);
                     window.draw(_window.num_sprite[aa]);
+                }
+                _score_held = _highscore;
+                for (int bb = 0; bb < 8; bb++){
+                    int digito = _score_held % 10;
+                    _score_held /= 10;
+                    _window.num_high[bb].setTexture(_window.num_tex[digito]);
+                    _window.num_sprite[bb].setPosition((125+ 7*24 - bb*24 ),770);
+                    window.draw(_window.num_sprite[bb]);
                 }
 
                 // Draw PacMan
