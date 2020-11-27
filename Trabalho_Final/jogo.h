@@ -31,6 +31,7 @@ public:
         // run();
 
         _isPaused = false;
+        _isStarting = true;
         _semaphore_pause.p();
     }
 
@@ -45,9 +46,14 @@ public:
     static void run(void *) {
 
         // Thread window_thread = Thread(Window::run);
-        Thread window_thread = Thread(runWindow);
-        Thread pacman_thread = Thread(runPacman);
         Thread ghost_thread = Thread(runGhost);
+        Thread pacman_thread = Thread(runPacman);
+        Thread window_thread = Thread(runWindow);
+
+        // Thread ready = Thread(runPeriod, 2, startGame, -1);
+        // Roda ready por um tempo e depois começa (teoricamente)
+
+        startGame(0);
 
         int pacman_status = pacman_thread.join();
         int ghost_status = ghost_thread.join();
@@ -81,7 +87,7 @@ public:
     static void timerJail(int ghost) {
 
         if (ghost <= 0) return;
-        _score += 400;
+        _score += 200;
 
         switch(ghost) {
             case 1:
@@ -111,6 +117,7 @@ private:
     static Ghost4 * _ghost4;
 
     static bool _isPaused;
+    static bool _isStarting;
     // static Thread * paused_thread;
     static Thread * stopComeCuDeGhost_thread;
     static Semaphore fuck_this;
@@ -119,11 +126,16 @@ private:
 
     static Semaphore _semaphore_pause;
 
+    static void startGame(int) {
+        _isPaused = false;
+        _isStarting = false;
+    }
+
     static void runPeriod(int seconds, void (* callBack)(int), int a = 0) {
         std::time_t start_time = std::time(0);
         std::time_t paused_time = start_time;
         while (std::difftime(std::time(0), start_time) < seconds) {
-            if(isPaused()) {
+            if(isPaused() && a >= 0) {
                 if (int aux = std::difftime(std::time(0), paused_time) > 0) {
                     seconds += aux;
                     paused_time = std::time(0);
@@ -131,7 +143,7 @@ private:
             }
             // if (Traits<Timer>::preemptive)
                 for (volatile int i = 0; i < 50000; i++);
-            Thread::yield();
+            if (!_isStarting) Thread::yield();
         }
         return callBack(a);
     }
@@ -143,7 +155,7 @@ private:
         //     paused_thread = new Thread(runPaused);
         //     // Thread::yield();
         // }
-
+        // _window._mutex_w.p();
         switch(ghost) {
             case 1:
                 // _ghost1->_mutex.p();
@@ -170,6 +182,7 @@ private:
                 // _ghost4->_mutex.v();
                 break;
         }
+        // _window._mutex_w.v();
         delete timerJail_thread[ghost - 1];
         // if (!Traits<Timer>::preemptive)
         //     _semaphore_pause.wakeup_all();
@@ -205,7 +218,7 @@ private:
     static void loseLife() {
         if (--_lives > 0) {
             // Tiles::resetTiles();
-
+            // _window._mutex_w.p();
             _pacman = PacMan(_window.getPacmanSprites(), 4);
             delete _ghost1;
             _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
@@ -215,6 +228,7 @@ private:
             _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
             delete _ghost4;
             _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
+            // _window._mutex_w.v();
             _isPaused = false;
             // if (!Traits<Timer>::preemptive)
                 _semaphore_pause.wakeup_all();
@@ -230,8 +244,26 @@ private:
         }
     }
 
+    static void drawLives() {
+        // _window._mutex_w.p();
+        if (_lives > 0) {
+            _window.life_sprite.setPosition(625, 750);
+            _window_render->draw(_window.life_sprite);
+            if (_lives > 1) {
+                _window.life_sprite.setPosition(580, 750);
+                _window_render->draw(_window.life_sprite);
+                if (_lives > 2) {
+                    _window.life_sprite.setPosition(535, 750);
+                    _window_render->draw(_window.life_sprite);
+                }
+            }
+        }
+        // _window._mutex_w.v();
+    }
+
     static void finishGame() {
         _window_render->close();
+        // _window._mutex_w.v();
         // if (_ghost1) delete _ghost1;
         // if (_ghost2) delete _ghost2;
         // if (_ghost3) delete _ghost3;
@@ -303,42 +335,16 @@ private:
         int lost = 0;
         bool done = false;
 
-        // _pacman._mutex.p();
-        // Direction pm_d = PacMan::pacman_dir;
-        // int pm_t_x = PacMan::pacmanGetNearTileX();
-        // int pm_t_y = PacMan::pacmanGetNearTileY();
-        // _pacman._mutex.v();
-        //
-        // _ghost1->getTargetTile(pm_t_x, pm_t_y, pm_d);
-        // lost += _ghost1->move(pm_t_x, pm_t_y);
-        // for (volatile unsigned long j = 0; j < (unsigned long)(DE_LEI * 500); j++);
-        //
-        // _ghost2->getTargetTile(pm_t_x, pm_t_y, pm_d);
-        // lost += _ghost2->move(pm_t_x, pm_t_y);
-        // for (volatile unsigned long j = 0; j < (unsigned long)(DE_LEI * 500); j++);
-        //
-        // _ghost3->getTargetTile(pm_t_x, pm_t_y, pm_d);
-        // lost += _ghost3->move(pm_t_x, pm_t_y);
-        // for (volatile unsigned long j = 0; j < (unsigned long)(DE_LEI * 500); j++);
-        //
-        // _ghost4->getTargetTile(pm_t_x, pm_t_y, pm_d);
-        // lost += _ghost4->move(pm_t_x, pm_t_y);
-
         while (true) {
 
             if (isPaused()) {
                 if (!done) {
                     done = true;
-                    // if (Traits<Timer>::preemptive);
-                    // int status = paused_thread->join();
-                    // else
                     _semaphore_pause.p();
                 }
             } else {
                 done = false;
                 _pacman._mutex.p();
-                // int pm_x = PacMan::pacman_x;
-                // int pm_y = PacMan::pacman_y;
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
@@ -366,6 +372,7 @@ private:
     static void runInput() {
         while (_window_render->isOpen())
         {
+            // _window._mutex_w.p();
             sf::Event event;
             while (_window_render->pollEvent(event))
             {
@@ -439,7 +446,8 @@ private:
                 }
             }
             // if (Traits<Timer>::preemptive)
-                for (volatile int i = 0; i < DE_LEI + (_isPaused * 5 * DE_LEI); i++);
+            // _window._mutex_w.v();
+            for (volatile int i = 0; i < DE_LEI + (_isPaused * 5 * DE_LEI); i++);
             Thread::yield();
         }
     }
@@ -460,11 +468,21 @@ private:
 
         while (window.isOpen())
         {
+            // _window._mutex_w.p();
             if (isPaused()) {
                 if (!done) {
-                    _window.pause_sprite.setPosition(288,405);
-                    window.draw(_window.pause_sprite);
+                    if (!_isStarting) {
+                        if (_lives > 0) {
+                            _window.pause_sprite.setPosition(288,405);
+                            window.draw(_window.pause_sprite);
+                        } else {
+                            _window.gameover_sprite.setPosition(212,405);
+                            window.draw(_window.gameover_sprite);
+                        }
+                    }
+                    // drawLives();
                     window.display();
+                    // _window._mutex_w.v();
                     done = true;
                     // if (Traits<Timer>::preemptive)
                     //     int status = paused_thread->join();
@@ -497,6 +515,7 @@ private:
                     }
                 }
 
+                // Draw Fruits
                 if(maze[13][13] == tile::F) {
                     if (_foods > 70) {
                         _window.cherry_sprite.setPosition(24 * 13 + 3, 710 - 24 * 13);
@@ -506,6 +525,9 @@ private:
                         window.draw(_window.strawberry_sprite);
                     }
                 }
+
+                // Draw Lives
+                drawLives();
 
                 window.draw(_window.maze_sprite);
 
@@ -579,12 +601,18 @@ private:
                     window.draw(_window._scared_sprites[(i / 15) % 4]);
                 }
 
+                if (_isStarting) {
+                    _window.ready_sprite.setPosition(263,410);
+                    window.draw(_window.ready_sprite);
+                    _isPaused = true;
+                }
+
                 window.display();
+                // _window._mutex_w.v();
                 for (volatile unsigned int j = 0; j < DE_LEI; j++);
 
                 if (i == 55440) i = 0;
 
-                // _window._mutex_w.v();
                 Thread::yield();
             }
         }

@@ -12,6 +12,7 @@ int Jogo::_score = 0;
 int Jogo::_highscore = 0;
 
 bool Jogo::_isPaused;
+bool Jogo::_isStarting;
 // Thread * Jogo::paused_thread;
 Thread * Jogo::stopComeCuDeGhost_thread;
 Semaphore Jogo::_semaphore_pause;

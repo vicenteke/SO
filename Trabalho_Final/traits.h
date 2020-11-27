@@ -93,7 +93,7 @@ template<> struct Traits<Timer> : public Traits<void>
 {
     static const bool debugged = false;
     static const bool preemptive = true;
-    static const unsigned int QUANTUM = 75000; // in us 145000
+    static const unsigned int QUANTUM = 145000; // in us 145000
 };
 
 __END_API
