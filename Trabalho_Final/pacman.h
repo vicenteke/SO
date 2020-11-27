@@ -41,7 +41,7 @@ public:
                     setTile(tile_x, tile_y, tiles::E);
                 return 2;
             case tiles::F:
-                setTile(tile_x, tile_y, tiles::u);
+                setTile(tile_x, tile_y, tiles::f);
                 return 3;
             default:
                 return 0;

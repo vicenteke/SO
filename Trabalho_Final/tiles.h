@@ -18,7 +18,7 @@ public:
      *      E: Eaten Big Pill
      */
 
-    typedef enum {W, G, P, u, o, e, O, E, F} tiles;
+    typedef enum {W, G, P, u, o, e, O, E, F, f} tiles;
 
     // 2D array defines the size of the maze and also what each tile contains
     static tiles maze[28][31];

@@ -308,7 +308,7 @@ void Window::load_and_bind_textures()
     pause_sprite.scale(3, 3);
     score_100_tex.loadFromFile("sprites/ui/100.png");
     score_100_sprite.setTexture(score_100_tex);
-    score_100_sprite.scale(3, 3);
+    // score_100_sprite.scale(3, 3);
     score_300_tex.loadFromFile("sprites/ui/300.png");
     score_300_sprite.setTexture(score_300_tex);
     score_300_sprite.scale(3, 3);
