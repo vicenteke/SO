@@ -22,7 +22,7 @@ public:
 
     void run();
 
-    void draw_texture(unsigned int texture, int length, int height, float angle);
+    // void draw_texture(unsigned int texture, int length, int height, float angle);
 
     sf::Sprite * getPacmanSprites() {
         return _pacman_sprites;
@@ -37,8 +37,9 @@ public:
         }
     }
 
-public:
     void load_and_bind_textures();
+
+public:
 
     // Game characters
     sf::Sprite _pacman_sprites[4];
@@ -47,8 +48,6 @@ public:
     sf::Sprite _ghost_sprites3[6];
     sf::Sprite _ghost_sprites4[6];
     sf::Sprite _scared_sprites[4];
-
-    // Fruit fruit: thread that checks _foods?
 
     Semaphore _mutex_w;
 

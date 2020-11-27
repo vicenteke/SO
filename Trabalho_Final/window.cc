@@ -7,10 +7,6 @@ Window::Window()
     load_and_bind_textures();
 }
 
-void Window::draw_texture(unsigned int texture, int length, int height, float angle)
-{
-}
-
 void Window::run()
 {
     // sf::RenderWindow window(sf::VideoMode(674, 1000), "Pac Man");

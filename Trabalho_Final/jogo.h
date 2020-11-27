@@ -71,13 +71,6 @@ public:
     static int _score;
     static int _highscore;
 
-    static bool isPaused() {
-        fuck_this.p();
-        bool aux = _isPaused;
-        fuck_this.v();
-        return aux;
-    }
-
     static void timerJail(int ghost) {
 
         if (ghost <= 0) return;
@@ -112,12 +105,19 @@ private:
 
     static bool _isPaused;
     // static Thread * paused_thread;
-    static Thread * stopComeCuDeGhost_thread;
-    static Semaphore fuck_this;
+    static Thread * stopChase_thread;
+    static Semaphore _mutex_paused;
 
     static Thread * timerJail_thread[4];
 
     static Semaphore _semaphore_pause;
+
+    static bool isPaused() {
+        _mutex_paused.p();
+        bool aux = _isPaused;
+        _mutex_paused.v();
+        return aux;
+    }
 
     static void runPeriod(int seconds, void (* callBack)(int), int a = 0) {
         std::time_t start_time = std::time(0);
@@ -177,22 +177,22 @@ private:
         // else delete paused_thread;
     }
 
-    static void startComeCuDeGhost() {
+    static void startChase() {
         _ghost1->isScared(true);
         _ghost2->isScared(true);
         _ghost3->isScared(true);
         _ghost4->isScared(true);
 
-        stopComeCuDeGhost_thread = new Thread(runPeriod, 4, stopComeCuDeGhost, -1);
+        stopChase_thread = new Thread(runPeriod, 4, stopChase, -1);
     }
 
-    static void stopComeCuDeGhost(int) {
+    static void stopChase(int) {
         _ghost1->isScared(false);
         _ghost2->isScared(false);
         _ghost3->isScared(false);
         _ghost4->isScared(false);
 
-        delete stopComeCuDeGhost_thread;
+        delete stopChase_thread;
     }
 
     static void loseLife() {
@@ -217,7 +217,7 @@ private:
         } else {
             if (!isPaused()) {
                 _isPaused = true;
-                for (volatile int k = 0; k < 50000; k++);
+                for (volatile int k = 0; k < 500000; k++);
             }
             // finishGame();
         }
@@ -248,7 +248,7 @@ private:
         // if (_ghost3) delete _ghost3;
         // if (_ghost4) delete _ghost4;
         // if (paused_thread) delete paused_thread;
-        if (stopComeCuDeGhost_thread) delete stopComeCuDeGhost_thread;
+        if (stopChase_thread) delete stopChase_thread;
         for (int i = 0; i < 4; i++) {
             if (timerJail_thread[i]) delete timerJail_thread[i];
         }
@@ -287,12 +287,12 @@ private:
                     case 1:
                         Jogo::_score += 10;
                         Jogo::_foods--;
-                        std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
+                        // std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                         break;
                     case 2:
                         Jogo::_score += 50;
-                        startComeCuDeGhost();
-                        std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
+                        startChase();
+                        // std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                         break;
                     case 3:
                         Jogo::_score += 100;

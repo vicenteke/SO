@@ -13,9 +13,9 @@ int Jogo::_highscore = 0;
 
 bool Jogo::_isPaused;
 // Thread * Jogo::paused_thread;
-Thread * Jogo::stopComeCuDeGhost_thread;
+Thread * Jogo::stopChase_thread;
 Semaphore Jogo::_semaphore_pause;
-Semaphore Jogo::fuck_this;
+Semaphore Jogo::_mutex_paused;
 Thread * Jogo::timerJail_thread[4];
 
 Semaphore Personagem::_mutex_maze;
