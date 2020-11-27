@@ -140,7 +140,7 @@ public:
         pacman_x = _x;
         pacman_y = _y;
 
-        _mutex.v();
+        // _mutex.v();
     }
 
     static int pacmanGetTileX() {

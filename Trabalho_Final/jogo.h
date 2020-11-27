@@ -1,7 +1,7 @@
 #ifndef JOGO_H
 #define JOGO_H
 
-#define DELAY 801000
+#define DELAY 751000
 
 #include "window.h"
 #include "thread.h"
@@ -45,7 +45,15 @@ public:
 
     static void run(void *) {
 
-        // Thread window_thread = Thread(Tiles::run);
+        // Get _highscore
+        std::ifstream myFile;
+        myFile.open("recorde.txt");
+        std::string helper;
+        getline(myFile, helper);
+        _highscore = std::stoi(helper);
+        myFile.close();
+
+        // Start Threads
         Thread window_thread = Thread(runWindow);
         Thread ghost_thread = Thread(runGhost);
         Thread pacman_thread = Thread(runPacman);
@@ -53,14 +61,6 @@ public:
         int pacman_status = pacman_thread.join();
         int ghost_status = ghost_thread.join();
         int window_status = window_thread.join();
-
-        std::ifstream myFile;
-        myFile.open("recorde.txt");
-        std::string helper;
-        getline(myFile, helper);
-        _highscore = std::stoi(helper);
-        std::cout << _highscore;
-        myFile.close();
     }
 
     static Window _window;
@@ -129,7 +129,7 @@ private:
                     paused_time = std::time(0);
                 }
             }
-            // if (Traits<Timer>::preemptive)
+            if (Traits<Timer>::preemptive)
                 for (volatile int i = 0; i < 50000; i++);
             Thread::yield();
         }
@@ -220,6 +220,13 @@ private:
                 for (volatile int k = 0; k < DELAY; k++) {
                     for (volatile int i = 0; i < 200; i++);
                 }
+                if (_score > _highscore) {
+                    std::ofstream myFile;
+                    myFile.open("recorde.txt", std::ofstream::trunc);
+                    myFile << std::to_string(_score);
+                    myFile.close();
+                    _highscore = _score;
+                }
             }
             // finishGame();
         }
@@ -280,7 +287,7 @@ private:
                     // if (Traits<Timer>::preemptive)
                     // int status = paused_thread->join();
                     // else
-                    for (volatile int k = 0; k < 50000; k++);
+                    for (volatile int k = 0; k < DELAY; k++);
                     _semaphore_pause.p();
                 }
             } else {
@@ -322,7 +329,7 @@ private:
             if (isPaused()) {
                 if (!done) {
                     done = true;
-                    for (volatile int k = 0; k < 50000; k++);
+                    for (volatile int k = 0; k < DELAY; k++);
                     _semaphore_pause.p();
                 }
             } else {
@@ -372,28 +379,28 @@ private:
                             // std::cout << "Keyboard esquerda!" << std::endl;
                             if (PacMan::pacman_dir != LEFT && !isPaused()) {
                                 // _window._mutex_w.p();
-                                _pacman._mutex.p();
+                                // _pacman._mutex.p();
                                 _pacman.changeDirection(LEFT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                             // std::cout << "Keyboard direita!" << std::endl;
                             if (PacMan::pacman_dir != RIGHT && !isPaused()) {
                                 // _window._mutex_w.p();
-                                _pacman._mutex.p();
+                                // _pacman._mutex.p();
                                 _pacman.changeDirection(RIGHT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                             // std::cout << "Keyboard para baixo!" << std::endl;
                             if (PacMan::pacman_dir != DOWN && !isPaused()) {
                                 // _window._mutex_w.p();
-                                _pacman._mutex.p();
+                                // _pacman._mutex.p();
                                 _pacman.changeDirection(DOWN);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                             // std::cout << "Keyboard para cima!" << std::endl;
                             if (PacMan::pacman_dir != UP && !isPaused()) {
                                 // _window._mutex_w.p();
-                                _pacman._mutex.p();
+                                // _pacman._mutex.p();
                                 _pacman.changeDirection(UP);
                             }
                         } else if (event.key.code == 15) {
@@ -468,7 +475,7 @@ private:
                     // if (Traits<Timer>::preemptive)
                     //     int status = paused_thread->join();
                     // else
-                    for (volatile int k = 0; k < 50000; k++);
+                    for (volatile int k = 0; k < DELAY; k++);
                     _semaphore_pause.p();
                 }
             } else {
@@ -536,7 +543,7 @@ private:
                 for (int bb = 0; bb < 8; bb++){
                     int digito = _score_held % 10;
                     _score_held /= 10;
-                    _window.num_high[bb].setTexture(_window.num_tex[digito]);
+                    _window.num_sprite[bb].setTexture(_window.num_tex[digito]);
                     _window.num_sprite[bb].setPosition((125+ 7*24 - bb*24 ),770);
                     window.draw(_window.num_sprite[bb]);
                 }
