@@ -1,0 +1,202 @@
+<diagram program="umletino" version="14.3.0"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>1200</x><y>835</y><w>460</w><h>400</h></coordinates><panel_attributes>/Personagem/
+--
++ Semaphore _mutex
+# int _x
+# int _y
+# Direction _last_input
+# sf::Sprite* _sprites
+# int _n_sprites
+# static Semaphore _mutex_maze
+--
++ Personagem(int x, int y, Direction dir, sf::Sprite * sprites, int n_sprites)
++ ~Personagem()
++ int getX()
++ int getY()
++ Direction direction()
++ void setX(int x)
++ void setY(int y)
++ void direction(Direction d)
++ void rotateSprite(int angle)
++ int move(int a, int b)
++ virtual int getTileX() = 0
++ virtual int getTileY() = 0
++ virtual int checkPosition(int, int) = 0
++ virtual void updatePosition(int, int) = 0
++ virtual void updateDirection() = 0
++ static tiles getTile(int i, int j)
++ static void setTile(int i, int j, tiles val) </panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>900</x><y>1415</y><w>460</w><h>260</h></coordinates><panel_attributes>PacMan
+--
++ static int pacman_x
++ static int pacman_y
++ static Direction pacman_dir
+--
++ PacMan(sf::Sprite * sprites, int n_sprites, int x, int y , Direction dir)
++ ~PacMan()
++ int getTileX()
++ int getTileY()
++ int checkPosition(int a = 0, int b = 0)
++ void changeDirection(Direction direction)
++ void updatePosition(int x, int y)
++ void updateDirection()
++ static int pacmanGetTileX()
++ static int pacmanGetTileY()
++ static int pacmanGetNearTileX()
++ static int pacmanGetNearTileY()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1530</x><y>1415</y><w>520</w><h>430</h></coordinates><panel_attributes>/Ghost/
+--
++ Semaphore _mutex_scared
+# int _target_x;
+# int _target_y;
+# sf::Sprite * _eyes;
+# int _i;
+# bool _isScared;
+# int _jail_x;
+# int _jail_y;
+# bool _isJailed;
+--
++ Ghost(sf::Sprite * eyes, sf::Sprite * sprites, int n_sprites, int x, int y, Direction dir)
++ ~Ghost()
++ int getTileX()
++ int getTileY()
++ int getNearTileX()
++ int getNearTileY()
++ int checkPosition(int pm_t_x, int pm_t_y)
++ int getDistance(int _x1, int _y1, int _x2, int _y2)
++ void isScared(bool b)
++ bool isScared()
++ void isJailed(bool b)
++ bool isJailed()
++ void scareRunAway(int pm_x, int pm_y)
++ virtual void getTargetTile(int, int, Direction) = 0
++ virtual void updatePosition(int x, int y)
++ virtual void updateDirection()
++ virtual void updateDirection(Direction d)
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2310</x><y>1285</y><w>490</w><h>170</h></coordinates><panel_attributes>Ghost1
+--
++ static int ghost1_x
++ static int ghost1_y
++ static Direction ghost1_dir
+--
++ Ghost1(sf::Sprite * eyes, sf::Sprite * sprites, int n_sprites, int x, int y, Direction dir)
++ ~Ghost1()
++ void getTargetTile(int pm_x, int pm_y, Direction dir)
++ void updatePosition(int x, int y)
++ void updateDirection()
++ void updateDirection(Direction dir)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2310</x><y>1665</y><w>490</w><h>170</h></coordinates><panel_attributes>Ghost3
+--
++ static int ghost3_x
++ static int ghost3_y
++ static Direction ghost3_dir
+--
++ Ghost3(sf::Sprite * eyes, sf::Sprite * sprites, int n_sprites, int x, int y, Direction dir)
++ ~Ghost3()
++ void getTargetTile(int pm_x, int pm_y, Direction dir)
++ void updatePosition(int x, int y)
++ void updateDirection()
++ void updateDirection(Direction dir)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2310</x><y>1475</y><w>490</w><h>170</h></coordinates><panel_attributes>Ghost2
+--
++ static int ghost2_x
++ static int ghost2_y
++ static Direction ghost2_dir
+--
++ Ghost2(sf::Sprite * eyes, sf::Sprite * sprites, int n_sprites, int x, int y, Direction dir)
++ ~Ghost2()
++ void getTargetTile(int pm_x, int pm_y, Direction dir)
++ void updatePosition(int x, int y)
++ void updateDirection()
++ void updateDirection(Direction dir)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2310</x><y>1855</y><w>490</w><h>170</h></coordinates><panel_attributes>Ghost4
+--
++ static int ghost4_x
++ static int ghost4_y
++ static Direction ghost4_dir
+--
++ Ghost4(sf::Sprite * eyes, sf::Sprite * sprites, int n_sprites, int x, int y, Direction dir)
++ ~Ghost4()
++ void getTargetTile(int pm_x, int pm_y, Direction dir)
++ void updatePosition(int x, int y)
++ void updateDirection()
++ void updateDirection(Direction dir)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2100</x><y>370</y><w>320</w><h>80</h></coordinates><panel_attributes>Tiles
+--
++ typedef enum {W, G, P, u, o, e, O, E, F} tiles
++ static tiles maze[28][31]
+--
++ static void resetTiles()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2500</x><y>370</y><w>320</w><h>650</h></coordinates><panel_attributes>Window
+--
++ Semaphore _mutex_w
++ sf::Sprite _pacman_sprites[4]
++ sf::Sprite _ghost_sprites[6]
++ sf::Sprite _ghost_sprites2[6]
++ sf::Sprite _ghost_sprites3[6]
++ sf::Sprite _ghost_sprites4[6]
++ sf::Sprite _scared_sprites[4]
++ sf::Texture num_tex[10]
++ sf::Sprite num_sprite[8]
++ sf::Sprite num_high[8]
+
++ sf::Texture maze_tex
++ sf::Sprite maze_sprite
++ sf::Texture pill_tex
++ sf::Sprite pill_sprite
++ sf::Texture bigPill_tex
++ sf::Sprite bigPill_sprite
++ sf::Texture pac_0_tex
++ sf::Sprite pac_0_sprite
++ sf::Texture pac_1_tex
++ sf::Sprite pac_1_sprite
++ sf::Texture pac_2_tex
++ sf::Sprite pac_2_sprite
++ sf::Texture ghost_r_0_tex;
++ sf::Sprite ghost_r_0_sprite;
++ sf::Texture ghost_r_1_tex;
++ sf::Sprite ghost_r_1_sprite;
++ sf::Texture ghost_p_0_tex;
++ sf::Sprite ghost_p_0_sprite;
++ sf::Texture ghost_p_1_tex;
++ sf::Sprite ghost_p_1_sprite;
++ sf::Texture ghost_b_0_tex;
++ sf::Sprite ghost_b_0_sprite;
+
+(Obs: segue com as outras texturas e sprites)
+
+--
++ Window()
++ void run()
++ sf::Sprite * getPacmanSprites()
++ sf::Sprite * getGhostSprites(int n)
++ void load_and_bind_textures()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2090</x><y>485</y><w>340</w><h>580</h></coordinates><panel_attributes>Jogo
+--
++ static Window _window
++ static int _lives
++ static int _foods
++ static int _score
++ static int _highscore
+- static sf::RenderWindow * _window_render
+- static PacMan _pacman
+- static Ghost1 * _ghost1
+- static Ghost2 * _ghost2
+- static Ghost3 * _ghost3
+- static Ghost4 * _ghost4
+- static bool _isPaused
+- static Thread * stopChase_thread
+- static Semaphore _mutex_paused
+- static Thread * timerJail_thread[4]
+- static Semaphore _semaphore_pause
+--
++ Jogo()
++ ~Jogo()
++ static void run(void *)
+
+- static void runPacman()
+- static void runGhost()
+- static void runInput()
+- static void runWindow()
++ static void timerJail(int ghost)
+- static void runPeriod(int seconds, void (* callBack)(int), int a = 0)
+- static void getOutJail(int ghost)
+
+- static bool isPaused()
+- static void startChase()
+- static void stopChase(int)
+- static void loseLife()
+- static void drawLives()
+- static void finishGame()
+- static void restartGame()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1110</x><y>1230</y><w>290</w><h>200</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>270;10;10;180</additional_attributes></element><element><id>Relation</id><coordinates><x>1470</x><y>1230</y><w>340</w><h>200</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;320;180</additional_attributes></element><element><id>Relation</id><coordinates><x>2040</x><y>1770</y><w>290</w><h>190</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;270;170</additional_attributes></element><element><id>Relation</id><coordinates><x>2040</x><y>1680</y><w>290</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;270;70</additional_attributes></element><element><id>Relation</id><coordinates><x>2040</x><y>1550</y><w>290</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;70;270;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2040</x><y>1370</y><w>290</w><h>200</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;180;270;10</additional_attributes></element></diagram>
