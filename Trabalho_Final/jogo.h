@@ -1,16 +1,16 @@
 #ifndef JOGO_H
 #define JOGO_H
 
-#define DE_LEI 800000
+#define DE_LEI 801000
 
-#include <ctime>
-#include "thread.h"
 #include "window.h"
+#include "thread.h"
 #include "pacman.h"
 #include "ghost1.h"
 #include "ghost2.h"
 #include "ghost3.h"
 #include "ghost4.h"
+#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -22,6 +22,7 @@ public:
     Jogo() {
 
         // _window = Window();
+
         _pacman = PacMan(_window.getPacmanSprites(), 4);
         _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
         _ghost2 = new Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
@@ -31,7 +32,6 @@ public:
         // run();
 
         _isPaused = false;
-        _isStarting = true;
         _semaphore_pause.p();
     }
 
@@ -45,15 +45,10 @@ public:
 
     static void run(void *) {
 
-        // Thread window_thread = Thread(Window::run);
+        // Thread window_thread = Thread(Tiles::run);
+        Thread window_thread = Thread(runWindow);
         Thread ghost_thread = Thread(runGhost);
         Thread pacman_thread = Thread(runPacman);
-        Thread window_thread = Thread(runWindow);
-
-        // Thread ready = Thread(runPeriod, 2, startGame, -1);
-        // Roda ready por um tempo e depois começa (teoricamente)
-
-        startGame(0);
 
         int pacman_status = pacman_thread.join();
         int ghost_status = ghost_thread.join();
@@ -75,7 +70,6 @@ public:
     static int _foods;
     static int _score;
     static int _highscore;
-
 
     static bool isPaused() {
         fuck_this.p();
@@ -117,7 +111,6 @@ private:
     static Ghost4 * _ghost4;
 
     static bool _isPaused;
-    static bool _isStarting;
     // static Thread * paused_thread;
     static Thread * stopComeCuDeGhost_thread;
     static Semaphore fuck_this;
@@ -125,11 +118,6 @@ private:
     static Thread * timerJail_thread[4];
 
     static Semaphore _semaphore_pause;
-
-    static void startGame(int) {
-        _isPaused = false;
-        _isStarting = false;
-    }
 
     static void runPeriod(int seconds, void (* callBack)(int), int a = 0) {
         std::time_t start_time = std::time(0);
@@ -143,7 +131,7 @@ private:
             }
             // if (Traits<Timer>::preemptive)
                 for (volatile int i = 0; i < 50000; i++);
-            if (!_isStarting) Thread::yield();
+            Thread::yield();
         }
         return callBack(a);
     }
@@ -207,14 +195,6 @@ private:
         delete stopComeCuDeGhost_thread;
     }
 
-    static void runPaused() {
-        while(true) {
-            // if (Traits<Timer>::preemptive)
-                for (volatile int i = 0; i < 50000; i++);
-            Thread::yield();
-        }
-    }
-
     static void loseLife() {
         if (--_lives > 0) {
             // Tiles::resetTiles();
@@ -237,8 +217,7 @@ private:
         } else {
             if (!isPaused()) {
                 _isPaused = true;
-                // if (Traits<Timer>::preemptive && !paused_thread)
-                //     paused_thread = new Thread(runPaused);
+                for (volatile int k = 0; k < 50000; k++);
             }
             // finishGame();
         }
@@ -299,6 +278,7 @@ private:
                     // if (Traits<Timer>::preemptive)
                     // int status = paused_thread->join();
                     // else
+                    for (volatile int k = 0; k < 50000; k++);
                     _semaphore_pause.p();
                 }
             } else {
@@ -320,7 +300,7 @@ private:
                 }
 
                 if (_foods == 170 || _foods == 70)
-                    maze[13][13] = tile::F;
+                    Personagem::setTile(13, 13, tiles::F);
                 else if (_foods <= 0)
                     _isPaused = true;
 
@@ -340,6 +320,7 @@ private:
             if (isPaused()) {
                 if (!done) {
                     done = true;
+                    for (volatile int k = 0; k < 50000; k++);
                     _semaphore_pause.p();
                 }
             } else {
@@ -454,7 +435,7 @@ private:
 
     static void runWindow()
     {
-        sf::RenderWindow window(sf::VideoMode(674, 810), "Pac Man");
+        sf::RenderWindow window(sf::VideoMode(674, 860), "Pac Man");
         _window_render = &window;
 
         //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
@@ -471,14 +452,12 @@ private:
             // _window._mutex_w.p();
             if (isPaused()) {
                 if (!done) {
-                    if (!_isStarting) {
-                        if (_lives > 0) {
-                            _window.pause_sprite.setPosition(288,405);
-                            window.draw(_window.pause_sprite);
-                        } else {
-                            _window.gameover_sprite.setPosition(212,405);
-                            window.draw(_window.gameover_sprite);
-                        }
+                    if (_lives > 0) {
+                        _window.pause_sprite.setPosition(288,405);
+                        window.draw(_window.pause_sprite);
+                    } else {
+                        _window.gameover_sprite.setPosition(212,405);
+                        window.draw(_window.gameover_sprite);
                     }
                     // drawLives();
                     window.display();
@@ -487,10 +466,10 @@ private:
                     // if (Traits<Timer>::preemptive)
                     //     int status = paused_thread->join();
                     // else
-                        _semaphore_pause.p();
+                    for (volatile int k = 0; k < 50000; k++);
+                    _semaphore_pause.p();
                 }
             } else {
-
                 i++;
                 done = false;
 
@@ -498,13 +477,13 @@ private:
 
                 for (int k = 0; k < 28; k++) {
                     for (int j = 0; j < 31; j++) {
-                        switch(maze[k][j]) {
-                            case tile::o:
+                        switch(Personagem::getTile(k, j)) {
+                            case tiles::o:
                                 // draw small food
                                 _window.pill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
                                 window.draw(_window.pill_sprite);
                                 break;
-                            case tile::O:
+                            case tiles::O:
                                 // draw large food
                                 if (i % 60 > 30) {
                                     _window.bigPill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
@@ -516,14 +495,23 @@ private:
                 }
 
                 // Draw Fruits
-                if(maze[13][13] == tile::F) {
+                if(Personagem::getTile(13, 13) == tiles::F) {
                     if (_foods > 70) {
-                        _window.cherry_sprite.setPosition(24 * 13 + 3, 710 - 24 * 13);
+                        _window.cherry_sprite.setPosition(315, 398);
                         window.draw(_window.cherry_sprite);
                     } else {
-                        _window.strawberry_sprite.setPosition(24 * 13 + 3, 710 - 24 * 13);
+                        _window.strawberry_sprite.setPosition(315, 398);
                         window.draw(_window.strawberry_sprite);
                     }
+                }
+                if (_foods > 70) {
+                    _window.strawberry_sprite.setPosition(627, 795);
+                    window.draw(_window.strawberry_sprite);
+                    if (_foods > 170) {
+                        _window.cherry_sprite.setPosition(582, 795);
+                        window.draw(_window.cherry_sprite);
+                    }
+
                 }
 
                 // Draw Lives
@@ -599,12 +587,6 @@ private:
                 } else {
                     _window._scared_sprites[(i / 15) % 4].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
                     window.draw(_window._scared_sprites[(i / 15) % 4]);
-                }
-
-                if (_isStarting) {
-                    _window.ready_sprite.setPosition(263,410);
-                    window.draw(_window.ready_sprite);
-                    _isPaused = true;
                 }
 
                 window.display();

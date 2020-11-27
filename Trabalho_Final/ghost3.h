@@ -52,10 +52,10 @@ public:
                 break;
         }
 
-        int dist_r = (maze[tile_x + 1][tile_y] == tile::W || _last_input == LEFT)? -1 : 1;
-        int dist_l = (maze[tile_x - 1][tile_y] == tile::W  || _last_input == RIGHT)? -1 : 1;
-        int dist_d = (maze[tile_x][tile_y - 1] == tile::W || maze[tile_x][tile_y - 1] == tile::G || _last_input == UP)? -1 : 1;
-        int dist_u = (maze[tile_x][tile_y + 1] == tile::W  || _last_input == DOWN)? -1 : 1;
+        int dist_r = (getTile(tile_x + 1, tile_y) == tiles::W || _last_input == LEFT)? -1 : 1;
+        int dist_l = (getTile(tile_x - 1, tile_y) == tiles::W  || _last_input == RIGHT)? -1 : 1;
+        int dist_d = (getTile(tile_x, tile_y - 1) == tiles::W || getTile(tile_x, tile_y - 1) == tiles::G || _last_input == UP)? -1 : 1;
+        int dist_u = (getTile(tile_x, tile_y + 1) == tiles::W  || _last_input == DOWN)? -1 : 1;
 
         if (dist_u > 0 && tile_y < _target_y) _last_input = UP;
         else if (dist_d > 0 && tile_y > _target_y) _last_input = DOWN;

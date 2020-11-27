@@ -1,6 +1,6 @@
 #include "tiles.h"
 
-Tiles::tile Tiles::maze[28][31] =
+Tiles::tiles Tiles::maze[28][31] =
          {
                  {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
                  {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},

@@ -1,6 +1,8 @@
 #ifndef TILES_H
 #define TILES_H
 
+#include "semaphore.h"
+
 class Tiles {
 public:
 
@@ -16,12 +18,12 @@ public:
      *      E: Eaten Big Pill
      */
 
-    typedef enum {W, G, P, u, o, e, O, E, F} tile;
+    typedef enum {W, G, P, u, o, e, O, E, F} tiles;
 
     // 2D array defines the size of the maze and also what each tile contains
-    static tile maze[28][31];
+    static tiles maze[28][31];
     static void resetTiles() {
-        tile buf[28][31] =
+        tiles buf[28][31] =
          {
                  {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
                  {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},

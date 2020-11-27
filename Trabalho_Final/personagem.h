@@ -14,7 +14,6 @@ __USING_API
 class Personagem {
 
 public:
-    Semaphore _mutex;
 
     Personagem(int x, int y, Direction dir, sf::Sprite * sprites, int n_sprites) :
     _x(x), _y(y), _last_input(dir), _sprites(sprites), _n_sprites(n_sprites) {}
@@ -83,7 +82,7 @@ public:
                         // tile_x = getTileX();
                     }
 
-                    else if ((maze[tile_x][tile_y + 1] != tile::W && maze[tile_x][tile_y + 1] != tile::G) || tile_y == 0)
+                    else if ((getTile(tile_x, tile_y + 1) != tiles::W && getTile(tile_x, tile_y + 1) != tiles::G) || tile_y == 0)
                         _y -= 1;
 
                     break;
@@ -99,7 +98,7 @@ public:
                             _x += 24;
                         // tile_x = getTileX();
                     }
-                    else if ((maze[tile_x][tile_y - 1] != tile::W && maze[tile_x][tile_y - 1] != tile::G) || tile_y == 0)
+                    else if ((getTile(tile_x, tile_y - 1) != tiles::W && getTile(tile_x, tile_y - 1) != tiles::G) || tile_y == 0)
                         _y += 1;
                     break;
             case LEFT:
@@ -117,7 +116,7 @@ public:
                             _y -= 24;
                         // tile_y = getTileY();
                     }
-                    else if ((maze[tile_x - 1][tile_y] != tile::W && maze[tile_x - 1][tile_y] != tile::G) || tile_x == 0)
+                    else if ((getTile(tile_x - 1, tile_y) != tiles::W && getTile(tile_x - 1, tile_y) != tiles::G) || tile_x == 0)
                         _x -= 1;
                     break;
             case RIGHT:
@@ -136,7 +135,7 @@ public:
                             _y -= 24;
                         // tile_y = getTileY();
                     }
-                    else if (maze[tile_x + 1][tile_y] != tile::W || tile_x == 0)
+                    else if (getTile(tile_x + 1, tile_y) != tiles::W || tile_x == 0)
                         _x += 1;
                     break;
         }
@@ -149,12 +148,30 @@ public:
     virtual void updatePosition(int, int) = 0;
     virtual void updateDirection() = 0;
 
+    static tiles getTile(int i, int j) {
+        _mutex_maze.p();
+        tiles ret = maze[i][j];
+        _mutex_maze.v();
+        return ret;
+    }
+
+    static void setTile(int i, int j, tiles val) {
+        _mutex_maze.p();
+        maze[i][j] = val;
+        _mutex_maze.v();
+    }
+
 protected:
     int _x;
     int _y;
     Direction _last_input;
     sf::Sprite *_sprites;
     int _n_sprites;
+
+    static Semaphore _mutex_maze;
+
+public:
+    Semaphore _mutex;
 };
 
 

@@ -30,18 +30,18 @@ public:
         int tile_x = getTileX();
         int tile_y = getTileY();
 
-        tile current_tile = maze[tile_x][tile_y];
+        tiles current_tile = getTile(tile_x, tile_y);
 
         _mutex.v();
         switch(current_tile) {
-            case tile::o:
-                    maze[tile_x][tile_y] = tile::e;
+            case tiles::o:
+                    setTile(tile_x, tile_y, tiles::e);
                 return 1;
-            case tile::O:
-                    maze[tile_x][tile_y] = tile::E;
+            case tiles::O:
+                    setTile(tile_x, tile_y, tiles::E);
                 return 2;
-            case tile::F:
-                maze[tile_x][tile_y] = tile::u;
+            case tiles::F:
+                setTile(tile_x, tile_y, tiles::u);
                 return 3;
             default:
                 return 0;

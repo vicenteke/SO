@@ -3,7 +3,7 @@
 
 #include "system.h"
 
-#define tile Tiles::tile
+#define tiles Tiles::tiles
 #define maze Tiles::maze
 
 enum Direction {UP, DOWN, LEFT, RIGHT, STOPPED};

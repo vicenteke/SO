@@ -12,12 +12,13 @@ int Jogo::_score = 0;
 int Jogo::_highscore = 0;
 
 bool Jogo::_isPaused;
-bool Jogo::_isStarting;
 // Thread * Jogo::paused_thread;
 Thread * Jogo::stopComeCuDeGhost_thread;
 Semaphore Jogo::_semaphore_pause;
 Semaphore Jogo::fuck_this;
 Thread * Jogo::timerJail_thread[4];
+
+Semaphore Personagem::_mutex_maze;
 
 sf::RenderWindow * Jogo::_window_render;
 

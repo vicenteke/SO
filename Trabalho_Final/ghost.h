@@ -13,6 +13,8 @@ public:
     Ghost(sf::Sprite * eyes = 0, sf::Sprite * sprites = 0, int n_sprites = 0, int x = 310, int y = 254, Direction dir = RIGHT)
     : Personagem(x, y, dir, sprites, n_sprites), _eyes(eyes) {
 
+        updatePosition(x, y);
+        updateDirection();
         _i = 0;
         _isScared = false;
         _jail_x = 310;
@@ -109,104 +111,6 @@ public:
     }
 
     virtual void getTargetTile(int, int, Direction) = 0;
-    // {
-    //
-    //     int tile_x = getTileX();
-    //     int tile_y = getTileY();
-    //
-    //     int dist = getDistance(_x, _y, pm_x, pm_y);
-    //
-    //     _target_x = pm_x;
-    //     _target_y = pm_y;
-    //
-    //     // Problemas:
-    //     // 1) Ghost trava no portal
-    //     // 2) Dependendo da esquina em que o pacman fica parado ele vai pra muito longe ou nunca chega no pacman
-    //     // 3) Deveria seguir diretamente o pacman, mas ta fazendo umas escolhas burras
-    //     // 4) Nunca deveria inverter a direção (ex: da direita pra esquerda)
-    //     if (tile_x != 0 && tile_y != 0) {
-    //         if (getDistance(_x + 24, _y, pm_x, pm_y) < dist && maze[tile_x + 1][tile_y] != tile::W && _last_input != LEFT) {
-    //             _last_input = RIGHT;
-    //        } else if (getDistance(_x - 24, _y, pm_x, pm_y) < dist && maze[tile_x - 1][tile_y] != tile::W  && _last_input != RIGHT) {
-    //             _last_input = LEFT;
-    //         } else if (getDistance(_x, _y - 24, pm_x, pm_y) < dist && maze[tile_x][tile_y + 1] != tile::W  && _last_input != DOWN) {
-    //             _last_input = UP;
-    //         } else if (getDistance(_x, _y + 24, pm_x, pm_y) < dist && maze[tile_x][tile_y - 1] != tile::W && maze[tile_x][tile_y - 1] != tile::G && _last_input != UP) {
-    //             _last_input = DOWN;
-    //         } else {
-    //             if (maze[tile_x + 1][tile_y] == tile::W && _last_input == RIGHT) {
-    //                 if (maze[tile_x][tile_y + 1] != tile::W && tile_y > _target_y) _last_input = UP;
-    //                 else _last_input = DOWN;
-    //             }
-    //             else if (maze[tile_x - 1][tile_y] == tile::W && _last_input == LEFT) {
-    //                 if (maze[tile_x][tile_y - 1] != tile::W  && tile_y < _target_y) _last_input = DOWN;
-    //                 else _last_input = UP;
-    //             }
-    //             else if (maze[tile_x][tile_y - 1] == tile::W && _last_input == DOWN) {
-    //                 if (maze[tile_x + 1][tile_y] != tile::W && tile_x < _target_x) _last_input = RIGHT;
-    //                 else _last_input = LEFT;
-    //             }
-    //             else if (maze[tile_x][tile_y + 1] == tile::W && _last_input == UP) {
-    //                 if (maze[tile_x - 1][tile_y] != tile::W && tile_x > _target_x) _last_input = LEFT;
-    //                 else _last_input = RIGHT;
-    //             }
-    //         }
-    //     }
-    //
-    //     ghost_dir = _last_input;
-    //
-    //     // if (tile_x != 0 && tile_y != 0)
-    //     //     if (tile_x < _target_x && maze[tile_x + 1][tile_y] != tile::W && _last_input != LEFT)
-    //     //         _last_input = RIGHT;
-    //     //     else if (tile_x >= _target_x && maze[tile_x - 1][tile_y] != tile::W && _last_input != RIGHT)
-    //     //         _last_input = LEFT;
-    //     //     else if (tile_y <= _target_y && maze[tile_x][tile_y - 1] != tile::W && _last_input != UP)
-    //     //         _last_input = DOWN;
-    //     //     else if (tile_y > _target_y && maze[tile_x][tile_y + 1] != tile::W && _last_input != DOWN)
-    //     //         _last_input = UP;
-    //     //     else {
-    //     //         if (maze[tile_x + 1][tile_y] != tile::W && _last_input != LEFT) _last_input = RIGHT;
-    //     //         else if (maze[tile_x - 1][tile_y] != tile::W && _last_input != RIGHT) _last_input = LEFT;
-    //     //         else if (maze[tile_x][tile_y - 1] != tile::W && _last_input != UP) _last_input = DOWN;
-    //     //         else if (maze[tile_x][tile_y + 1] != tile::W && _last_input != DOWN) _last_input = UP;
-    //     //     }
-    //     //     // else {
-    //     //     //     if (maze[tile_x + 1][tile_y] == tile::W && _last_input == RIGHT) {
-    //     //     //         if (maze[tile_x][tile_y + 1] != tile::W && tile_y > _target_y) _last_input = UP;
-    //     //     //         else _last_input = DOWN;
-    //     //     //     }
-    //     //     //     else if (maze[tile_x - 1][tile_y] == tile::W && _last_input == LEFT) {
-    //     //     //         if (maze[tile_x][tile_y - 1] != tile::W  && tile_y < _target_y) _last_input = DOWN;
-    //     //     //         else _last_input = UP;
-    //     //     //     }
-    //     //     //     else if (maze[tile_x][tile_y - 1] == tile::W && _last_input == DOWN) {
-    //     //     //         if (maze[tile_x + 1][tile_y] != tile::W && tile_x < _target_x) _last_input = RIGHT;
-    //     //     //         else _last_input = LEFT;
-    //     //     //     }
-    //     //     //     else if (maze[tile_x][tile_y + 1] == tile::W && _last_input == UP) {
-    //     //     //         if (maze[tile_x - 1][tile_y] != tile::W && tile_x > _target_x) _last_input = LEFT;
-    //     //     //         else _last_input = RIGHT;
-    //     //     //     }
-    //     //     // }
-    // }
-
-    /*sf::Sprite getEye() {
-        return _eyes[_last_input];
-    }
-
-    sf::Sprite getSprite() {
-        return _sprites[(_i / 15) % 2];
-    }
-
-    void setPositions() {
-        _sprites[(_i / 15) % 2].setPosition(_x, _y);
-        _eyes[_last_input].setPosition(_x, _y);
-    }
-
-    void count() {
-        _i++;
-        if (_i == 55440) _i = 0;
-    }*/
 
     virtual void updatePosition(int x, int y) {}
 
@@ -224,14 +128,14 @@ public:
         _target_x = pm_x;
         _target_y = pm_y;
 
-        int dist_r = (maze[tile_x + 1][tile_y] == tile::W || _last_input == LEFT)? -1 : 1;
-        int dist_l = (maze[tile_x - 1][tile_y] == tile::W  || _last_input == RIGHT)? -1 : 1;
-        int dist_d = (maze[tile_x][tile_y - 1] == tile::W || maze[tile_x][tile_y - 1] == tile::G || _last_input == UP)? -1 : 1;
-        int dist_u = (maze[tile_x][tile_y + 1] == tile::W  || _last_input == DOWN)? -1 : 1;
+        int dist_r = (getTile(tile_x + 1, tile_y) == tiles::W || _last_input == LEFT)? -1 : 1;
+        int dist_l = (getTile(tile_x - 1, tile_y) == tiles::W  || _last_input == RIGHT)? -1 : 1;
+        int dist_d = (getTile(tile_x, tile_y - 1) == tiles::W || getTile(tile_x, tile_y - 1) == tiles::G || _last_input == UP)? -1 : 1;
+        int dist_u = (getTile(tile_x, tile_y + 1) == tiles::W  || _last_input == DOWN)? -1 : 1;
 
-        if (dist_u > 0 && tile_y > _target_y) _last_input = UP;
+        if (dist_u > 0 && tile_y >= _target_y) _last_input = UP;
         else if (dist_d > 0 && tile_y < _target_y) _last_input = DOWN;
-        else if (dist_r > 0 && tile_x > _target_x) _last_input = RIGHT;
+        else if (dist_r > 0 && tile_x >= _target_x) _last_input = RIGHT;
         else if (dist_l > 0) _last_input = LEFT;
         else if (dist_u > 0) _last_input = UP;
         else if (dist_d > 0) _last_input = DOWN;
