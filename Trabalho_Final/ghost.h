@@ -133,9 +133,9 @@ public:
         int dist_d = (getTile(tile_x, tile_y - 1) == tiles::W || getTile(tile_x, tile_y - 1) == tiles::G || _last_input == UP)? -1 : 1;
         int dist_u = (getTile(tile_x, tile_y + 1) == tiles::W  || _last_input == DOWN)? -1 : 1;
 
-        if (dist_u > 0 && tile_y >= _target_y) _last_input = UP;
+        if (dist_u > 0 && tile_y > _target_y) _last_input = UP;
         else if (dist_d > 0 && tile_y < _target_y) _last_input = DOWN;
-        else if (dist_r > 0 && tile_x >= _target_x) _last_input = RIGHT;
+        else if (dist_r > 0 && tile_x > _target_x) _last_input = RIGHT;
         else if (dist_l > 0) _last_input = LEFT;
         else if (dist_u > 0) _last_input = UP;
         else if (dist_d > 0) _last_input = DOWN;

@@ -1,7 +1,7 @@
 #ifndef JOGO_H
 #define JOGO_H
 
-#define DE_LEI 801000
+#define DELAY 801000
 
 #include "window.h"
 #include "thread.h"
@@ -217,7 +217,9 @@ private:
         } else {
             if (!isPaused()) {
                 _isPaused = true;
-                for (volatile int k = 0; k < 500000; k++);
+                for (volatile int k = 0; k < DELAY; k++) {
+                    for (volatile int i = 0; i < 200; i++);
+                }
             }
             // finishGame();
         }
@@ -304,7 +306,7 @@ private:
                 else if (_foods <= 0)
                     _isPaused = true;
 
-                for (volatile unsigned int j = 0; j < DE_LEI; j++);
+                for (volatile unsigned int j = 0; j < DELAY; j++);
                 Thread::yield();
             }
         }
@@ -344,7 +346,7 @@ private:
                     lost = 0;
                     loseLife();
                 }
-                for (volatile unsigned int j = 0; j < DE_LEI; j++);
+                for (volatile unsigned int j = 0; j < DELAY; j++);
                 Thread::yield();
             }
         }
@@ -428,7 +430,7 @@ private:
             }
             // if (Traits<Timer>::preemptive)
             // _window._mutex_w.v();
-            for (volatile int i = 0; i < DE_LEI + (_isPaused * 5 * DE_LEI); i++);
+            for (volatile int i = 0; i < DELAY + (_isPaused * 5 * DELAY); i++);
             Thread::yield();
         }
     }
@@ -591,7 +593,7 @@ private:
 
                 window.display();
                 // _window._mutex_w.v();
-                for (volatile unsigned int j = 0; j < DE_LEI; j++);
+                for (volatile unsigned int j = 0; j < DELAY; j++);
 
                 if (i == 55440) i = 0;
 

@@ -35,20 +35,20 @@ public:
 
         switch(dir) {
             case LEFT:
-                _target_x = pm_x - 4;
+                _target_x = pm_x + 4;
                 _target_y = pm_y;
                 break;
             case RIGHT:
-                _target_x = pm_x + 4;
+                _target_x = pm_x - 4;
                 _target_y = pm_y;
                 break;
             case DOWN:
                 _target_x = pm_x;
-                _target_y = pm_y - 4;
+                _target_y = pm_y + 4;
                 break;
             case UP:
-                _target_x = pm_x - 4;
-                _target_y = pm_y + 4;
+                _target_x = pm_x + 4;
+                _target_y = pm_y - 4;
                 break;
         }
 
