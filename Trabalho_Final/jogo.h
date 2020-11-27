@@ -1,7 +1,7 @@
 #ifndef JOGO_H
 #define JOGO_H
 
-#define DELAY 751000
+#define DELAY 651000
 
 #include "window.h"
 #include "thread.h"
@@ -287,7 +287,7 @@ private:
                     // if (Traits<Timer>::preemptive)
                     // int status = paused_thread->join();
                     // else
-                    for (volatile int k = 0; k < DELAY; k++);
+                    for (volatile int k = 0; k < DELAY * 10; k++);
                     _semaphore_pause.p();
                 }
             } else {
@@ -329,7 +329,7 @@ private:
             if (isPaused()) {
                 if (!done) {
                     done = true;
-                    for (volatile int k = 0; k < DELAY; k++);
+                    for (volatile int k = 0; k < DELAY * 10; k++);
                     _semaphore_pause.p();
                 }
             } else {
@@ -427,10 +427,7 @@ private:
                             finishGame();
                         } else if (event.key.code == 17) {
                             restartGame();
-                        } else if (event.key.code == 57) {
-                            // std::cout << _pacman.getTileX() << ", " << _pacman.getTileY() << '\n';
-                        } else
-                            std::cout << "Keyboard pressed = " << event.key.code << std::endl;
+                        }
                         break;
 
                 }
@@ -475,7 +472,7 @@ private:
                     // if (Traits<Timer>::preemptive)
                     //     int status = paused_thread->join();
                     // else
-                    for (volatile int k = 0; k < DELAY; k++);
+                    for (volatile int k = 0; k < DELAY * 10; k++);
                     _semaphore_pause.p();
                 }
             } else {
@@ -529,22 +526,26 @@ private:
                 window.draw(_window.maze_sprite);
 
                 //Draw Score
-                _window.score_sprite.setPosition(0,745);
+                _window.score_sprite.setPosition(5,760);
                 window.draw(_window.score_sprite);
+
+                _window.high_sprite.setPosition(5,795);
+                window.draw(_window.high_sprite);
+
                 int _score_held = _score;
                 for (int aa = 0; aa < 8; aa++){
                     int digito = _score_held % 10;
                     _score_held /= 10;
                     _window.num_sprite[aa].setTexture(_window.num_tex[digito]);
-                    _window.num_sprite[aa].setPosition((125+ 7*24 - aa*24 ),745);
+                    _window.num_sprite[aa].setPosition((140+ 7*24 - aa*24 ),760);
                     window.draw(_window.num_sprite[aa]);
                 }
-                _score_held = _highscore;
+                _score_held = (_highscore > _score) ? _highscore : _score;
                 for (int bb = 0; bb < 8; bb++){
                     int digito = _score_held % 10;
                     _score_held /= 10;
                     _window.num_sprite[bb].setTexture(_window.num_tex[digito]);
-                    _window.num_sprite[bb].setPosition((125+ 7*24 - bb*24 ),770);
+                    _window.num_sprite[bb].setPosition((140+ 7*24 - bb*24 ),795);
                     window.draw(_window.num_sprite[bb]);
                 }
 
