@@ -9,6 +9,7 @@ Timer::Timer(const unsigned int period, const Function * handler) {
 
     // Sets "handler" as handler for signal SIGALRM
     action.sa_handler = handler;
+    sigemptyset(&action.sa_mask);
     sigaction(SIGALRM, &action, NULL);
 
     // Configures alarm timer

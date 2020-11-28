@@ -16,3 +16,5 @@ Ghost:
     1. SOLVED Muito burro
     2. SOLVED Se o PacMan vai na direção dele, não perde
     3. SOLVED Se eu como eles, eles não saem mais da jaula (BIRL)
+
+ATUALIZAR UML

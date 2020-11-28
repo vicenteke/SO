@@ -125,6 +125,11 @@ public:
         int tile_x = getTileX();
         int tile_y = getTileY();
 
+        if (tile_x == 0 || tile_y == 0) {
+            _mutex.v();
+            return;
+        }
+
         _target_x = pm_x;
         _target_y = pm_y;
 
@@ -136,10 +141,10 @@ public:
         if (dist_u > 0 && tile_y > _target_y) _last_input = UP;
         else if (dist_d > 0 && tile_y < _target_y) _last_input = DOWN;
         else if (dist_r > 0 && tile_x > _target_x) _last_input = RIGHT;
-        else if (dist_l > 0) _last_input = LEFT;
-        else if (dist_u > 0) _last_input = UP;
-        else if (dist_d > 0) _last_input = DOWN;
-        else if (dist_r > 0) _last_input = RIGHT;
+        else if (dist_l > 0 && _last_input != RIGHT) _last_input = LEFT;
+        else if (dist_u > 0 && _last_input != DOWN) _last_input = UP;
+        else if (dist_d > 0 && _last_input != UP) _last_input = DOWN;
+        else if (dist_r > 0 && _last_input != LEFT) _last_input = RIGHT;
 
         updateDirection(_last_input);
 

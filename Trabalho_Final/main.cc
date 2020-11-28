@@ -1,7 +1,7 @@
 #include "jogo.h"
 
 Window Jogo::_window;
-PacMan Jogo::_pacman;
+PacMan * Jogo::_pacman;
 Ghost1 * Jogo::_ghost1;
 Ghost2 * Jogo::_ghost2;
 Ghost3 * Jogo::_ghost3;
@@ -17,6 +17,8 @@ Thread * Jogo::stopChase_thread;
 Semaphore Jogo::_semaphore_pause;
 Semaphore Jogo::_mutex_paused;
 Thread * Jogo::timerJail_thread[4];
+Thread * Jogo::_ghost_threads[5];
+bool Jogo::_isStarting;
 
 Semaphore Personagem::_mutex_maze;
 

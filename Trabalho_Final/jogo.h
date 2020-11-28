@@ -23,7 +23,7 @@ public:
 
         // _window = Window();
 
-        _pacman = PacMan(_window.getPacmanSprites(), 4);
+        _pacman = new PacMan(_window.getPacmanSprites(), 4);
         _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
         _ghost2 = new Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
         _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
@@ -32,15 +32,20 @@ public:
         // run();
 
         _isPaused = false;
+        _isStarting = true;
         _semaphore_pause.p();
     }
 
     ~Jogo() {
         // finishGame();
+        if (_pacman) delete _pacman;
         if (_ghost1) delete _ghost1;
         if (_ghost2) delete _ghost2;
         if (_ghost3) delete _ghost3;
         if (_ghost4) delete _ghost4;
+        for (int i = 0; i < 5; i++) {
+            if (_ghost_threads[i]) delete _ghost_threads[i];
+        }
     }
 
     static void run(void *) {
@@ -54,13 +59,13 @@ public:
         myFile.close();
 
         // Start Threads
+        _ghost_threads[4] = new Thread(runGhost);
         Thread window_thread = Thread(runWindow);
-        Thread ghost_thread = Thread(runGhost);
         Thread pacman_thread = Thread(runPacman);
 
-        int pacman_status = pacman_thread.join();
-        int ghost_status = ghost_thread.join();
+        int ghost_status = _ghost_threads[4]->join();
         int window_status = window_thread.join();
+        int pacman_status = pacman_thread.join();
     }
 
     static Window _window;
@@ -97,17 +102,19 @@ private:
     static sf::RenderWindow * _window_render;
 
     // Characters
-    static PacMan _pacman;
+    static PacMan * _pacman;
     static Ghost1 * _ghost1;
     static Ghost2 * _ghost2;
     static Ghost3 * _ghost3;
     static Ghost4 * _ghost4;
 
+    static Thread * _ghost_threads[5];
+    static bool _isStarting;
+
     static bool _isPaused;
-    // static Thread * paused_thread;
-    static Thread * stopChase_thread;
     static Semaphore _mutex_paused;
 
+    static Thread * stopChase_thread;
     static Thread * timerJail_thread[4];
 
     static Semaphore _semaphore_pause;
@@ -197,9 +204,15 @@ private:
 
     static void loseLife() {
         if (--_lives > 0) {
+            // _isStarting = true;
             // Tiles::resetTiles();
+            tiles aux = Personagem::getTile(13, 13);
+            if(aux == tiles::F || aux == tiles::f)
+                Personagem::setTile(13, 13, tiles::u);
+
             // _window._mutex_w.p();
-            _pacman = PacMan(_window.getPacmanSprites(), 4);
+            delete _pacman;
+            _pacman = new PacMan(_window.getPacmanSprites(), 4);
             delete _ghost1;
             _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
             delete _ghost2;
@@ -209,17 +222,17 @@ private:
             delete _ghost4;
             _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
             // _window._mutex_w.v();
+
             _isPaused = false;
-            // if (!Traits<Timer>::preemptive)
-                _semaphore_pause.wakeup_all();
-            // else if (paused_thread) delete paused_thread;
-            // _foods = 240;
+            // delete _ghost_threads[4];
+            // if (_ghost_threads[4]) delete _ghost_threads[4];
+            // _ghost_threads[4] = new Thread(runGhost);
+            _semaphore_pause.wakeup_all();
+            // Thread::yield();
         } else {
             if (!isPaused()) {
                 _isPaused = true;
-                for (volatile int k = 0; k < DELAY; k++) {
-                    for (volatile int i = 0; i < 200; i++);
-                }
+                for (volatile int i = 0; i < DELAY * 6; i++);
                 if (_score > _highscore) {
                     std::ofstream myFile;
                     myFile.open("recorde.txt", std::ofstream::trunc);
@@ -228,6 +241,7 @@ private:
                     _highscore = _score;
                 }
             }
+            Thread::yield();
             // finishGame();
         }
     }
@@ -272,7 +286,13 @@ private:
         // _isPaused = false;
         // if (!Traits<Timer>::preemptive)
         //     _semaphore_pause.wakeup_all();
+        //
+        // if (_ghost_threads[3]) delete _ghost_threads[3];
+        // if (_ghost_threads[2]) delete _ghost_threads[2];
+        // if (_ghost_threads[1]) delete _ghost_threads[1];
+        // if (_ghost_threads[0]) delete _ghost_threads[0];
         loseLife();
+
     }
 
     static void runPacman() {
@@ -280,6 +300,13 @@ private:
         bool done = false;
 
         while (true) {
+
+            if (_isStarting) {
+                while (_isStarting) {
+                    for (volatile int k = 0; k < DELAY; k++);
+                    Thread::yield();
+                }
+            }
 
             if (isPaused()) {
                 if (!done) {
@@ -289,73 +316,242 @@ private:
                     // else
                     for (volatile int k = 0; k < DELAY * 10; k++);
                     _semaphore_pause.p();
+                    // for (volatile int k = 0; k < DELAY * 4; k++);
                 }
-            } else {
-                done = false;
-                switch(_pacman.move()) {
-                    case 1:
-                        Jogo::_score += 10;
-                        Jogo::_foods--;
-                        // std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
-                        break;
-                    case 2:
-                        Jogo::_score += 50;
-                        startChase();
-                        // std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
-                        break;
-                    case 3:
-                        Jogo::_score += 100;
-                        break;
-                }
-
-                if (_foods == 170 || _foods == 70)
-                    Personagem::setTile(13, 13, tiles::F);
-                else if (_foods <= 0)
-                    _isPaused = true;
-
-                for (volatile unsigned int j = 0; j < DELAY; j++);
-                Thread::yield();
             }
+            done = false;
+            switch(_pacman->move()) {
+                case 1:
+                    Jogo::_score += 10;
+                    Jogo::_foods--;
+                    // std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
+                    break;
+                case 2:
+                    Jogo::_score += 50;
+                    startChase();
+                    // std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
+                    break;
+                case 3:
+                    Jogo::_score += 100;
+                    break;
+            }
+
+            if (_foods == 170 || _foods == 70)
+                Personagem::setTile(13, 13, tiles::F);
+            else if (_foods <= 0)
+                _isPaused = true;
+
+            for (volatile unsigned int j = 0; j < DELAY; j++);
+            Thread::yield();
         }
     }
 
     static void runGhost() {
 
+        _ghost1->updatePosition(265, 334);
+        _ghost2->updatePosition(298, 334);
+        _ghost3->updatePosition(331, 334);
+        _ghost4->updatePosition(365, 334);
+
+        if (_ghost_threads[3]) delete _ghost_threads[3];
+        if (_ghost_threads[2]) delete _ghost_threads[2];
+        if (_ghost_threads[1]) delete _ghost_threads[1];
+        if (_ghost_threads[0]) delete _ghost_threads[0];
+
+        for (volatile int j = 0; j < 40; j++) {
+            for (volatile int k = 0; k < DELAY * 5; k++);
+            Thread::yield();
+        }
+
+        _isStarting = false;
+        _ghost_threads[0] = new Thread(runGhost1);
+        for (volatile int j = 0; j < 67; j++) {
+            for (volatile int k = 0; k < DELAY; k++);
+            Thread::yield();
+        }
+
+        _ghost_threads[1] = new Thread(runGhost2);
+        for (volatile int j = 0; j < 133; j++) {
+            for (volatile int k = 0; k < DELAY * 2 / 3; k++);
+            Thread::yield();
+        }
+
+        _ghost_threads[2] = new Thread(runGhost3);
+        for (volatile int j = 0; j < 200; j++) {
+            for (volatile int k = 0; k < DELAY / 3; k++);
+            Thread::yield();
+        }
+
+        _ghost_threads[3] = new Thread(runGhost4);
+
+        int status;
+        status = _ghost_threads[0] ? _ghost_threads[0]->join() : 0;
+        status = _ghost_threads[1] ? _ghost_threads[1]->join() : 0;
+        status = _ghost_threads[2] ? _ghost_threads[2]->join() : 0;
+        status = _ghost_threads[3] ? _ghost_threads[3]->join() : 0;
+    }
+
+    static void runGhost1() {
         int lost = 0;
         bool done = false;
 
         while (true) {
+
+            if (_isStarting) {
+                while (_isStarting) {
+                    for (volatile int k = 0; k < DELAY; k++);
+                    Thread::yield();
+                }
+            }
 
             if (isPaused()) {
                 if (!done) {
                     done = true;
                     for (volatile int k = 0; k < DELAY * 10; k++);
                     _semaphore_pause.p();
+                    for (volatile int k = 0; k < DELAY * 4; k++);
                 }
             } else {
                 done = false;
-                _pacman._mutex.p();
+                _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                _pacman._mutex.v();
+                _pacman->_mutex.v();
 
                 _ghost1->getTargetTile(pm_t_x, pm_t_y, pm_d);
-                lost += _ghost1->move(pm_t_x, pm_t_y);
-                _ghost2->getTargetTile(pm_t_x, pm_t_y, pm_d);
-                lost += _ghost2->move(pm_t_x, pm_t_y);
-                _ghost3->getTargetTile(pm_t_x, pm_t_y, pm_d);
-                lost += _ghost3->move(pm_t_x, pm_t_y);
-                _ghost4->getTargetTile(pm_t_x, pm_t_y, pm_d);
-                lost += _ghost4->move(pm_t_x, pm_t_y);
+                lost = _ghost1->move(pm_t_x, pm_t_y);
 
-                if (lost > 0) {
+                if (lost == 1) {
                     lost = 0;
                     loseLife();
                 }
-                for (volatile unsigned int j = 0; j < DELAY; j++);
-                Thread::yield();
             }
+            for (volatile unsigned int j = 0; j < DELAY / 3; j++);
+            Thread::yield();
+        }
+    }
+
+    static void runGhost2() {
+        int lost = 0;
+        bool done = false;
+
+        while (true) {
+
+            if (_isStarting) {
+                while (_isStarting) {
+                    for (volatile int k = 0; k < DELAY; k++);
+                    Thread::yield();
+                }
+            }
+
+            if (isPaused()) {
+                if (!done) {
+                    done = true;
+                    for (volatile int k = 0; k < DELAY * 10; k++);
+                    _semaphore_pause.p();
+                    for (volatile int k = 0; k < DELAY * 4; k++);
+                }
+            } else {
+                done = false;
+                _pacman->_mutex.p();
+                Direction pm_d = PacMan::pacman_dir;
+                int pm_t_x = PacMan::pacmanGetNearTileX();
+                int pm_t_y = PacMan::pacmanGetNearTileY();
+                _pacman->_mutex.v();
+
+                _ghost2->getTargetTile(pm_t_x, pm_t_y, pm_d);
+                lost = _ghost2->move(pm_t_x, pm_t_y);
+
+                if (lost == 1) {
+                    lost = 0;
+                    loseLife();
+                }
+            }
+            for (volatile unsigned int j = 0; j < DELAY / 3; j++);
+            Thread::yield();
+        }
+    }
+
+    static void runGhost3() {
+        int lost = 0;
+        bool done = false;
+
+        while (true) {
+
+            if (_isStarting) {
+                while (_isStarting) {
+                    for (volatile int k = 0; k < DELAY; k++);
+                    Thread::yield();
+                }
+            }
+
+            if (isPaused()) {
+                if (!done) {
+                    done = true;
+                    for (volatile int k = 0; k < DELAY * 10; k++);
+                    _semaphore_pause.p();
+                    for (volatile int k = 0; k < DELAY * 4; k++);
+                }
+            } else {
+                done = false;
+                _pacman->_mutex.p();
+                Direction pm_d = PacMan::pacman_dir;
+                int pm_t_x = PacMan::pacmanGetNearTileX();
+                int pm_t_y = PacMan::pacmanGetNearTileY();
+                _pacman->_mutex.v();
+
+                _ghost3->getTargetTile(pm_t_x, pm_t_y, pm_d);
+                lost = _ghost3->move(pm_t_x, pm_t_y);
+
+                if (lost == 1) {
+                    lost = 0;
+                    loseLife();
+                }
+            }
+            for (volatile unsigned int j = 0; j < DELAY / 3; j++);
+            Thread::yield();
+        }
+    }
+
+    static void runGhost4() {
+        int lost = 0;
+        bool done = false;
+
+        while (true) {
+
+            if (_isStarting) {
+                while (_isStarting) {
+                    for (volatile int k = 0; k < DELAY; k++);
+                    Thread::yield();
+                }
+            }
+
+            if (isPaused()) {
+                if (!done) {
+                    done = true;
+                    for (volatile int k = 0; k < DELAY * 10; k++);
+                    _semaphore_pause.p();
+                    for (volatile int k = 0; k < DELAY * 4; k++);
+                }
+            } else {
+                done = false;
+                _pacman->_mutex.p();
+                Direction pm_d = PacMan::pacman_dir;
+                int pm_t_x = PacMan::pacmanGetNearTileX();
+                int pm_t_y = PacMan::pacmanGetNearTileY();
+                _pacman->_mutex.v();
+
+                _ghost4->getTargetTile(pm_t_x, pm_t_y, pm_d);
+                lost = _ghost4->move(pm_t_x, pm_t_y);
+
+                if (lost == 1) {
+                    lost = 0;
+                    loseLife();
+                }
+            }
+            for (volatile unsigned int j = 0; j < DELAY / 3; j++);
+            Thread::yield();
         }
     }
 
@@ -379,29 +575,29 @@ private:
                             // std::cout << "Keyboard esquerda!" << std::endl;
                             if (PacMan::pacman_dir != LEFT && !isPaused()) {
                                 // _window._mutex_w.p();
-                                // _pacman._mutex.p();
-                                _pacman.changeDirection(LEFT);
+                                // _pacman->_mutex.p();
+                                _pacman->changeDirection(LEFT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                             // std::cout << "Keyboard direita!" << std::endl;
                             if (PacMan::pacman_dir != RIGHT && !isPaused()) {
                                 // _window._mutex_w.p();
-                                // _pacman._mutex.p();
-                                _pacman.changeDirection(RIGHT);
+                                // _pacman->_mutex.p();
+                                _pacman->changeDirection(RIGHT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                             // std::cout << "Keyboard para baixo!" << std::endl;
                             if (PacMan::pacman_dir != DOWN && !isPaused()) {
                                 // _window._mutex_w.p();
-                                // _pacman._mutex.p();
-                                _pacman.changeDirection(DOWN);
+                                // _pacman->_mutex.p();
+                                _pacman->changeDirection(DOWN);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                             // std::cout << "Keyboard para cima!" << std::endl;
                             if (PacMan::pacman_dir != UP && !isPaused()) {
                                 // _window._mutex_w.p();
-                                // _pacman._mutex.p();
-                                _pacman.changeDirection(UP);
+                                // _pacman->_mutex.p();
+                                _pacman->changeDirection(UP);
                             }
                         } else if (event.key.code == 15) {
                             _isPaused = !isPaused();
@@ -434,13 +630,12 @@ private:
             }
             // if (Traits<Timer>::preemptive)
             // _window._mutex_w.v();
-            for (volatile int i = 0; i < DELAY + (_isPaused * 5 * DELAY); i++);
+            for (volatile int i = 0; i < DELAY + ((_isPaused || _isStarting) * 5 * DELAY); i++);
             Thread::yield();
         }
     }
 
-    static void runWindow()
-    {
+    static void runWindow() {
         sf::RenderWindow window(sf::VideoMode(674, 860), "Pac Man");
         _window_render = &window;
 
@@ -474,139 +669,146 @@ private:
                     // else
                     for (volatile int k = 0; k < DELAY * 10; k++);
                     _semaphore_pause.p();
+                    for (volatile int k = 0; k < DELAY * 4; k++);
                 }
-            } else {
-                i++;
-                done = false;
-
-                window.clear();
-
-                for (int k = 0; k < 28; k++) {
-                    for (int j = 0; j < 31; j++) {
-                        switch(Personagem::getTile(k, j)) {
-                            case tiles::o:
-                                // draw small food
-                                _window.pill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
-                                window.draw(_window.pill_sprite);
-                                break;
-                            case tiles::O:
-                                // draw large food
-                                if (i % 60 > 30) {
-                                    _window.bigPill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
-                                    window.draw(_window.bigPill_sprite);
-                                }
-                                break;
-                        }
-                    }
-                }
-
-                // Draw Fruits
-                if(Personagem::getTile(13, 13) == tiles::F) {
-                    if (_foods > 70) {
-                        _window.cherry_sprite.setPosition(315, 398);
-                        window.draw(_window.cherry_sprite);
-                    } else {
-                        _window.strawberry_sprite.setPosition(315, 398);
-                        window.draw(_window.strawberry_sprite);
-                    }
-                }
-                if (_foods > 70) {
-                    _window.strawberry_sprite.setPosition(627, 795);
-                    window.draw(_window.strawberry_sprite);
-                    if (_foods > 170) {
-                        _window.cherry_sprite.setPosition(582, 795);
-                        window.draw(_window.cherry_sprite);
-                    }
-
-                }
-
-                // Draw Lives
-                drawLives();
-
-                window.draw(_window.maze_sprite);
-
-                //Draw Score
-                _window.score_sprite.setPosition(5,760);
-                window.draw(_window.score_sprite);
-
-                _window.high_sprite.setPosition(5,795);
-                window.draw(_window.high_sprite);
-
-                int _score_held = _score;
-                for (int aa = 0; aa < 8; aa++){
-                    int digito = _score_held % 10;
-                    _score_held /= 10;
-                    _window.num_sprite[aa].setTexture(_window.num_tex[digito]);
-                    _window.num_sprite[aa].setPosition((140+ 7*24 - aa*24 ),760);
-                    window.draw(_window.num_sprite[aa]);
-                }
-                _score_held = (_highscore > _score) ? _highscore : _score;
-                for (int bb = 0; bb < 8; bb++){
-                    int digito = _score_held % 10;
-                    _score_held /= 10;
-                    _window.num_sprite[bb].setTexture(_window.num_tex[digito]);
-                    _window.num_sprite[bb].setPosition((140+ 7*24 - bb*24 ),795);
-                    window.draw(_window.num_sprite[bb]);
-                }
-
-                // Draw PacMan
-                _pacman._mutex.p();
-                _window._pacman_sprites[(i / 15) % 4].setPosition(PacMan::pacman_x, PacMan::pacman_y);
-                _pacman._mutex.v();
-                window.draw(_window._pacman_sprites[(i / 15) % 4]);
-
-                // Draw Ghost 1
-                if (!_ghost1->isScared()) {
-                    _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
-                    window.draw(_window._ghost_sprites[(i / 15) % 2]);
-                    _window._ghost_sprites[2 + Ghost1::ghost1_dir - (Ghost1::ghost1_dir == STOPPED)].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
-                    window.draw(_window._ghost_sprites[2 + Ghost1::ghost1_dir - (Ghost1::ghost1_dir == STOPPED)]);
-                } else {
-                    _window._scared_sprites[(i / 15) % 4].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
-                    window.draw(_window._scared_sprites[(i / 15) % 4]);
-                }
-
-                // Draw Ghost 2
-                if (!_ghost2->isScared()) {
-                    _window._ghost_sprites2[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
-                    window.draw(_window._ghost_sprites2[(i / 15) % 2]);
-                    _window._ghost_sprites2[2 + Ghost2::ghost2_dir - (Ghost2::ghost2_dir == STOPPED)].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
-                    window.draw(_window._ghost_sprites2[2 + Ghost2::ghost2_dir - (Ghost2::ghost2_dir == STOPPED)]);
-                } else {
-                    _window._scared_sprites[(i / 15) % 4].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
-                    window.draw(_window._scared_sprites[(i / 15) % 4]);
-                }
-
-                // Draw Ghost 3
-                if (!_ghost3->isScared()) {
-                    _window._ghost_sprites3[(i / 15) % 2].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
-                    window.draw(_window._ghost_sprites3[(i / 15) % 2]);
-                    _window._ghost_sprites3[2 + Ghost3::ghost3_dir - (Ghost3::ghost3_dir == STOPPED)].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
-                    window.draw(_window._ghost_sprites3[2 + Ghost3::ghost3_dir - (Ghost3::ghost3_dir == STOPPED)]);
-                } else {
-                    _window._scared_sprites[(i / 15) % 4].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
-                    window.draw(_window._scared_sprites[(i / 15) % 4]);
-                }
-
-                // Draw Ghost 4
-                if (!_ghost4->isScared()) {
-                    _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
-                    window.draw(_window._ghost_sprites4[(i / 15) % 2]);
-                    _window._ghost_sprites4[2 + Ghost4::ghost4_dir - (Ghost4::ghost4_dir == STOPPED)].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
-                    window.draw(_window._ghost_sprites4[2 + Ghost4::ghost4_dir - (Ghost4::ghost4_dir == STOPPED)]);
-                } else {
-                    _window._scared_sprites[(i / 15) % 4].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
-                    window.draw(_window._scared_sprites[(i / 15) % 4]);
-                }
-
-                window.display();
-                // _window._mutex_w.v();
-                for (volatile unsigned int j = 0; j < DELAY; j++);
-
-                if (i == 55440) i = 0;
-
-                Thread::yield();
             }
+
+            i++;
+            done = false;
+
+            window.clear();
+
+            if (_isStarting) {
+                _window.ready_sprite.setPosition(265, 407);
+                window.draw(_window.ready_sprite);
+                i--;
+            }
+
+            for (int k = 0; k < 28; k++) {
+                for (int j = 0; j < 31; j++) {
+                    switch(Personagem::getTile(k, j)) {
+                        case tiles::o:
+                            // draw small food
+                            _window.pill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
+                            window.draw(_window.pill_sprite);
+                            break;
+                        case tiles::O:
+                            // draw large food
+                            if (i % 60 > 30) {
+                                _window.bigPill_sprite.setPosition(24 * k + 3, 725 - 24 * j);
+                                window.draw(_window.bigPill_sprite);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            // Draw Fruits
+            if(Personagem::getTile(13, 13) == tiles::F) {
+                if (_foods > 70) {
+                    _window.cherry_sprite.setPosition(315, 398);
+                    window.draw(_window.cherry_sprite);
+                } else {
+                    _window.strawberry_sprite.setPosition(315, 398);
+                    window.draw(_window.strawberry_sprite);
+                }
+            }
+            if (_foods > 70) {
+                _window.strawberry_sprite.setPosition(627, 795);
+                window.draw(_window.strawberry_sprite);
+                if (_foods > 170) {
+                    _window.cherry_sprite.setPosition(582, 795);
+                    window.draw(_window.cherry_sprite);
+                }
+
+            }
+
+            // Draw Lives
+            drawLives();
+
+            window.draw(_window.maze_sprite);
+
+            //Draw Score
+            _window.score_sprite.setPosition(5,760);
+            window.draw(_window.score_sprite);
+
+            _window.high_sprite.setPosition(5,795);
+            window.draw(_window.high_sprite);
+
+            int _score_held = _score;
+            for (int aa = 0; aa < 8; aa++){
+                int digito = _score_held % 10;
+                _score_held /= 10;
+                _window.num_sprite[aa].setTexture(_window.num_tex[digito]);
+                _window.num_sprite[aa].setPosition((140+ 7*24 - aa*24 ),760);
+                window.draw(_window.num_sprite[aa]);
+            }
+            _score_held = (_highscore > _score) ? _highscore : _score;
+            for (int bb = 0; bb < 8; bb++){
+                int digito = _score_held % 10;
+                _score_held /= 10;
+                _window.num_sprite[bb].setTexture(_window.num_tex[digito]);
+                _window.num_sprite[bb].setPosition((140+ 7*24 - bb*24 ),795);
+                window.draw(_window.num_sprite[bb]);
+            }
+
+            // Draw PacMan
+            _pacman->_mutex.p();
+            _window._pacman_sprites[(i / 15) % 4].setPosition(PacMan::pacman_x, PacMan::pacman_y);
+            _pacman->_mutex.v();
+            window.draw(_window._pacman_sprites[(i / 15) % 4]);
+
+            // Draw Ghost 1
+            if (!_ghost1->isScared()) {
+                _window._ghost_sprites[(i / 15) % 2].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                window.draw(_window._ghost_sprites[(i / 15) % 2]);
+                _window._ghost_sprites[2 + Ghost1::ghost1_dir - (Ghost1::ghost1_dir == STOPPED)].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                window.draw(_window._ghost_sprites[2 + Ghost1::ghost1_dir - (Ghost1::ghost1_dir == STOPPED)]);
+            } else {
+                _window._scared_sprites[(i / 15) % 4].setPosition(Ghost1::ghost1_x, Ghost1::ghost1_y);
+                window.draw(_window._scared_sprites[(i / 15) % 4]);
+            }
+
+            // Draw Ghost 2
+            if (!_ghost2->isScared()) {
+                _window._ghost_sprites2[(i / 15) % 2].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                window.draw(_window._ghost_sprites2[(i / 15) % 2]);
+                _window._ghost_sprites2[2 + Ghost2::ghost2_dir - (Ghost2::ghost2_dir == STOPPED)].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                window.draw(_window._ghost_sprites2[2 + Ghost2::ghost2_dir - (Ghost2::ghost2_dir == STOPPED)]);
+            } else {
+                _window._scared_sprites[(i / 15) % 4].setPosition(Ghost2::ghost2_x, Ghost2::ghost2_y);
+                window.draw(_window._scared_sprites[(i / 15) % 4]);
+            }
+
+            // Draw Ghost 3
+            if (!_ghost3->isScared()) {
+                _window._ghost_sprites3[(i / 15) % 2].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                window.draw(_window._ghost_sprites3[(i / 15) % 2]);
+                _window._ghost_sprites3[2 + Ghost3::ghost3_dir - (Ghost3::ghost3_dir == STOPPED)].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                window.draw(_window._ghost_sprites3[2 + Ghost3::ghost3_dir - (Ghost3::ghost3_dir == STOPPED)]);
+            } else {
+                _window._scared_sprites[(i / 15) % 4].setPosition(Ghost3::ghost3_x, Ghost3::ghost3_y);
+                window.draw(_window._scared_sprites[(i / 15) % 4]);
+            }
+
+            // Draw Ghost 4
+            if (!_ghost4->isScared()) {
+                _window._ghost_sprites4[(i / 15) % 2].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                window.draw(_window._ghost_sprites4[(i / 15) % 2]);
+                _window._ghost_sprites4[2 + Ghost4::ghost4_dir - (Ghost4::ghost4_dir == STOPPED)].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                window.draw(_window._ghost_sprites4[2 + Ghost4::ghost4_dir - (Ghost4::ghost4_dir == STOPPED)]);
+            } else {
+                _window._scared_sprites[(i / 15) % 4].setPosition(Ghost4::ghost4_x, Ghost4::ghost4_y);
+                window.draw(_window._scared_sprites[(i / 15) % 4]);
+            }
+
+            window.display();
+            // _window._mutex_w.v();
+            for (volatile unsigned int j = 0; j < DELAY; j++);
+
+            if (i == 55440) i = 0;
+
+            Thread::yield();
         }
     }
 };
