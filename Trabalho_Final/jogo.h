@@ -117,6 +117,8 @@ private:
     static Thread * stopChase_thread;
     static Thread * timerJail_thread[4];
 
+    static Thread * _score100_thread;
+
     static Semaphore _semaphore_pause;
 
     static bool isPaused() {
@@ -200,6 +202,11 @@ private:
         _ghost4->isScared(false);
 
         delete stopChase_thread;
+    }
+
+    static void remove100(int) {
+        Personagem::setTile(13, 13, tiles::u);
+        if (_score100_thread) delete _score100_thread;
     }
 
     static void loseLife() {
@@ -291,8 +298,13 @@ private:
         // if (_ghost_threads[2]) delete _ghost_threads[2];
         // if (_ghost_threads[1]) delete _ghost_threads[1];
         // if (_ghost_threads[0]) delete _ghost_threads[0];
+
         loseLife();
 
+        // Isso aqui meio que funciona, mas dá seg fault quando pausa/perde
+        // if (_ghost_threads[0]) delete _ghost_threads[4];
+        // _isStarting = true;
+        // _ghost_threads[4] = new Thread(runGhost);
     }
 
     static void runPacman() {
@@ -333,6 +345,7 @@ private:
                     break;
                 case 3:
                     Jogo::_score += 100;
+                    _score100_thread = new Thread(runPeriod, 2, remove100, 0);
                     break;
             }
 
@@ -712,7 +725,13 @@ private:
                     _window.strawberry_sprite.setPosition(315, 398);
                     window.draw(_window.strawberry_sprite);
                 }
+            } else if (Personagem::getTile(13, 13) == tiles::f) {
+                if (i % 60 > 30){
+                    _window.score_100_sprite.setPosition(315, 415);
+                    window.draw(_window.score_100_sprite);
+                }
             }
+
             if (_foods > 70) {
                 _window.strawberry_sprite.setPosition(627, 795);
                 window.draw(_window.strawberry_sprite);

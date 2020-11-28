@@ -17,6 +17,8 @@ Thread * Jogo::stopChase_thread;
 Semaphore Jogo::_semaphore_pause;
 Semaphore Jogo::_mutex_paused;
 Thread * Jogo::timerJail_thread[4];
+Thread * Jogo::_score100_thread;
+
 Thread * Jogo::_ghost_threads[5];
 bool Jogo::_isStarting;
 
