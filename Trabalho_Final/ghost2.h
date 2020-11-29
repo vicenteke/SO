@@ -18,6 +18,7 @@ public:
     ~Ghost2() {}
 
     void getTargetTile(int pm_x, int pm_y, Direction dir) {
+        // Gets target tile and sets direction for ghost
 
         if (isJailed()) {
             return;
@@ -70,11 +71,13 @@ public:
     }
 
     void updatePosition(int x, int y) {
+        // Updates static values
         ghost2_x = x;
         ghost2_y = y;
     }
 
     void updateDirection() {
+        // Updates static values or sets _last_input in special case
         if (_last_input == STOPPED) {
             ghost2_dir = _last_input;
         } else {
@@ -83,10 +86,12 @@ public:
     }
 
     void updateDirection(Direction dir) {
+        // Updates both static and non-static attributes
         ghost2_dir = dir;
         _last_input = dir;
     }
 
+public:
     static int ghost2_x;
     static int ghost2_y;
     static Direction ghost2_dir;

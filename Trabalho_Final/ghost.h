@@ -8,8 +8,6 @@ __USING_API
 class Ghost : public Personagem {
 public:
 
-    Semaphore _mutex_scared;
-
     Ghost(sf::Sprite * eyes = 0, sf::Sprite * sprites = 0, int n_sprites = 0, int x = 310, int y = 254, Direction dir = RIGHT)
     : Personagem(x, y, dir, sprites, n_sprites), _eyes(eyes) {
 
@@ -25,6 +23,7 @@ public:
     ~Ghost() {}
 
     int getTileX() {
+        // Gets tile X for ghost. Returns 0 in case it is not centralized in any
         if ((_x - 14) % 24 != 0)
             return 0;
 
@@ -43,6 +42,7 @@ public:
     }
 
     int getTileY() {
+        // Gets tile Y for ghost. Returns 0 in case it is not centralized in any
         if ((_y - 14) % 24 != 0)
             return 0;
 
@@ -61,6 +61,7 @@ public:
     }
 
     int getNearTileX() {
+        // Returns nearest tile in X axis for ghost (does not return 0 if not centralized)
         int tile_x = getTileX();
 
         if (tile_x == 0 ){
@@ -83,6 +84,7 @@ public:
     }
 
     int getNearTileY() {
+        // Returns nearest tile in Y axis for ghost (does not return 0 if not centralized)
         int tile_y = getTileY();
 
         if (tile_y == 0) {
@@ -109,13 +111,6 @@ public:
     int getDistance(int _x1, int _y1, int _x2, int _y2) {
         return abs(_x1 - _x2) + abs(_y1 - _y2);
     }
-
-    virtual void getTargetTile(int, int, Direction) = 0;
-
-    virtual void updatePosition(int x, int y) {}
-
-    virtual void updateDirection() {}
-    virtual void updateDirection(Direction) {}
 
     void scareRunAway(int pm_x, int pm_y) {
         // Used instead of getTargetTile when _isScared = true
@@ -172,6 +167,15 @@ public:
         _mutex_scared.v();
         return tmp;
     }
+
+    // Virtual Functions
+    virtual void getTargetTile(int, int, Direction) = 0;
+    virtual void updatePosition(int x, int y) {}
+    virtual void updateDirection() {}
+    virtual void updateDirection(Direction) {}
+
+public:
+    Semaphore _mutex_scared;
 
 protected:
     int _target_x;

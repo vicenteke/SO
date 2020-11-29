@@ -21,15 +21,11 @@ class Jogo {
 public:
     Jogo() {
 
-        // _window = Window();
-
         _pacman = new PacMan(_window.getPacmanSprites(), 4);
         _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
         _ghost2 = new Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
         _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
         _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
-        //
-        // run();
 
         isPaused(false);
         isStarting(true);
@@ -37,7 +33,6 @@ public:
     }
 
     ~Jogo() {
-        // finishGame();
         if (_pacman) delete _pacman;
         if (_ghost1) delete _ghost1;
         if (_ghost2) delete _ghost2;
@@ -68,15 +63,8 @@ public:
         int pacman_status = pacman_thread.join();
     }
 
-    static Window _window;
-
-    // Game stats
-    static int _lives;
-    static int _foods;
-    static int _score;
-    static int _highscore;
-
     static void timerJail(int ghost) {
+        // Starts timer for each ghost in jail
 
         if (ghost <= 0) return;
         _score += 200;
@@ -97,6 +85,15 @@ public:
         }
     }
 
+public:
+    static Window _window;
+
+    // Game stats
+    static int _lives;
+    static int _foods;
+    static int _score;
+    static int _highscore;
+
 private:
 
     static sf::RenderWindow * _window_render;
@@ -116,10 +113,11 @@ private:
 
     static Thread * stopChase_thread;
     static Thread * timerJail_thread[4];
+    static Semaphore _semaphore_pause;
 
     static Thread * _score100_thread;
 
-    static Semaphore _semaphore_pause;
+private:
 
     static bool isPaused() {
         _mutex_paused.p();
@@ -148,6 +146,8 @@ private:
     }
 
     static void runPeriod(int seconds, void (* callBack)(int), int a = 0) {
+        // Calls "callBack" after "seconds" seconds
+
         std::time_t start_time = std::time(0);
         std::time_t paused_time = start_time;
         while (std::difftime(std::time(0), start_time) < seconds) {
@@ -165,47 +165,31 @@ private:
     }
 
     static void getOutJail(int ghost) {
+        // Removes ghst from jail
 
-        // isPaused(true);
-        // if (Traits<Timer>::preemptive) {
-        //     paused_thread = new Thread(runPaused);
-        //     // Thread::yield();
-        // }
-        // _window._mutex_w.p();
         switch(ghost) {
             case 1:
-                // _ghost1->_mutex.p();
                 delete _ghost1;
                 _ghost1 = new Ghost1(&(_window.getGhostSprites(1)[2]), _window.getGhostSprites(1), 2);
-                // _ghost1->_mutex.v();
                 break;
             case 2:
-                // _ghost2->_mutex.p();
                 delete _ghost2;
                 _ghost2 = new Ghost2(&(_window.getGhostSprites(2)[2]), _window.getGhostSprites(2), 2);
-                // _ghost2->_mutex.v();
                 break;
             case 3:
-                // _ghost3->_mutex.p();
                 delete _ghost3;
                 _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
-                // _ghost3->_mutex.v();
                 break;
             case 4:
-                // _ghost4->_mutex.p();
                 delete _ghost4;
                 _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
-                // _ghost4->_mutex.v();
                 break;
         }
-        // _window._mutex_w.v();
         delete timerJail_thread[ghost - 1];
-        // if (!Traits<Timer>::preemptive)
-        //     _semaphore_pause.wakeup_all();
-        // else delete paused_thread;
     }
 
     static void startChase() {
+        // Starts chase mode
         _ghost1->isScared(true);
         _ghost2->isScared(true);
         _ghost3->isScared(true);
@@ -215,6 +199,7 @@ private:
     }
 
     static void stopChase(int) {
+        // Stops chase mode
         _ghost1->isScared(false);
         _ghost2->isScared(false);
         _ghost3->isScared(false);
@@ -224,11 +209,13 @@ private:
     }
 
     static void remove100(int) {
+        // Deletes "100" sprite
         Personagem::setTile(13, 13, tiles::u);
         if (_score100_thread) delete _score100_thread;
     }
 
     static void loseLife() {
+        // Reduces 1 life and restarts game or stops game as lost
 
         if (--_lives > 0) {
 
@@ -236,7 +223,6 @@ private:
             if(aux == tiles::F || aux == tiles::f)
                 Personagem::setTile(13, 13, tiles::u);
 
-            // _window._mutex_w.p();
             delete _pacman;
             _pacman = new PacMan(_window.getPacmanSprites(), 4);
             delete _ghost1;
@@ -247,7 +233,6 @@ private:
             _ghost3 = new Ghost3(&(_window.getGhostSprites(3)[2]), _window.getGhostSprites(3), 2);
             delete _ghost4;
             _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
-            // _window._mutex_w.v();
 
             isPaused(false);
             _semaphore_pause.wakeup_all();
@@ -265,7 +250,6 @@ private:
             }
 
             isStarting(false);
-            // Thread::yield();
         } else {
             if (!isPaused()) {
                 isPaused(true);
@@ -279,12 +263,11 @@ private:
                 }
             }
             Thread::yield();
-            // finishGame();
         }
     }
 
     static void drawLives() {
-        // _window._mutex_w.p();
+        // Draw lives sprites
         if (_lives > 0) {
             _window.life_sprite.setPosition(625, 750);
             _window_render->draw(_window.life_sprite);
@@ -297,42 +280,31 @@ private:
                 }
             }
         }
-        // _window._mutex_w.v();
     }
 
     static void finishGame() {
+        // Closes window and finishes game
         _window_render->close();
-        // _window._mutex_w.v();
-        // if (_ghost1) delete _ghost1;
-        // if (_ghost2) delete _ghost2;
-        // if (_ghost3) delete _ghost3;
-        // if (_ghost4) delete _ghost4;
-        // if (paused_thread) delete paused_thread;
         if (stopChase_thread) delete stopChase_thread;
         for (int i = 0; i < 4; i++) {
             if (timerJail_thread[i]) delete timerJail_thread[i];
         }
+        if (_score100_thread) delete _score100_thread;
     }
 
     static void restartGame() {
+        // Restarts game, called when 'R' key is pressed
         Tiles::resetTiles();
         _lives = 4;
         _score = 0;
         _foods = 240;
-        // if (Traits<Timer>::preemptive && paused_thread) delete paused_thread;
-        // isPaused(false);
-        // if (!Traits<Timer>::preemptive)
-        //     _semaphore_pause.wakeup_all();
-        //
-        // if (_ghost_threads[3]) delete _ghost_threads[3];
-        // if (_ghost_threads[2]) delete _ghost_threads[2];
-        // if (_ghost_threads[1]) delete _ghost_threads[1];
-        // if (_ghost_threads[0]) delete _ghost_threads[0];
 
         loseLife();
     }
 
     static void runPacman() {
+        // PacMan's thread
+        // Moves PacMan and updates score and foods
 
         bool done = false;
 
@@ -348,32 +320,27 @@ private:
             if (isPaused()) {
                 if (!done) {
                     done = true;
-                    // if (Traits<Timer>::preemptive)
-                    // int status = paused_thread->join();
-                    // else
                     for (volatile int k = 0; k < DELAY * 10; k++);
                     _semaphore_pause.p();
-                    // for (volatile int k = 0; k < DELAY * 4; k++);
                 }
             }
             done = false;
             switch(_pacman->move()) {
-                case 1:
+                case 1: // Pill eaten
                     Jogo::_score += 10;
                     Jogo::_foods--;
-                    // std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                     break;
-                case 2:
+                case 2: // Big pill eaten
                     Jogo::_score += 50;
                     startChase();
-                    // std::cout << "Score: " << Jogo::_score << " | Foods: " << Jogo::_foods << " | Lives: " << Jogo::_lives << '\n';
                     break;
-                case 3:
+                case 3: // Fruit eaten
                     Jogo::_score += 100;
                     _score100_thread = new Thread(runPeriod, 2, remove100, 0);
                     break;
             }
 
+            // Creates fruit when it's time
             if (_foods == 170 || _foods == 70)
                 Personagem::setTile(13, 13, tiles::F);
             else if (_foods <= 0)
@@ -385,16 +352,12 @@ private:
     }
 
     static void runGhost() {
+        // Creates ghosts' threads
 
         _ghost1->updatePosition(265, 334);
         _ghost2->updatePosition(298, 334);
         _ghost3->updatePosition(331, 334);
         _ghost4->updatePosition(365, 334);
-
-        // if (_ghost_threads[3]) delete _ghost_threads[3];
-        // if (_ghost_threads[2]) delete _ghost_threads[2];
-        // if (_ghost_threads[1]) delete _ghost_threads[1];
-        // if (_ghost_threads[0]) delete _ghost_threads[0];
 
         for (volatile int j = 0; j < 40; j++) {
             for (volatile int k = 0; k < DELAY * 5; k++);
@@ -403,23 +366,8 @@ private:
 
         isStarting(false);
         _ghost_threads[0] = new Thread(runGhost1);
-        // for (volatile int j = 0; j < 67; j++) {
-        //     for (volatile int k = 0; k < DELAY; k++);
-        //     Thread::yield();
-        // }
-
         _ghost_threads[1] = new Thread(runGhost2);
-        // for (volatile int j = 0; j < 133; j++) {
-        //     for (volatile int k = 0; k < DELAY * 2 / 3; k++);
-        //     Thread::yield();
-        // }
-
         _ghost_threads[2] = new Thread(runGhost3);
-        // for (volatile int j = 0; j < 200; j++) {
-        //     for (volatile int k = 0; k < DELAY / 3; k++);
-        //     Thread::yield();
-        // }
-
         _ghost_threads[3] = new Thread(runGhost4);
 
         int status;
@@ -430,13 +378,11 @@ private:
     }
 
     static void runGhost1() {
+        // Ghost 1's thread
+        // Moves ghost and checks if got PacMan
+
         int lost = 0;
         bool done = false;
-
-        // for (volatile int j = 0; j < 200; j++) {
-        //     for (volatile int k = 0; k < DELAY / 3; k++);
-        //     Thread::yield();
-        // }
 
         while (true) {
 
@@ -447,11 +393,6 @@ private:
                     for (volatile int k = 0; k < DELAY / 3; k++);
                     Thread::yield();
                 }
-
-                // for (volatile int j = 0; j < 200; j++) {
-                //     for (volatile int k = 0; k < DELAY / 3; k++);
-                //     Thread::yield();
-                // }
             }
 
             if (isPaused()) {
@@ -463,11 +404,9 @@ private:
                 }
             } else {
                 done = false;
-                // if (_pacman) _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                // _pacman->_mutex.v();
 
                 _ghost1->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost = _ghost1->move(pm_t_x, pm_t_y);
@@ -485,6 +424,8 @@ private:
     }
 
     static void runGhost2() {
+        // Ghost 2's thread
+
         int lost = 0;
         bool done = false;
 
@@ -518,11 +459,9 @@ private:
                 }
             } else {
                 done = false;
-                // _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                // _pacman->_mutex.v();
 
                 _ghost2->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost = _ghost2->move(pm_t_x, pm_t_y);
@@ -540,6 +479,8 @@ private:
     }
 
     static void runGhost3() {
+        // Ghost 3's thread
+
         int lost = 0;
         bool done = false;
 
@@ -573,11 +514,9 @@ private:
                 }
             } else {
                 done = false;
-                // _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                // _pacman->_mutex.v();
 
                 _ghost3->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost = _ghost3->move(pm_t_x, pm_t_y);
@@ -595,6 +534,8 @@ private:
     }
 
     static void runGhost4() {
+        // Ghost 4's thread
+
         int lost = 0;
         bool done = false;
 
@@ -628,11 +569,9 @@ private:
                 }
             } else {
                 done = false;
-                // _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                // _pacman->_mutex.v();
 
                 _ghost4->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost = _ghost4->move(pm_t_x, pm_t_y);
@@ -650,86 +589,64 @@ private:
     }
 
     static void runInput() {
+        // Thread for keyboard input
+
         while (_window_render->isOpen())
         {
-            // _window._mutex_w.p();
             sf::Event event;
             while (_window_render->pollEvent(event))
             {
                 switch (event.type) {
 
                     case sf::Event::Closed:
-                         // _window_render->close();
                          finishGame();
                          break;
 
                     // key pressed
                     case sf::Event::KeyPressed:
                         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-                            // std::cout << "Keyboard esquerda!" << std::endl;
                             if (PacMan::pacman_dir != LEFT && !isPaused()) {
-                                // _window._mutex_w.p();
-                                // _pacman->_mutex.p();
                                 _pacman->changeDirection(LEFT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                            // std::cout << "Keyboard direita!" << std::endl;
                             if (PacMan::pacman_dir != RIGHT && !isPaused()) {
-                                // _window._mutex_w.p();
-                                // _pacman->_mutex.p();
                                 _pacman->changeDirection(RIGHT);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                            // std::cout << "Keyboard para baixo!" << std::endl;
                             if (PacMan::pacman_dir != DOWN && !isPaused()) {
-                                // _window._mutex_w.p();
-                                // _pacman->_mutex.p();
                                 _pacman->changeDirection(DOWN);
                             }
                         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                            // std::cout << "Keyboard para cima!" << std::endl;
                             if (PacMan::pacman_dir != UP && !isPaused()) {
-                                // _window._mutex_w.p();
-                                // _pacman->_mutex.p();
                                 _pacman->changeDirection(UP);
                             }
                         } else if (event.key.code == 15) {
                             _isPaused = !isPaused();
                             if (isPaused()) {
 
-                                // if (Traits<Timer>::preemptive) {
-                                    // paused_thread = new Thread(runPaused);
-                                    // Thread::yield();
-                                // }
-                                // _semaphore_pause.p();
                             } else {
-                                // if (!Traits<Timer>::preemptive)
                                     _semaphore_pause.wakeup_all();
-                                // else {
-                                    // delete paused_thread;
-                                // }
                                 if (_lives <= 0 || _foods <= 0) {
                                    restartGame();
                                }
                             }
-                            // Thread::yield();
                         } else if (event.key.code == 16) {
                             finishGame();
                         } else if (event.key.code == 17) {
                             restartGame();
                         }
                         break;
-
                 }
             }
-            // if (Traits<Timer>::preemptive)
-            // _window._mutex_w.v();
             for (volatile int i = 0; i < DELAY + ((_isPaused || _isStarting) * 5 * DELAY); i++);
             Thread::yield();
         }
     }
 
     static void runWindow() {
+        // Window's thread
+        // Prints sprites on screen
+
         sf::RenderWindow window(sf::VideoMode(674, 860), "Pac Man");
         _window_render = &window;
 
@@ -744,7 +661,6 @@ private:
 
         while (window.isOpen())
         {
-            // _window._mutex_w.p();
             if (isPaused()) {
                 if (!done) {
                     if (_lives > 0) {
@@ -754,13 +670,8 @@ private:
                         _window.gameover_sprite.setPosition(212,405);
                         window.draw(_window.gameover_sprite);
                     }
-                    // drawLives();
                     window.display();
-                    // _window._mutex_w.v();
                     done = true;
-                    // if (Traits<Timer>::preemptive)
-                    //     int status = paused_thread->join();
-                    // else
                     for (volatile int k = 0; k < DELAY * 10; k++);
                     _semaphore_pause.p();
                     for (volatile int k = 0; k < DELAY * 4; k++);

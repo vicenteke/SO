@@ -22,8 +22,6 @@ public:
 
     void run();
 
-    // void draw_texture(unsigned int texture, int length, int height, float angle);
-
     sf::Sprite * getPacmanSprites() {
         return _pacman_sprites;
     }
@@ -127,34 +125,12 @@ public:
     sf::Texture eye_left_tex;
     sf::Sprite eye_left_sprite;
 
+    // Numbers
+    sf::Texture num_tex[10];
+    sf::Sprite num_sprite[8];
+    sf::Sprite num_high[8];
+
     // UI Textures
-    /*
-    sf::Texture num_0_tex;
-    sf::Sprite num_0_sprite;
-    sf::Texture num_1_tex;
-    sf::Sprite num_1_sprite;
-    sf::Texture num_2_tex;
-    sf::Sprite num_2_sprite;
-    sf::Texture num_3_tex;
-    sf::Sprite num_3_sprite;
-    sf::Texture num_4_tex;
-    sf::Sprite num_4_sprite;
-    sf::Texture num_5_tex;
-    sf::Sprite num_5_sprite;
-    sf::Texture num_6_tex;
-    sf::Sprite num_6_sprite;
-    sf::Texture num_7_tex;
-    sf::Sprite num_7_sprite;
-    sf::Texture num_8_tex;
-    sf::Sprite num_8_sprite;
-    sf::Texture num_9_tex;
-    sf::Sprite num_9_sprite;
-    */
-   //TESTE
-   sf::Texture num_tex[10];
-   sf::Sprite num_sprite[8];
-   sf::Sprite num_high[8];
-   //TESTE
     sf::Texture score_200_tex;
     sf::Sprite score_200_sprite;
     sf::Texture score_400_tex;

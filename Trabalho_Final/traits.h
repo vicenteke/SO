@@ -92,8 +92,8 @@ template<> struct Traits<Semaphore> : public Traits<void>
 template<> struct Traits<Timer> : public Traits<void>
 {
     static const bool debugged = false;
-    static const bool preemptive = true;
-    static const unsigned int QUANTUM = 45000; // in us 145000
+    static const bool preemptive = false;
+    static const unsigned int QUANTUM = 25000; // in us 145000
 };
 
 __END_API

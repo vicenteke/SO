@@ -8,10 +8,6 @@ __USING_API
 class PacMan : public Personagem {
 public:
 
-    // First Tile: 14 , 14
-    // Last Tile: 614 , 686
-    // Tile size: 24 , 24
-    // Starter Tile: 310, 398
     PacMan(sf::Sprite * sprites = 0, int n_sprites = 0, int x = 310, int y = 542, Direction dir = LEFT)
     : Personagem(x, y, dir, sprites, n_sprites) {
 
@@ -26,6 +22,7 @@ public:
     }
 
     int checkPosition(int a = 0, int b = 0) {
+        // Checks if PacMan has eaten something except ghosts (they check it)
 
         int tile_x = getTileX();
         int tile_y = getTileY();
@@ -49,6 +46,7 @@ public:
     }
 
     void changeDirection(Direction direction) {
+        // Called by input to change PacMan's direction
 
         if (direction == _last_input)
             return;
@@ -122,28 +120,14 @@ public:
                 break;
         }
 
-        // if(getTileX() == 0) {
-        //     int tmp = (_x - 14) % 24;
-        //     _x -= tmp;
-        //     if (tmp > 12)
-        //         _x += 24;
-        // }
-        //
-        // if(getTileY() == 0) {
-        //     int tmp = (_y - 14) % 24;
-        //     _y -= tmp;
-        //     if (tmp > 12)
-        //         _y += 24;
-        // }
-
         _last_input = direction;
         pacman_x = _x;
         pacman_y = _y;
-
-        // _mutex.v();
     }
 
     static int pacmanGetTileX() {
+        // Returns tile based on static attribute
+
         if ((pacman_x - 14) % 24 != 0)
             return 0;
 
@@ -157,11 +141,11 @@ public:
             case RIGHT: return -1 + (pacman_x - 14) / 24;
                 break;
         }
-
-        // return (pacman_x - 3) / 24;
     }
 
     static int pacmanGetTileY() {
+        // Returns tile based on static attribute. 0 if not centralized
+
         if ((pacman_y - 14) % 24 != 0)
             return 0;
 
@@ -175,24 +159,26 @@ public:
             case RIGHT: return 2 + (710 - pacman_y) / 24;
                 break;
         }
-
-        // return (725 - pacman_y) / 24;
     }
 
     int getTileX() {
+        // Function overwrite
         return pacmanGetTileX();
     }
 
     int getTileY() {
+        // Function overwrite
         return pacmanGetTileY();
     }
 
     void updatePosition(int x, int y) {
+        // Returns tile based on static attribute
         pacman_x = x;
         pacman_y = y;
     }
 
     void updateDirection() {
+        // Updates static values or sets _last_input in special case
         if (_last_input == STOPPED) {
             pacman_dir = _last_input;
         } else {
@@ -201,14 +187,14 @@ public:
     }
 
     static int pacmanGetNearTileX() {
+        // Returns near tile based on static attribute
+
         int tile_x = pacmanGetTileX();
 
         if (tile_x == 0) {
             int tmp = (pacman_x - 14) % 24;
-            // _x -= tmp;
             if (tmp > 12)
                 tmp -= 24;
-            // tile_x = getTileX();
 
             switch (pacman_dir) {
                 case UP:  tile_x = -1 + (pacman_x - tmp - 14) / 24;
@@ -220,34 +206,20 @@ public:
                 case RIGHT: tile_x = -1 + (pacman_x - tmp - 14) / 24;
                     break;
             }
-
-            // if (((pacman_x - 14) % 24) > 12)
-            //     tile_x = 1;
-            //
-            // switch (pacman_dir) {
-            //     case UP:  tile_x += -1 + (pacman_x - 14) / 24;
-            //         break;
-            //     case DOWN:  tile_x += 1 + (pacman_x - 14) / 24;
-            //         break;
-            //     case LEFT: tile_x += 1 + (pacman_x - 14) / 24;
-            //         break;
-            //     case RIGHT: tile_x += -1 + (pacman_x - 14) / 24;
-            //         break;
-            // }
-
         }
 
         return tile_x;
     }
 
     static int pacmanGetNearTileY() {
+        // Returns near tile based on static attribute
+
         int tile_y = pacmanGetTileY();
 
         if (tile_y == 0) {
             int tmp = (734 - pacman_y) % 24;
             if (tmp > 12)
                 tmp -= 24;
-            // tile_x = getTileX();
 
             switch (pacman_dir) {
                 case DOWN:  tile_y = 2 + (710 - pacman_y + tmp) / 24;
@@ -259,20 +231,6 @@ public:
                 case RIGHT: tile_y = 2 + (710 - pacman_y + tmp) / 24;
                     break;
             }
-
-            // if (((734 - pacman_y) % 24) <= 12)
-            //     tile_y = -1;
-            //
-            // switch (pacman_dir) {
-            //     case DOWN:  tile_y += 2 + (710 - pacman_y) / 24;
-            //         break;
-            //     case UP:  tile_y += (710 - pacman_y) / 24;
-            //         break;
-            //     case LEFT: tile_y += (710 - pacman_y) / 24;
-            //         break;
-            //     case RIGHT: tile_y += 2 + (710 - pacman_y) / 24;
-            //         break;
-            // }
         }
 
         return tile_y;

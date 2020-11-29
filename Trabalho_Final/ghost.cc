@@ -4,6 +4,7 @@
 #include "ghost4.h"
 #include "jogo.h"
 
+// Initializes Ghosts static attributes
 int Ghost1::ghost1_x;
 int Ghost1::ghost1_y;
 Direction Ghost1::ghost1_dir;
@@ -17,20 +18,18 @@ int Ghost4::ghost4_x;
 int Ghost4::ghost4_y;
 Direction Ghost4::ghost4_dir;
 
-// Semaphore Ghost::_mutex_scared;// = Semaphore();
 int Ghost::checkPosition(int pm_t_x, int pm_t_y) {
+// Checks if ghost has been eaten or if it got PacMan
 
     int tile_x = getNearTileX();
     int tile_y = getNearTileY();
 
-    // if (tile_x != 0 && tile_y != 0)
     if (tile_x == pm_t_x && tile_y == pm_t_y) {
-        // std::cout << "you lost!!!!!!!!!!!!!!!!\n";
         _mutex.v();
-        if (!_isScared)
+        if (!_isScared) // Got PacMan
             return 1;
 
-        else {
+        else { // Was eaten
             isJailed(true);
             isScared(false);
             _x = _jail_x;
@@ -38,7 +37,7 @@ int Ghost::checkPosition(int pm_t_x, int pm_t_y) {
             _last_input = STOPPED;
             updatePosition(_x, _y);
             updateDirection();
-            switch(_jail_x) {
+            switch(_jail_x) { // Starts timer for each ghost in jail
                 case 265:
                     Jogo::timerJail(1); // Ghost1
                     break;
@@ -52,7 +51,6 @@ int Ghost::checkPosition(int pm_t_x, int pm_t_y) {
                     Jogo::timerJail(4); // Ghost4
                     break;
             }
-            // Jogo::timerJail();
             return -1;
         }
     }

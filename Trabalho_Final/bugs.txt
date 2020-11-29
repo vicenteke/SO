@@ -2,10 +2,10 @@ Geral:
     1. SOLVED? Erro "Alarm clock"
     2. SOLVED Pause: às vezes trava com timer
     3. SOLVED Trocar nomes de start/stopComeCuDeGhost, fuck_this
-    4. Tirar comentários e prints inúteis
+    4. SOLVED Tirar comentários e prints inúteis
     5. SOLVED Quando perde uma vida "reseta" as bolinhas
-    6. De vez em quando alguma thread (provavelmente window) dá lock em todas as outras
-    7. Come bigPill + pause + restart = "Error while creating udev enumerator"
+    6. SOLVED? De vez em quando alguma thread (provavelmente window) dá lock em todas as outras
+    7. SOLVED? Come bigPill + pause + restart = "Error while creating udev enumerator"
 
 PacMan:
 
