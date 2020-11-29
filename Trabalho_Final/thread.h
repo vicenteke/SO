@@ -164,6 +164,7 @@ private:
     static Timer * _timer;
 
     friend class Semaphore;
+    Ready_Queue * _semaphore_queue;
 };
 
 template<typename ... Tn>
@@ -180,6 +181,7 @@ inline Thread::Thread(void (* entry)(Tn ...), Tn ... an) : _link(this, (std::chr
 
     _suspended = NULL;
     _joinable = true;
+    _semaphore_queue = NULL;
 }
 
 __END_API

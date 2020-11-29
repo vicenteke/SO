@@ -220,6 +220,12 @@ void Thread::thread_exit (int exit_code) {
         }
     }
 
+    if (_semaphore_queue) {
+        _semaphore_queue->remove(this);
+        _semaphore_queue = NULL;
+        --_sleeping_threads;
+    }
+
     yield();
 }
 
@@ -247,6 +253,7 @@ void Thread::sleep(Ready_Queue & _waiting) {
     exec->state(WAITING);
     _ready.remove(exec);
     ++_sleeping_threads;
+    exec->_semaphore_queue = &_waiting;
     yield();
 }
 
@@ -263,6 +270,7 @@ int Thread::wakeup(Ready_Queue & _waiting) {
         next->state(READY);
         _ready.insert(next->link());
         --_sleeping_threads;
+        next->_semaphore_queue = NULL;
 
         yield();
 
@@ -285,6 +293,7 @@ void Thread::wakeup_all(Ready_Queue & _waiting) {
         next->state(READY);
         _ready.insert(next->link());
         --_sleeping_threads;
+        next->_semaphore_queue = NULL;
         db<Thread>(TRC) << "Thread " << next->id() << " awake\n";
     }
 }

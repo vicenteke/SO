@@ -31,8 +31,8 @@ public:
         //
         // run();
 
-        _isPaused = false;
-        _isStarting = true;
+        isPaused(false);
+        isStarting(true);
         _semaphore_pause.p();
     }
 
@@ -128,6 +128,25 @@ private:
         return aux;
     }
 
+    static bool isStarting() {
+        _mutex_paused.p();
+        bool aux = _isStarting;
+        _mutex_paused.v();
+        return aux;
+    }
+
+    static void isPaused(bool b) {
+        _mutex_paused.p();
+        _isPaused = b;
+        _mutex_paused.v();
+    }
+
+    static void isStarting(bool b) {
+        _mutex_paused.p();
+        _isStarting = b;
+        _mutex_paused.v();
+    }
+
     static void runPeriod(int seconds, void (* callBack)(int), int a = 0) {
         std::time_t start_time = std::time(0);
         std::time_t paused_time = start_time;
@@ -147,7 +166,7 @@ private:
 
     static void getOutJail(int ghost) {
 
-        // _isPaused = true;
+        // isPaused(true);
         // if (Traits<Timer>::preemptive) {
         //     paused_thread = new Thread(runPaused);
         //     // Thread::yield();
@@ -192,7 +211,7 @@ private:
         _ghost3->isScared(true);
         _ghost4->isScared(true);
 
-        stopChase_thread = new Thread(runPeriod, 4, stopChase, -1);
+        stopChase_thread = new Thread(runPeriod, 4, stopChase, 0);
     }
 
     static void stopChase(int) {
@@ -210,9 +229,9 @@ private:
     }
 
     static void loseLife() {
+
         if (--_lives > 0) {
-            // _isStarting = true;
-            // Tiles::resetTiles();
+
             tiles aux = Personagem::getTile(13, 13);
             if(aux == tiles::F || aux == tiles::f)
                 Personagem::setTile(13, 13, tiles::u);
@@ -230,15 +249,26 @@ private:
             _ghost4 = new Ghost4(&(_window.getGhostSprites(4)[2]), _window.getGhostSprites(4), 2);
             // _window._mutex_w.v();
 
-            _isPaused = false;
-            // delete _ghost_threads[4];
-            // if (_ghost_threads[4]) delete _ghost_threads[4];
-            // _ghost_threads[4] = new Thread(runGhost);
+            isPaused(false);
             _semaphore_pause.wakeup_all();
+
+            _ghost1->updatePosition(265, 334);
+            _ghost2->updatePosition(298, 334);
+            _ghost3->updatePosition(331, 334);
+            _ghost4->updatePosition(365, 334);
+
+            isStarting(true);
+
+            for (volatile int j = 0; j < 100; j++) {
+                for (volatile int k = 0; k < DELAY * 2; k++);
+                Thread::yield();
+            }
+
+            isStarting(false);
             // Thread::yield();
         } else {
             if (!isPaused()) {
-                _isPaused = true;
+                isPaused(true);
                 for (volatile int i = 0; i < DELAY * 6; i++);
                 if (_score > _highscore) {
                     std::ofstream myFile;
@@ -290,7 +320,7 @@ private:
         _score = 0;
         _foods = 240;
         // if (Traits<Timer>::preemptive && paused_thread) delete paused_thread;
-        // _isPaused = false;
+        // isPaused(false);
         // if (!Traits<Timer>::preemptive)
         //     _semaphore_pause.wakeup_all();
         //
@@ -300,11 +330,6 @@ private:
         // if (_ghost_threads[0]) delete _ghost_threads[0];
 
         loseLife();
-
-        // Isso aqui meio que funciona, mas dá seg fault quando pausa/perde
-        // if (_ghost_threads[0]) delete _ghost_threads[4];
-        // _isStarting = true;
-        // _ghost_threads[4] = new Thread(runGhost);
     }
 
     static void runPacman() {
@@ -313,9 +338,9 @@ private:
 
         while (true) {
 
-            if (_isStarting) {
-                while (_isStarting) {
-                    for (volatile int k = 0; k < DELAY; k++);
+            if (isStarting()) {
+                while (isStarting()) {
+                    for (volatile int k = 0; k < DELAY / 3; k++);
                     Thread::yield();
                 }
             }
@@ -352,7 +377,7 @@ private:
             if (_foods == 170 || _foods == 70)
                 Personagem::setTile(13, 13, tiles::F);
             else if (_foods <= 0)
-                _isPaused = true;
+                isPaused(true);
 
             for (volatile unsigned int j = 0; j < DELAY; j++);
             Thread::yield();
@@ -366,34 +391,34 @@ private:
         _ghost3->updatePosition(331, 334);
         _ghost4->updatePosition(365, 334);
 
-        if (_ghost_threads[3]) delete _ghost_threads[3];
-        if (_ghost_threads[2]) delete _ghost_threads[2];
-        if (_ghost_threads[1]) delete _ghost_threads[1];
-        if (_ghost_threads[0]) delete _ghost_threads[0];
+        // if (_ghost_threads[3]) delete _ghost_threads[3];
+        // if (_ghost_threads[2]) delete _ghost_threads[2];
+        // if (_ghost_threads[1]) delete _ghost_threads[1];
+        // if (_ghost_threads[0]) delete _ghost_threads[0];
 
         for (volatile int j = 0; j < 40; j++) {
             for (volatile int k = 0; k < DELAY * 5; k++);
             Thread::yield();
         }
 
-        _isStarting = false;
+        isStarting(false);
         _ghost_threads[0] = new Thread(runGhost1);
-        for (volatile int j = 0; j < 67; j++) {
-            for (volatile int k = 0; k < DELAY; k++);
-            Thread::yield();
-        }
+        // for (volatile int j = 0; j < 67; j++) {
+        //     for (volatile int k = 0; k < DELAY; k++);
+        //     Thread::yield();
+        // }
 
         _ghost_threads[1] = new Thread(runGhost2);
-        for (volatile int j = 0; j < 133; j++) {
-            for (volatile int k = 0; k < DELAY * 2 / 3; k++);
-            Thread::yield();
-        }
+        // for (volatile int j = 0; j < 133; j++) {
+        //     for (volatile int k = 0; k < DELAY * 2 / 3; k++);
+        //     Thread::yield();
+        // }
 
         _ghost_threads[2] = new Thread(runGhost3);
-        for (volatile int j = 0; j < 200; j++) {
-            for (volatile int k = 0; k < DELAY / 3; k++);
-            Thread::yield();
-        }
+        // for (volatile int j = 0; j < 200; j++) {
+        //     for (volatile int k = 0; k < DELAY / 3; k++);
+        //     Thread::yield();
+        // }
 
         _ghost_threads[3] = new Thread(runGhost4);
 
@@ -408,13 +433,25 @@ private:
         int lost = 0;
         bool done = false;
 
+        // for (volatile int j = 0; j < 200; j++) {
+        //     for (volatile int k = 0; k < DELAY / 3; k++);
+        //     Thread::yield();
+        // }
+
         while (true) {
 
-            if (_isStarting) {
-                while (_isStarting) {
-                    for (volatile int k = 0; k < DELAY; k++);
+            if (isStarting()) {
+                _ghost1->updatePosition(265, 334);
+                STARTING:
+                while (isStarting()) {
+                    for (volatile int k = 0; k < DELAY / 3; k++);
                     Thread::yield();
                 }
+
+                // for (volatile int j = 0; j < 200; j++) {
+                //     for (volatile int k = 0; k < DELAY / 3; k++);
+                //     Thread::yield();
+                // }
             }
 
             if (isPaused()) {
@@ -426,18 +463,20 @@ private:
                 }
             } else {
                 done = false;
-                _pacman->_mutex.p();
+                // if (_pacman) _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                _pacman->_mutex.v();
+                // _pacman->_mutex.v();
 
                 _ghost1->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost = _ghost1->move(pm_t_x, pm_t_y);
 
                 if (lost == 1) {
                     lost = 0;
+                    _ghost1->updatePosition(265, 334);
                     loseLife();
+                    goto STARTING;
                 }
             }
             for (volatile unsigned int j = 0; j < DELAY / 3; j++);
@@ -449,11 +488,23 @@ private:
         int lost = 0;
         bool done = false;
 
+        for (volatile int j = 0; j < 200; j++) {
+            for (volatile int k = 0; k < DELAY / 3; k++);
+            Thread::yield();
+        }
+
         while (true) {
 
-            if (_isStarting) {
-                while (_isStarting) {
-                    for (volatile int k = 0; k < DELAY; k++);
+            if (isStarting()) {
+                _ghost2->updatePosition(298, 334);
+                STARTING:
+                while (isStarting()) {
+                    for (volatile int k = 0; k < DELAY / 3; k++);
+                    Thread::yield();
+                }
+
+                for (volatile int j = 0; j < 200; j++) {
+                    for (volatile int k = 0; k < DELAY / 3; k++);
                     Thread::yield();
                 }
             }
@@ -467,18 +518,20 @@ private:
                 }
             } else {
                 done = false;
-                _pacman->_mutex.p();
+                // _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                _pacman->_mutex.v();
+                // _pacman->_mutex.v();
 
                 _ghost2->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost = _ghost2->move(pm_t_x, pm_t_y);
 
                 if (lost == 1) {
                     lost = 0;
+                    _ghost2->updatePosition(298, 334);
                     loseLife();
+                    goto STARTING;
                 }
             }
             for (volatile unsigned int j = 0; j < DELAY / 3; j++);
@@ -490,11 +543,23 @@ private:
         int lost = 0;
         bool done = false;
 
+        for (volatile int j = 0; j < 400; j++) {
+            for (volatile int k = 0; k < DELAY / 3; k++);
+            Thread::yield();
+        }
+
         while (true) {
 
-            if (_isStarting) {
-                while (_isStarting) {
-                    for (volatile int k = 0; k < DELAY; k++);
+            if (isStarting()) {
+                _ghost3->updatePosition(331, 334);
+                STARTING:
+                while (isStarting()) {
+                    for (volatile int k = 0; k < DELAY / 3; k++);
+                    Thread::yield();
+                }
+
+                for (volatile int j = 0; j < 400; j++) {
+                    for (volatile int k = 0; k < DELAY / 3; k++);
                     Thread::yield();
                 }
             }
@@ -508,18 +573,20 @@ private:
                 }
             } else {
                 done = false;
-                _pacman->_mutex.p();
+                // _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                _pacman->_mutex.v();
+                // _pacman->_mutex.v();
 
                 _ghost3->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost = _ghost3->move(pm_t_x, pm_t_y);
 
                 if (lost == 1) {
                     lost = 0;
+                    _ghost3->updatePosition(331, 334);
                     loseLife();
+                    goto STARTING;
                 }
             }
             for (volatile unsigned int j = 0; j < DELAY / 3; j++);
@@ -531,11 +598,23 @@ private:
         int lost = 0;
         bool done = false;
 
+        for (volatile int j = 0; j < 600; j++) {
+            for (volatile int k = 0; k < DELAY / 3; k++);
+            Thread::yield();
+        }
+
         while (true) {
 
-            if (_isStarting) {
-                while (_isStarting) {
-                    for (volatile int k = 0; k < DELAY; k++);
+            if (isStarting()) {
+                _ghost4->updatePosition(365, 334);
+                STARTING:
+                while (isStarting()) {
+                    for (volatile int k = 0; k < DELAY / 3; k++);
+                    Thread::yield();
+                }
+
+                for (volatile int j = 0; j < 600; j++) {
+                    for (volatile int k = 0; k < DELAY / 3; k++);
                     Thread::yield();
                 }
             }
@@ -549,18 +628,20 @@ private:
                 }
             } else {
                 done = false;
-                _pacman->_mutex.p();
+                // _pacman->_mutex.p();
                 Direction pm_d = PacMan::pacman_dir;
                 int pm_t_x = PacMan::pacmanGetNearTileX();
                 int pm_t_y = PacMan::pacmanGetNearTileY();
-                _pacman->_mutex.v();
+                // _pacman->_mutex.v();
 
                 _ghost4->getTargetTile(pm_t_x, pm_t_y, pm_d);
                 lost = _ghost4->move(pm_t_x, pm_t_y);
 
                 if (lost == 1) {
                     lost = 0;
+                    _ghost4->updatePosition(365, 334);
                     loseLife();
+                    goto STARTING;
                 }
             }
             for (volatile unsigned int j = 0; j < DELAY / 3; j++);
@@ -691,7 +772,7 @@ private:
 
             window.clear();
 
-            if (_isStarting) {
+            if (isStarting()) {
                 _window.ready_sprite.setPosition(265, 407);
                 window.draw(_window.ready_sprite);
                 i--;

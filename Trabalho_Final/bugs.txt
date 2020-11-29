@@ -5,6 +5,7 @@ Geral:
     4. Tirar comentários e prints inúteis
     5. SOLVED Quando perde uma vida "reseta" as bolinhas
     6. De vez em quando alguma thread (provavelmente window) dá lock em todas as outras
+    7. Come bigPill + pause + restart = "Error while creating udev enumerator"
 
 PacMan:
 
