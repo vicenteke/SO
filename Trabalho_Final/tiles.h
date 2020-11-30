@@ -1,8 +1,6 @@
 #ifndef TILES_H
 #define TILES_H
 
-#include "semaphore.h"
-
 class Tiles {
 public:
 

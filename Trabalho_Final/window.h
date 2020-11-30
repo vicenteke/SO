@@ -20,8 +20,6 @@ class Window
 public:
     Window();
 
-    void run();
-
     sf::Sprite * getPacmanSprites() {
         return _pacman_sprites;
     }

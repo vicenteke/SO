@@ -7,10 +7,6 @@ Window::Window()
     load_and_bind_textures();
 }
 
-void Window::run()
-{
-}
-
 void Window::load_and_bind_textures()
 {
     // Bind map textures

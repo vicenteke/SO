@@ -621,14 +621,12 @@ private:
                                 _pacman->changeDirection(UP);
                             }
                         } else if (event.key.code == 15) {
-                            _isPaused = !isPaused();
-                            if (isPaused()) {
-
-                            } else {
-                                    _semaphore_pause.wakeup_all();
+                            _isPaused = !_isPaused;
+                            if (!isPaused()) {
+                                _semaphore_pause.wakeup_all();
                                 if (_lives <= 0 || _foods <= 0) {
                                    restartGame();
-                               }
+                                }
                             }
                         } else if (event.key.code == 16) {
                             finishGame();
